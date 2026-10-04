@@ -10,7 +10,9 @@
 })(this, function (DATA) {
   'use strict';
 
-  var ZONES = ['Earth', 'Rhom', 'Corsus', 'Yaesha', 'Reisum'];
+  // 'Subject 2923' is the DLC's rural Earth (World_Rural, Ward Prime), kept apart from the city.
+  // 'Ward 17' holds the final bosses, reached after the other worlds.
+  var ZONES = ['Earth', 'Subject 2923', 'Rhom', 'Corsus', 'Yaesha', 'Reisum', 'Ward 17'];
   var ADVENTURE_ZONES = { City: 'Earth', Wasteland: 'Rhom', Swamp: 'Corsus', Jungle: 'Yaesha', Snow: 'Reisum' };
 
   // Saves are binary with ASCII asset paths inside; latin1 keeps every byte as one char.
@@ -25,7 +27,8 @@
   }
 
   function getZone(line) {
-    if (/World_City|Quest_Church|World_Rural/.test(line)) return 'Earth';
+    if (/World_City|Quest_Church/.test(line)) return 'Earth';
+    if (line.indexOf('World_Rural') !== -1) return 'Subject 2923';
     if (line.indexOf('World_Wasteland') !== -1) return 'Rhom';
     if (line.indexOf('World_Jungle') !== -1) return 'Yaesha';
     if (line.indexOf('World_Swamp') !== -1) return 'Corsus';
@@ -114,10 +117,10 @@
         } else if (eventName === 'BrainBug') {
           zoneEvents[zone].push(makeEvent('Sketterling', 'Sketterling', 'Loot Beetle', ev.location, zone));
         } else if (eventName === 'BarnSiege' || eventName === 'Homestead') {
-          zoneEvents[zone].push(makeEvent('WardPrime', 'Ward Prime', 'Quest Event', 'Earth: Ward Prime', 'Earth'));
+          zoneEvents[zone].push(makeEvent('WardPrime', 'Ward Prime', 'Quest Event', 'Subject 2923: Ward Prime', 'Subject 2923'));
         }
       } catch (e) {
-        if (typeof console !== 'undefined') console.warn('Erro lendo evento', line, e);
+        if (typeof console !== 'undefined') console.warn('Error reading event', line, e);
       }
     }
 
@@ -135,6 +138,7 @@
       }
       out.push(ev);
     });
+    out.push.apply(out, zoneEvents['Subject 2923']);
     out.push.apply(out, zoneEvents.Rhom);
     if (campaign) out.push(makeEvent('UndyingKing', 'Undying King', 'World Boss', 'Rhom: Undying Throne', 'Rhom'));
     var queenAdded = false;
@@ -154,8 +158,8 @@
       out.push(ev);
     });
     out.push.apply(out, zoneEvents.Reisum);
-    if (campaign) out.push(makeEvent('Ward17', 'The Dreamer', 'World Boss', 'Earth: Ward 17', 'Earth'));
-    if (mode === 'Subject2923') out.push(makeEvent('Ward17Root', 'Harsgaard', 'World Boss', 'Earth: Ward 17 (Root Dimension)', 'Earth'));
+    if (campaign) out.push(makeEvent('Ward17', 'The Dreamer', 'World Boss', 'Ward 17', 'Ward 17'));
+    if (mode === 'Subject2923') out.push(makeEvent('Ward17Root', 'Harsgaard', 'World Boss', 'Ward 17: Root Dimension', 'Ward 17'));
     return out;
   }
 
@@ -191,15 +195,15 @@
     var main = between(text, '/Game/Campaign_Main/Quest_Campaign_City.Quest_Campaign_City',
       '/Game/Campaign_Main/Quest_Campaign_Main.Quest_Campaign_Main_C');
     if (main) {
-      result.campaign = { mode: 'Campaign', label: 'Campanha', events: processEvents(main, 'Campaign') };
+      result.campaign = { mode: 'Campaign', label: 'Campaign', events: processEvents(main, 'Campaign') };
     } else {
       var s2923 = between(text, '/Game/World_Rural/Templates/Template_Rural_Overworld_0',
         '/Game/Campaign_Clementine/Quest_Campaign_Clementine.Quest_Campaign_Clementine_C');
-      if (s2923) result.campaign = { mode: 'Subject2923', label: 'Campanha Subject 2923', events: processEvents(s2923, 'Subject2923') };
+      if (s2923) result.campaign = { mode: 'Subject2923', label: 'Subject 2923 Campaign', events: processEvents(s2923, 'Subject2923') };
     }
 
     var adv = findAdventure(text);
-    if (adv) result.adventure = { mode: 'Adventure', label: 'Aventura', world: adv.world, events: processEvents(adv.text, 'Adventure') };
+    if (adv) result.adventure = { mode: 'Adventure', label: 'Adventure', world: adv.world, events: processEvents(adv.text, 'Adventure') };
     return result;
   }
 
@@ -220,7 +224,7 @@
     ];
     var characters = [];
     for (var i = 1; i < parts.length; i++) {
-      var archetype = 'Desconhecido';
+      var archetype = 'Unknown';
       var am = parts[i - 1].match(/\/Game\/_Core\/Archetypes\/[a-zA-Z_]+/g);
       if (am) {
         var a = am[am.length - 1].replace('/Game/_Core/Archetypes/', '').split('_')[1];
@@ -261,8 +265,8 @@
       if (item.starter) return true;
       if (item.comesWith != null) return owns(DATA.items[item.comesWith]);
       if (item.key && have[item.key]) return true;
-      if (item.category === 'Consumível' || item.category === 'Skin') return null;
-      if (item.category === 'Armadura') {
+      if (item.category === 'Consumable' || item.category === 'Skin') return null;
+      if (item.category === 'Armor') {
         var set = norm((item.group || '').replace(/ Set$/, '').replace(/'s$/, ''));
         var slot = /legging|trousers|greaves|pants|boots|kilt|britches|tassets/i.test(item.name) ? 'Legs'
           : /mask|hood|helm|goggles|visage|headdress|hat|skull|shroud/i.test(item.name) ? 'Head' : 'Body';

@@ -1,18 +1,18 @@
-/* global RWA_DATA, RWA_PARSER */
+/* global RWA_DATA, RWA_PARSER, RWA_WIKI */
 (function () {
   'use strict';
 
   var DATA = RWA_DATA, P = RWA_PARSER;
   var $ = function (id) { return document.getElementById(id); };
 
-  var WORLD_LABEL = { Earth: 'Terra', Rhom: 'Rhom', Corsus: 'Corsus', Yaesha: 'Yaesha', Reisum: 'Reisum',
-    'Ward 13': 'Ward 13', 'Ward 17': 'Ward 17', 'Ward Prime': 'Ward Prime', 'The Labyrinth': 'Labirinto', '': 'Geral / conquistas' };
+  var WORLD_LABEL = { Earth: 'Earth', 'Subject 2923': 'Subject 2923', Rhom: 'Rhom', Corsus: 'Corsus', Yaesha: 'Yaesha', Reisum: 'Reisum',
+    'Ward 13': 'Ward 13', 'Ward 17': 'Ward 17', 'Ward Prime': 'Ward Prime', 'The Labyrinth': 'The Labyrinth', '': 'General / achievements' };
   var WORLD_ORDER = ['Earth', 'Rhom', 'Corsus', 'Yaesha', 'Reisum', 'Ward 13', 'Ward 17', 'Ward Prime', 'The Labyrinth', ''];
-  var TYPE_LABEL = { 'World Boss': 'Chefe', 'Miniboss': 'Mini-chefe', 'Side Dungeon': 'Masmorra', 'Siege': 'Cerco',
-    'Point of Interest': 'Ponto de interesse', 'Item Drop': 'Item', 'Loot Beetle': 'Besouro', 'Home': 'Base', 'Quest Event': 'Evento' };
-  var CATEGORIES = ['Arma', 'Armadura', 'Amuleto', 'Anel', 'Mod', 'Trait', 'Emote', 'Skin', 'Consumível'];
+  var TYPE_LABEL = { 'World Boss': 'Boss', 'Miniboss': 'Miniboss', 'Side Dungeon': 'Dungeon', 'Siege': 'Siege',
+    'Point of Interest': 'Point of interest', 'Item Drop': 'Item', 'Loot Beetle': 'Beetle', 'Home': 'Home', 'Quest Event': 'Event' };
+  var CATEGORIES = ['Weapon', 'Armor', 'Amulet', 'Ring', 'Mod', 'Trait', 'Emote', 'Skin', 'Consumable'];
   // Skins and consumables are not stored as unlocks in the profile, so we can't tell if you have them.
-  var UNTRACKED = { 'Skin': true, 'Consumível': true };
+  var UNTRACKED = { 'Skin': true, 'Consumable': true };
 
   var state = {
     auto: false, dir: '', listing: null,
@@ -90,7 +90,7 @@
 
   function handleFiles(list) {
     var files = Array.prototype.slice.call(list).filter(function (f) { return /\.(sav|bak)$/i.test(f.name); });
-    if (!files.length) return showLoadError('Nenhum arquivo .sav encontrado. Escolha o save_N.sav e o profile.sav.');
+    if (!files.length) return showLoadError('No .sav file found. Pick save_N.sav and profile.sav.');
     Promise.all(files.map(function (f) {
       return readFile(f).then(function (buf) {
         var name = f.name.toLowerCase();
@@ -100,15 +100,15 @@
       });
     })).then(function () {
       rebuild();
-      if (state.charIndex == null && !state.characters.length) return showLoadError('Não achei nenhum save de mundo (save_N.sav) nos arquivos escolhidos.');
+      if (state.charIndex == null && !state.characters.length) return showLoadError('No world save (save_N.sav) found in the selected files.');
       showApp();
-    }).catch(function (e) { showLoadError('Erro lendo os arquivos: ' + e); });
+    }).catch(function (e) { showLoadError('Error reading the files: ' + e); });
   }
   function nextFreeIndex() { var i = 0; while (state.files['save_' + i + '.sav']) i++; return i; }
 
   function showLoadError(msg) { var el = $('load-error'); el.textContent = msg; el.hidden = !msg; }
 
-  // Automatic mode: the page is served by server.ps1 (Iniciar.bat), which can read the save folder.
+  // Automatic mode: the page is served by server.ps1 (Start.bat), which can read the save folder.
   function api(path) { return fetch(path, { cache: 'no-store' }); }
   function tryAuto() {
     if (location.protocol === 'file:') return;
@@ -117,8 +117,8 @@
       state.auto = true;
       state.dir = info.dir;
       if (!info.found) {
-        setStatus('Pasta de saves não encontrada: ' + info.dir, false);
-        showLoadError('O servidor não achou a pasta de saves em ' + info.dir + '. Arraste os arquivos manualmente ou rode o Iniciar.bat com o caminho certo.');
+        setStatus('Save folder not found: ' + info.dir, false);
+        showLoadError('The server could not find the save folder at ' + info.dir + '. Drag the files in manually or run Start.bat with the right path.');
         return;
       }
       return syncFromServer(info.files).then(function () { setInterval(poll, 3000); });
@@ -141,7 +141,7 @@
       }).then(function (buf) { state.files[f.name.toLowerCase()] = buf; });
     })).then(function () {
       rebuild();
-      setStatus('Automático · ' + state.dir + ' · atualizado às ' + new Date().toLocaleTimeString(), true);
+      setStatus('Automatic · ' + state.dir + ' · updated at ' + new Date().toLocaleTimeString(), true);
       if (state.charIndex != null || state.characters.length) showApp();
       return true;
     });
@@ -150,7 +150,7 @@
   function poll() {
     api('api/saves').then(function (r) { return r.json(); }).then(function (info) {
       if (info.found) return syncFromServer(info.files);
-    }).catch(function () { setStatus('Servidor parado — feche e abra o Iniciar.bat de novo', false); });
+    }).catch(function () { setStatus('Server stopped — close and reopen Start.bat', false); });
   }
 
   function setStatus(text, live) {
@@ -168,7 +168,7 @@
     showLoadError('');
     $('loader').hidden = true;
     $('app').hidden = false;
-    if (!state.auto) setStatus('Manual · arquivos carregados às ' + new Date().toLocaleTimeString(), false);
+    if (!state.auto) setStatus('Manual · files loaded at ' + new Date().toLocaleTimeString(), false);
     render();
   }
 
@@ -192,7 +192,7 @@
     sel.innerHTML = Object.keys(indexes).map(Number).sort(function (a, b) { return a - b; }).map(function (i) {
       var c = state.characters[i];
       var hasSave = !!(state.parsed && state.parsed[i]);
-      var label = 'Personagem ' + (i + 1) + (c ? ' — ' + c.archetype : '') + ' (save_' + i + '.sav' + (hasSave ? '' : ', não carregado') + ')';
+      var label = 'Character ' + (i + 1) + (c ? ' — ' + c.archetype : '') + ' (save_' + i + '.sav' + (hasSave ? '' : ', not loaded') + ')';
       return '<option value="' + i + '"' + (i === state.charIndex ? ' selected' : '') + (hasSave ? '' : ' disabled') + '>' + esc(label) + '</option>';
     }).join('');
   }
@@ -214,29 +214,70 @@
   }
 
   function statusIcon(owned) {
-    if (owned === true) return '<span class="st ok" title="Já tenho">✔</span>';
-    if (owned === false) return '<span class="st miss" title="Falta">✘</span>';
-    return '<span class="st unk" title="Desconhecido">?</span>';
+    if (owned === true) return '<span class="st ok" title="Owned">✔</span>';
+    if (owned === false) return '<span class="st miss" title="Missing">✘</span>';
+    return '<span class="st unk" title="Unknown">?</span>';
   }
 
   function itemOwned(it) { return UNTRACKED[it.category] ? null : state.owns(it); }
 
   function itemDetails(it, extra) {
-    var meta = [it.category, it.world && WORLD_LABEL[it.world] !== undefined ? WORLD_LABEL[it.world] : it.world, it.mode && 'Modo: ' + it.mode, it.dlc && 'DLC: ' + it.dlc]
+    var meta = [it.category, it.world && WORLD_LABEL[it.world] !== undefined ? WORLD_LABEL[it.world] : it.world, it.mode && 'Mode: ' + it.mode, it.dlc && 'DLC: ' + it.dlc]
       .filter(Boolean).join(' · ');
-    return '<details class="item"><summary>' + statusIcon(itemOwned(it)) + ' ' + esc(it.name) +
+    return '<details class="item"><summary>' + statusIcon(itemOwned(it)) + ' ' + esc(it.name) + itemWikiLink(it) +
       (it.category ? '<span class="cat">' + esc(it.category) + '</span>' : '') + (extra || '') + '</summary>' +
-      '<div class="how">' + (it.how ? esc(it.how) : '<i>Sem descrição na planilha.</i>') +
+      '<div class="how">' + (it.how ? esc(it.how) : '<i>No description in the sheet.</i>') +
       (meta ? '<div class="meta">' + esc(meta) + '</div>' : '') + '</div></details>';
   }
+
+  // Fextralife wiki pages for the areas our locations name, keyed by lowercase alphanumerics.
+  // Every slug was checked to exist; areas without a page (Fairview, Reisum's areas, …) get no link.
+  var WIKI = {
+    earth: 'Earth', rhom: 'Rhom', corsus: 'Corsus', yaesha: 'Yaesha', reisum: 'Reisum',
+    ward13: 'Ward_13', ward17: 'Ward_17', wardprime: 'Ward_Prime',
+    // Earth
+    westcourt: 'Westcourt', chapelstation: 'Chapel_Station', churchoftheharbinger: 'Church_of_the_Harbinger',
+    hiddengrotto: 'Hidden_Grotto', junktown: 'Junk_Town', marrowpass: 'Marrow_Pass',
+    researchstationalpha: "Leto's_Lab_(Research_Station_Alpha)", sorrowsfield: "Sorrow's_Field", sunkenpassage: 'Sunken_Passage',
+    theashyard: 'The_Ash_Yard', thechokinghollow: 'The_Choking_Hallow', thegallows: 'The_Gallows',
+    thehiddensanctum: 'The_Hidden_Sanctum', thetangledpass: 'The_Tangled_Pass', thewarren: 'The_Warren', cutthroatchannel: 'Cutthroat_Channel',
+    // Rhom
+    theeasternwind: 'The_Eastern_Wind', thescouringwaste: 'The_Scouring_Wastes', theironrift: 'The_Iron_Rift', theburrows: 'The_Burrows',
+    shackledcanyon: 'Shackled_Canyon', theardenttemple: 'The_Ardent_Temple', loomoftheblacksun: 'Loom_of_the_Black_Sun',
+    thebunker: 'The_Bunker', concourseofthesun: 'Concourse_of_the_Sun', vaultoftheheralds: 'Vault_of_Heralds',
+    thepurgehall: 'The_Purge_Hall', undyingthrone: 'Undying_Throne',
+    // Corsus
+    thefetidglade: 'The_Fetid_Glade', themistfen: 'The_Mist_Fen', thedrownedtrench: 'The_Drowned_Trench', thecapillary: 'The_Capillary',
+    hallofwhispers: 'Hall_of_Whispers', thegrotto: 'The_Grotto', circlethatchery: 'Circlet_Hatchery', strangepass: 'The_Strange_Pass',
+    // Yaesha
+    theverdantstrand: 'The_Verdant_Strand', thescaldingglade: 'Scalding_Glade', forgottenundercroft: 'Forgotten_Undercroft',
+    templeoftheravager: 'Temple_of_Ravager', theravagershaunt: "The_Ravager's_Haunt", thetempestcourt: 'The_Tempest_Court',
+    widowspass: "Widow's_Pass", hereticsnest: "Heretic's_Nest", witheringvillage: 'Withering_Village',
+    shrineoftheimmortals: 'Shrine_of_The_Immortals', widowsvestry: "Widow's_Vestry", merchantdungeon: 'Stuck_Merchant',
+  };
+
+  function globe(slug, label) {
+    if (!slug) return '';
+    var url = 'https://remnantfromtheashes.wiki.fextralife.com/' + encodeURI(slug).replace(/'/g, '%27');
+    return ' <a class="wiki" href="' + esc(url) + '" target="_blank" rel="noopener" title="' + esc(label) + ' — Fextralife wiki">🌐</a>';
+  }
+
+  // Globe icon linking to the wiki page of the most specific part of "Earth: Fairview: The Tangled Pass".
+  function wikiLink(location) {
+    var page = location.split(': ').pop();
+    return globe(WIKI[page.toLowerCase().replace(/[^a-z0-9]/g, '')], page);
+  }
+
+  // Item pages come from js/wiki.js (tools/build-wiki.ps1), which only lists pages that exist.
+  function itemWikiLink(it) { return globe(RWA_WIKI.items[it.name], it.name); }
 
   function chip(label, on, attrs) { return '<span class="chip' + (on ? ' on' : '') + '" ' + attrs + '>' + esc(label) + '</span>'; }
 
   function renderWorld() {
     var save = current();
     var seg = $('mode-switch');
-    if (!save) { seg.innerHTML = ''; $('world-body').innerHTML = ''; return showEmpty('Escolha um personagem com save carregado.'); }
-    if (save.error) { $('world-body').innerHTML = ''; return showEmpty('Não consegui ler ' + save.file + ': ' + save.error); }
+    if (!save) { seg.innerHTML = ''; $('world-body').innerHTML = ''; return showEmpty('Pick a character with a loaded save.'); }
+    if (save.error) { $('world-body').innerHTML = ''; return showEmpty('Could not read ' + save.file + ': ' + save.error); }
     if (state.mode === 'adventure' && !save.adventure) state.mode = 'campaign';
     if (state.mode === 'campaign' && !save.campaign && save.adventure) state.mode = 'adventure';
     seg.innerHTML = [['campaign', save.campaign], ['adventure', save.adventure]].map(function (p) {
@@ -251,7 +292,7 @@
     var block = save[state.mode];
     if (!block) {
       $('world-body').innerHTML = '';
-      return showEmpty('Nenhuma campanha ou aventura encontrada neste save. Se você acabou de criar o personagem, termine o tutorial e use o cristal para viajar antes de analisar.');
+      return showEmpty('No campaign or adventure found in this save. If you just created the character, finish the tutorial and travel using the crystal before analyzing.');
     }
     var q = $('world-search').value.trim().toLowerCase();
     var onlyMissing = $('world-only-missing').checked;
@@ -263,12 +304,12 @@
       if (q && (ev.name + ' ' + ev.location + ' ' + items.map(function (i) { return i.name; }).join(' ')).toLowerCase().indexOf(q) === -1) return;
       if (ev.zone !== lastZone) { rows.push('<tr class="zone-row"><td colspan="4">' + esc(WORLD_LABEL[ev.zone]) + '</td></tr>'); lastZone = ev.zone; }
       shown++;
-      rows.push('<tr><td class="loc">' + esc(ev.location) + '</td><td class="type"><span class="type-badge">' + esc(TYPE_LABEL[ev.type] || ev.type) +
+      rows.push('<tr><td class="loc">' + esc(ev.location) + wikiLink(ev.location) + '</td><td class="type"><span class="type-badge">' + esc(TYPE_LABEL[ev.type] || ev.type) +
         '</span></td><td class="name">' + esc(ev.name) + '</td><td>' +
         (items.length ? items.map(function (it) { return itemDetails(it); }).join('') : '<span class="cat">—</span>') + '</td></tr>');
     });
     $('world-body').innerHTML = rows.join('');
-    if (shown) $('world-empty').hidden = true; else showEmpty('Nada com esses filtros.');
+    if (shown) $('world-empty').hidden = true; else showEmpty('Nothing matches these filters.');
   }
 
   function showEmpty(msg) { var el = $('world-empty'); el.textContent = msg; el.hidden = false; }
@@ -280,7 +321,7 @@
     var showOwned = $('missing-show-owned').checked || !hasProfile;
 
     $('missing-cats').innerHTML = CATEGORIES.map(function (c) {
-      return chip(c + (UNTRACKED[c] ? ' (não rastreável)' : ''), state.missingCats[c], 'data-cat="' + esc(c) + '"');
+      return chip(c + (UNTRACKED[c] ? ' (not trackable)' : ''), state.missingCats[c], 'data-cat="' + esc(c) + '"');
     }).join('');
 
     var stats = {};
@@ -305,28 +346,28 @@
 
     $('summary').innerHTML = WORLD_ORDER.filter(function (w) { return stats[w].total; }).map(function (w) {
       var s = stats[w], pct = s.total ? Math.round(100 * (s.total - s.missing) / s.total) : 0;
-      var big = hasProfile ? (s.missing ? 'falta ' + s.missing : 'completo') : s.total + ' itens';
+      var big = hasProfile ? (s.missing ? s.missing + ' missing' : 'complete') : s.total + ' items';
       return '<button class="card' + (state.missingWorld === w ? ' on' : '') + '" data-world="' + esc(w) + '">' +
         '<div class="w">' + esc(WORLD_LABEL[w]) + '</div>' +
         '<div class="n' + (!hasProfile ? ' neutral' : !s.missing ? ' done' : '') + '">' + esc(big) + '</div>' +
-        (hasProfile ? '<div class="of">' + (s.total - s.missing) + ' de ' + s.total + ' itens</div>' : '<div class="of">carregue o profile.sav</div>') +
-        (hasProfile && s.now ? '<div class="now">' + s.now + ' dá para pegar agora</div>' : '') +
+        (hasProfile ? '<div class="of">' + (s.total - s.missing) + ' of ' + s.total + ' items</div>' : '<div class="of">load profile.sav</div>') +
+        (hasProfile && s.now ? '<div class="now">' + s.now + ' obtainable now</div>' : '') +
         (hasProfile ? '<div class="bar"><i style="width:' + pct + '%"></i></div>' : '') + '</button>';
     }).join('');
 
     var html = WORLD_ORDER.filter(function (w) { return groups[w]; }).map(function (w) {
       var list = groups[w].sort(function (a, b) { return (a.where ? 0 : 1) - (b.where ? 0 : 1) || a.it.category.localeCompare(b.it.category) || a.it.name.localeCompare(b.it.name); });
-      return '<div class="group"><h3>' + esc(WORLD_LABEL[w]) + ' <small>' + list.length + ' itens</small></h3>' + list.map(function (row) {
+      return '<div class="group"><h3>' + esc(WORLD_LABEL[w]) + ' <small>' + list.length + ' items</small></h3>' + list.map(function (row) {
         var it = row.it;
-        var tags = (row.where ? '<span class="tag now">disponível agora</span>' : '') +
+        var tags = (row.where ? '<span class="tag now">available now</span>' : '') +
           (it.mode ? '<span class="tag mode">' + esc(it.mode) + '</span>' : '') + (it.dlc ? '<span class="tag">' + esc(it.dlc) + '</span>' : '');
-        var where = row.where ? '<div class="where">No seu mundo: ' + row.where.map(function (x) {
-          return esc(x.block + ' → ' + x.location + ' (' + x.event + ')');
+        var where = row.where ? '<div class="where">In your world: ' + row.where.map(function (x) {
+          return esc(x.block + ' → ' + x.location + ' (' + x.event + ')') + wikiLink(x.location);
         }).join(' · ') + '</div>' : '';
         return '<div class="mrow">' + itemDetails(it, tags) + where + '</div>';
       }).join('') + '</div>';
     }).join('');
-    $('missing-list').innerHTML = html || '<div class="empty">' + (hasProfile ? 'Nada faltando com esses filtros. 🎉' : 'Nada com esses filtros.') + '</div>';
+    $('missing-list').innerHTML = html || '<div class="empty">' + (hasProfile ? 'Nothing missing with these filters. 🎉' : 'Nothing matches these filters.') + '</div>';
   }
 
   // ---- events ------------------------------------------------------------
@@ -338,7 +379,7 @@
     $('file').addEventListener('change', function (e) { handleFiles(e.target.files); e.target.value = ''; });
     $('copy-path').addEventListener('click', function () {
       var text = $('save-path').textContent;
-      (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () { $('copy-path').textContent = 'Copiado!'; }, function () {});
+      (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () { $('copy-path').textContent = 'Copied!'; }, function () {});
     });
     $('reload').addEventListener('click', function () { $('loader').hidden = false; $('drop').scrollIntoView({ behavior: 'smooth' }); });
     $('character').addEventListener('change', function (e) { state.charIndex = +e.target.value; store('char', state.charIndex); render(); });

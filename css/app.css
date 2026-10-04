@@ -85,6 +85,8 @@ table.events { width: 100%; border-collapse: collapse; background: var(--panel);
 .events th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); background: var(--panel-2); padding: 8px 10px; }
 .events td { border-top: 1px solid var(--line); padding: 8px 10px; vertical-align: top; }
 .events td.loc { color: var(--muted); font-size: 13px; width: 26%; }
+.wiki { text-decoration: none; font-size: 13px; opacity: .7; }
+.wiki:hover { opacity: 1; }
 .events td.type { white-space: nowrap; font-size: 13px; width: 1%; }
 .events td.name { font-weight: 600; width: 18%; }
 .zone-row td { background: var(--panel-2); font-weight: 700; color: var(--accent); }

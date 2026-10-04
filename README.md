@@ -1,70 +1,74 @@
 # Remnant World Analyzer
 
-Mostra o que rolou no seu mundo de **Remnant: From the Ashes** (campanha e aventura), o que cada evento dá, **o que você já tem (✔) e o que falta (✘)**, e um resumo do que falta por mundo — Terra, Rhom, Corsus, Yaesha, Reisum, Ward 13, Ward 17, Ward Prime — com a descrição de como obter cada item.
+Shows what rolled in your **Remnant: From the Ashes** world (campaign and adventure), what each event drops, **what you already have (✔) and what you're missing (✘)**, and a per-world summary of what's left — Earth, Subject 2923, Rhom, Corsus, Yaesha, Reisum, Ward 13, Ward 17, Ward Prime — with a description of how to obtain each item.
 
-Fork de [hzla/Remnant-World-Analyzer](https://github.com/hzla/Remnant-World-Analyzer), com o parser reescrito (o original não mostrava nada em saves com aventura ativa).
+Fork of [hzla/Remnant-World-Analyzer](https://github.com/hzla/Remnant-World-Analyzer), with a rewritten parser (the original showed nothing for saves with an active adventure).
 
-## Como usar
+## How to use
 
-### Jeito automático (Windows) — recomendado
-1. Baixe o projeto (`git clone` ou *Code → Download ZIP* e extraia).
-2. Dê dois cliques em **`Iniciar.bat`**.
-3. O navegador abre sozinho já com o seu save. Deixe a janela preta aberta: **a página se atualiza sozinha quando o jogo salva**.
+### Automatic (Windows) — recommended
+1. Download the project (`git clone`, or *Code → Download ZIP* and extract it).
+2. Double-click **`Start.bat`**.
+3. The browser opens on its own with your save already loaded. Keep the black window open: **the page refreshes by itself whenever the game saves**.
 
-O script acha a pasta `%LOCALAPPDATA%\Remnant\Saved\SaveGames` (Steam/Epic). Se os seus saves estão em outro lugar:
+The script looks in `%LOCALAPPDATA%\Remnant\Saved\SaveGames` (Steam/Epic). If your saves are somewhere else:
 
 ```bat
-Iniciar.bat -SaveDir "D:\Meus saves\Remnant"
+Start.bat -SaveDir "D:\My saves\Remnant"
 ```
 
-Outras opções: `-Port 9000` (outra porta), `-NoBrowser` (não abrir o navegador).
+Other options: `-Port 9000` (different port), `-NoBrowser` (don't open the browser).
 
-> Se o Windows mostrar “O Windows protegeu o seu PC” ao abrir o `.bat` baixado em ZIP, clique em *Mais informações → Executar assim mesmo*. O script só lê a pasta de saves e serve a página em `http://localhost` — nada sai do seu PC.
+> If Windows shows "Windows protected your PC" when opening the `.bat` from a ZIP download, click *More info → Run anyway*. The script only reads the save folder and serves the page on `http://localhost` — nothing leaves your PC.
 
-### Jeito manual (qualquer sistema, sem instalar nada)
-1. Abra o `index.html` no navegador.
-2. Arraste para a página o `save_N.sav` **e** o `profile.sav` (ou clique e, na pasta, aperte `Ctrl+A`).
-   - Pasta: `%LOCALAPPDATA%\Remnant\Saved\SaveGames` (cole na barra de endereço da janela de arquivos).
-   - `save_0.sav` é o personagem 1, `save_1.sav` o personagem 2, e assim por diante.
-   - Sem o `profile.sav` a página mostra o mundo, mas não sabe o que você já tem.
+### Manual (any OS, nothing to install)
+1. Open `index.html` in your browser.
+2. Drag `save_N.sav` **and** `profile.sav` onto the page (or click and press `Ctrl+A` in the folder).
+   - Folder: `%LOCALAPPDATA%\Remnant\Saved\SaveGames` (paste it into the file dialog's address bar).
+   - `save_0.sav` is character 1, `save_1.sav` is character 2, and so on.
+   - Without `profile.sav` the page shows the world but can't tell what you already have.
 
-> Uma página web sozinha não consegue ler essa pasta automaticamente: o Chrome/Edge bloqueiam o acesso de sites a `AppData`. Por isso o jeito automático usa o `Iniciar.bat`.
+> A web page on its own can't read that folder automatically: Chrome/Edge block websites from accessing `AppData`. That's why the automatic mode uses `Start.bat`.
 
-## O que aparece
+## What you get
 
-- **Mundo atual** — campanha e aventura, cada evento com local, tipo e itens. Clique num item para ver *como obter*. Filtros por mundo, tipo, busca e “só eventos com item faltando”.
-- **O que falta** — cartões por mundo (“Corsus: falta 12 · 4 dá para pegar agora”). Clique num cartão para filtrar. Itens que caem no seu mundo atual aparecem primeiro, marcados **disponível agora**, com o local exato. Itens comprados no Ward 13 ficam em **Ward 13**; conquistas e itens sem mundo em **Geral / conquistas**.
-- Mods que já vêm em armas (ex.: Skewer no Devastator) contam como seus quando você tem a arma.
-- **Skins e consumíveis** aparecem como lista de referência: o save não guarda isso de um jeito que dê para conferir.
+- **Current world** — campaign and adventure, each event with location, type and items. Click an item to see *how to obtain* it. Filters by world, type, search and "only events with a missing item".
+- **Missing items** — one card per world ("Corsus: 12 missing · 4 obtainable now"). Click a card to filter. Items that drop in your current world come first, tagged **available now**, with the exact location. Items bought in Ward 13 are under **Ward 13**; achievements and items with no world are under **General / achievements**.
+- Mods that come built into weapons (e.g. Skewer on the Devastator) count as yours when you have the weapon.
+- **Skins and consumables** are shown as a reference list: the save doesn't store them in a way that can be checked.
 
-## Para quem for mexer no código
+## For developers
 
 ```
-index.html, css/app.css, js/app.js   página
-js/parser.js                          leitura do save e do profile (roda no navegador e no Node)
-js/data.js                            GERADO — itens, eventos, locais
-tools/build-data.mjs                  gera js/data.js a partir de tools/source/
-tools/overrides.mjs                   correções manuais de nomes → caminhos do jogo
-server.ps1, Iniciar.bat               servidor local do modo automático
-test/parser.test.mjs                  testes
+index.html, css/app.css, js/app.js   page
+js/parser.js                          save and profile parsing (runs in the browser and in Node)
+js/data.js                            GENERATED — items, events, locations
+tools/build-data.mjs                  generates js/data.js from tools/source/
+tools/overrides.mjs                   manual name → game path fixes
+js/wiki.js                            GENERATED — Fextralife wiki page of each item
+tools/build-wiki.ps1                  generates js/wiki.js, keeping only pages that exist
+server.ps1, Start.bat                 local server for automatic mode
+test/parser.test.mjs                  tests
 ```
 
 ```sh
-node tools/build-data.mjs --download --report   # baixa a planilha de novo e regenera js/data.js
-node --test test/                              # testes de dados e parser
-RWA_SAVE=caminho/save_0.sav RWA_PROFILE=caminho/profile.sav node --test test/   # + com seu save
+node tools/build-data.mjs --download --report   # re-download the sheet and regenerate js/data.js
+powershell -ExecutionPolicy Bypass -File tools/build-wiki.ps1   # re-check item wiki pages (after build-data)
+node --test test/                              # data and parser tests
+RWA_SAVE=path/save_0.sav RWA_PROFILE=path/profile.sav node --test test/   # + with your own save
 ```
 
-O `--report` lista itens da planilha que não foram ligados a um caminho do jogo e caminhos sem item; corrija em `tools/overrides.mjs`.
+`--report` lists sheet items that couldn't be linked to a game path, and game paths with no item; fix them in `tools/overrides.mjs`.
 
-## Agradecimentos
+## Credits
 
-- [hzla/Remnant-World-Analyzer](https://github.com/hzla/Remnant-World-Analyzer) — o projeto original.
-- [Razzmatazzz/RemnantSaveManager](https://github.com/Razzmatazzz/RemnantSaveManager) — a lógica de leitura de campanha, aventura e inventário foi portada dele, e `tools/source/GameInfo.xml` (eventos → itens) vem dele.
-- [Remnant: From the Ashes — Completionist's Checklist](https://docs.google.com/spreadsheets/d/1rmmwn-kaVS44qWgub7ubXqL26fAgM7TBIi-dNc7VGdI), de **Amythyst34** — lista completa de itens, mundos, modos, DLC e “How to Obtain” (`tools/source/sheet-*.csv`).
-- Forks com correções e ideias: [axllency](https://github.com/axllency/Remnant-World-Analyzer), [tkerzmann](https://github.com/tkerzmann/Remnant-World-Analyzer), [paige404](https://github.com/paige404/Remnant-World-Analyzer), [gmferise](https://github.com/gmferise/Remnant-World-Analyzer), [northy](https://github.com/northy/Remnant-World-Analyzer), [chris-faulkner](https://github.com/chris-faulkner/Remnant-World-Analyzer).
-- /u/FAOAB no Reddit, pela [planilha de nomes](https://docs.google.com/spreadsheets/d/1VzmDx0ZXQWN5N_9_zP0gEqToyuB9ZjlxgZOEGdiuA6A) usada pelo original.
+- [hzla/Remnant-World-Analyzer](https://github.com/hzla/Remnant-World-Analyzer) — the original project.
+- [Razzmatazzz/RemnantSaveManager](https://github.com/Razzmatazzz/RemnantSaveManager) — the campaign, adventure and inventory parsing logic was ported from it, and `tools/source/GameInfo.xml` (events → items) comes from it.
+- [Remnant: From the Ashes — Completionist's Checklist](https://docs.google.com/spreadsheets/d/1rmmwn-kaVS44qWgub7ubXqL26fAgM7TBIi-dNc7VGdI) by **Amythyst34** — full list of items, worlds, modes, DLC and "How to Obtain" (`tools/source/sheet-*.csv`).
+- [Remnant: From the Ashes Wiki](https://remnantfromtheashes.wiki.fextralife.com/) by **Fextralife** — the item and location pages linked by the 🌐 icons (`js/wiki.js`).
+- Forks with fixes and ideas: [axllency](https://github.com/axllency/Remnant-World-Analyzer), [tkerzmann](https://github.com/tkerzmann/Remnant-World-Analyzer), [paige404](https://github.com/paige404/Remnant-World-Analyzer), [gmferise](https://github.com/gmferise/Remnant-World-Analyzer), [northy](https://github.com/northy/Remnant-World-Analyzer), [chris-faulkner](https://github.com/chris-faulkner/Remnant-World-Analyzer).
+- /u/FAOAB on Reddit, for the [name spreadsheet](https://docs.google.com/spreadsheets/d/1VzmDx0ZXQWN5N_9_zP0gEqToyuB9ZjlxgZOEGdiuA6A) used by the original.
 
-## Licença
+## License
 
-GPL-3.0 (veja `LICENSE`), porque inclui código portado e dados do RemnantSaveManager, que é GPL-3.0.
+GPL-3.0 (see `LICENSE`), because it includes code and data ported from RemnantSaveManager, which is GPL-3.0.

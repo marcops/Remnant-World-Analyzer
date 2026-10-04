@@ -1,11 +1,11 @@
 <#
-  Remnant World Analyzer - servidor local.
+  Remnant World Analyzer - local server.
 
-  Serve a pagina em http://localhost:8765, le os saves direto da pasta do jogo
-  e avisa a pagina quando o jogo salva. Nada e instalado e nada sai do seu PC.
+  Serves the page at http://localhost:8765, reads the saves straight from the game folder
+  and lets the page know when the game saves. Nothing is installed and nothing leaves your PC.
 
-  Uso normal: dois cliques no Iniciar.bat.
-  Opcoes:   Iniciar.bat -SaveDir "D:\outra\pasta" -Port 9000 -NoBrowser
+  Normal use: double-click Start.bat.
+  Options:  Start.bat -SaveDir "D:\other\folder" -Port 9000 -NoBrowser
 #>
 param(
   [string]$SaveDir = (Join-Path $env:LOCALAPPDATA 'Remnant\Saved\SaveGames'),
@@ -27,7 +27,7 @@ function Start-Listener {
     $l.Prefixes.Add("http://localhost:$p/")
     try { $l.Start(); return @{ Listener = $l; Port = $p } } catch { $l.Close() }
   }
-  throw "Nenhuma porta livre entre $Port e $($Port + 9)."
+  throw "No free port between $Port and $($Port + 9)."
 }
 
 function Send($ctx, [int]$status, [string]$type, [byte[]]$bytes) {
@@ -69,7 +69,7 @@ function Read-Shared([string]$path) {
       } finally { $fs.Dispose() }
     } catch { Start-Sleep -Milliseconds 300 }
   }
-  throw "Nao consegui ler $path"
+  throw "Could not read $path"
 }
 
 function Handle($ctx) {
@@ -79,9 +79,9 @@ function Handle($ctx) {
 
   if ($path -eq '/api/file') {
     $name = [string]$ctx.Request.QueryString['name']
-    if ($name -notmatch $SaveFilePattern) { return Send-Text $ctx 400 'nome de arquivo invalido' }
+    if ($name -notmatch $SaveFilePattern) { return Send-Text $ctx 400 'invalid file name' }
     $full = Join-Path $SaveDir $name
-    if (-not (Test-Path -LiteralPath $full -PathType Leaf)) { return Send-Text $ctx 404 'arquivo nao encontrado' }
+    if (-not (Test-Path -LiteralPath $full -PathType Leaf)) { return Send-Text $ctx 404 'file not found' }
     return Send $ctx 200 'application/octet-stream' (Read-Shared $full)
   }
 
@@ -91,7 +91,7 @@ function Handle($ctx) {
   $ext = [IO.Path]::GetExtension($full).ToLower()
   if (-not $full.StartsWith($Root + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
       -not $Mime.ContainsKey($ext) -or -not (Test-Path -LiteralPath $full -PathType Leaf)) {
-    return Send-Text $ctx 404 'nao encontrado'
+    return Send-Text $ctx 404 'not found'
   }
   Send $ctx 200 $Mime[$ext] ([IO.File]::ReadAllBytes($full))
 }
@@ -103,15 +103,15 @@ $url = "http://localhost:$($server.Port)/"
 $Host.UI.RawUI.WindowTitle = "Remnant World Analyzer - $url"
 Write-Host ''
 Write-Host '  Remnant World Analyzer' -ForegroundColor Yellow
-Write-Host "  Pagina:  $url"
+Write-Host "  Page:    $url"
 if (Test-Path -LiteralPath $SaveDir -PathType Container) {
   Write-Host "  Saves:   $SaveDir" -ForegroundColor Green
 } else {
-  Write-Host "  Saves:   $SaveDir  (PASTA NAO ENCONTRADA)" -ForegroundColor Red
-  Write-Host '           Rode:  Iniciar.bat -SaveDir "C:\caminho\da\pasta"'
+  Write-Host "  Saves:   $SaveDir  (FOLDER NOT FOUND)" -ForegroundColor Red
+  Write-Host '           Run:  Start.bat -SaveDir "C:\path\to\folder"'
 }
 Write-Host ''
-Write-Host '  Deixe esta janela aberta enquanto usa a pagina. Para sair: feche a janela ou Ctrl+C.'
+Write-Host '  Keep this window open while using the page. To quit: close the window or press Ctrl+C.'
 Write-Host ''
 
 if (-not $NoBrowser) { Start-Process $url }
@@ -124,7 +124,7 @@ try {
     $ctx = $task.GetAwaiter().GetResult()
     try { Handle $ctx }
     catch {
-      Write-Host "  Erro: $($_.Exception.Message)" -ForegroundColor Red
+      Write-Host "  Error: $($_.Exception.Message)" -ForegroundColor Red
       try { Send-Text $ctx 500 $_.Exception.Message } catch { }
     }
   }

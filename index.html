@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Remnant World Analyzer</title>
   <link rel="stylesheet" href="css/app.css">
   <script src="js/data.js"></script>
+  <script src="js/wiki.js"></script>
   <script src="js/parser.js"></script>
   <script src="js/app.js" defer></script>
 </head>
@@ -13,7 +14,7 @@
   <header class="top">
     <div class="brand">
       <h1>Remnant World Analyzer</h1>
-      <p class="sub">Remnant: From the Ashes — o que rolou no seu mundo e o que ainda falta pegar</p>
+      <p class="sub">Remnant: From the Ashes — what rolled in your world and what you still need to get</p>
     </div>
     <div id="status" class="status" hidden></div>
   </header>
@@ -21,42 +22,42 @@
   <main>
     <section id="loader" class="loader">
       <div id="drop" class="drop" tabindex="0">
-        <p class="drop-title">Arraste aqui o <b>save_N.sav</b> e o <b>profile.sav</b></p>
-        <p class="drop-hint">ou <label class="link">clique para escolher<input id="file" type="file" accept=".sav,.bak" multiple hidden></label> — na pasta, aperte <kbd>Ctrl</kbd>+<kbd>A</kbd> para pegar os dois de uma vez</p>
-        <p class="drop-path">Pasta dos saves (Steam/Epic):
+        <p class="drop-title">Drop <b>save_N.sav</b> and <b>profile.sav</b> here</p>
+        <p class="drop-hint">or <label class="link">click to choose<input id="file" type="file" accept=".sav,.bak" multiple hidden></label> — in the folder, press <kbd>Ctrl</kbd>+<kbd>A</kbd> to pick both at once</p>
+        <p class="drop-path">Save folder (Steam/Epic):
           <code id="save-path">%LOCALAPPDATA%\Remnant\Saved\SaveGames</code>
-          <button id="copy-path" class="btn small" type="button">Copiar</button>
+          <button id="copy-path" class="btn small" type="button">Copy</button>
         </p>
-        <p class="drop-hint">Quer que abra sozinho e atualize quando o jogo salvar? Use o <b>Iniciar.bat</b> (veja o README).</p>
+        <p class="drop-hint">Want it to open by itself and refresh whenever the game saves? Use <b>Start.bat</b> (see the README).</p>
       </div>
       <p id="load-error" class="error" hidden></p>
     </section>
 
     <section id="app" hidden>
       <div class="toolbar">
-        <label class="field">Personagem
+        <label class="field">Character
           <select id="character"></select>
         </label>
-        <p id="profile-note" class="note" hidden>Sem <b>profile.sav</b>: não dá para saber o que você já tem. Carregue também o profile.sav.</p>
-        <button id="reload" class="btn small" type="button">Carregar outros arquivos</button>
+        <p id="profile-note" class="note" hidden>No <b>profile.sav</b>: can't tell what you already have. Load profile.sav too.</p>
+        <button id="reload" class="btn small" type="button">Load other files</button>
       </div>
 
       <nav class="tabs" role="tablist">
-        <button class="tab active" data-tab="world" role="tab">Mundo atual</button>
-        <button class="tab" data-tab="missing" role="tab">O que falta</button>
+        <button class="tab active" data-tab="world" role="tab">Current world</button>
+        <button class="tab" data-tab="missing" role="tab">Missing items</button>
       </nav>
 
       <div id="tab-world" class="tab-panel">
         <div class="seg" id="mode-switch"></div>
         <div class="filters">
-          <input id="world-search" type="search" placeholder="Buscar evento, local ou item…">
+          <input id="world-search" type="search" placeholder="Search event, location or item…">
           <div class="chips" id="world-zones"></div>
           <div class="chips" id="world-types"></div>
-          <label class="check"><input id="world-only-missing" type="checkbox"> Só eventos com item faltando</label>
+          <label class="check"><input id="world-only-missing" type="checkbox"> Only events with a missing item</label>
         </div>
         <div id="world-empty" class="empty" hidden></div>
         <table class="events">
-          <thead><tr><th>Local</th><th>Tipo</th><th>Evento</th><th>Itens</th></tr></thead>
+          <thead><tr><th>Location</th><th>Type</th><th>Event</th><th>Items</th></tr></thead>
           <tbody id="world-body"></tbody>
         </table>
       </div>
@@ -64,10 +65,10 @@
       <div id="tab-missing" class="tab-panel" hidden>
         <div id="summary" class="summary"></div>
         <div class="filters">
-          <input id="missing-search" type="search" placeholder="Buscar item ou como obter…">
+          <input id="missing-search" type="search" placeholder="Search item or how to obtain…">
           <div class="chips" id="missing-cats"></div>
-          <label class="check"><input id="missing-only-now" type="checkbox"> Só o que dá para pegar no meu mundo agora</label>
-          <label class="check"><input id="missing-show-owned" type="checkbox"> Mostrar também o que já tenho</label>
+          <label class="check"><input id="missing-only-now" type="checkbox"> Only what I can get in my world right now</label>
+          <label class="check"><input id="missing-show-owned" type="checkbox"> Also show what I already have</label>
         </div>
         <div id="missing-list"></div>
       </div>
@@ -75,19 +76,20 @@
   </main>
 
   <footer class="credits">
-    <h2>Agradecimentos</h2>
+    <h2>Credits</h2>
     <ul>
-      <li><a href="https://github.com/hzla/Remnant-World-Analyzer" target="_blank" rel="noopener">hzla/Remnant-World-Analyzer</a> — o projeto original, do qual este é um fork.</li>
-      <li><a href="https://github.com/Razzmatazzz/RemnantSaveManager" target="_blank" rel="noopener">Razzmatazzz/RemnantSaveManager</a> (GPL-3.0) — lógica de leitura de campanha/aventura/inventário e a base de eventos → itens (GameInfo.xml).</li>
-      <li><a href="https://docs.google.com/spreadsheets/d/1rmmwn-kaVS44qWgub7ubXqL26fAgM7TBIi-dNc7VGdI" target="_blank" rel="noopener">Remnant: From the Ashes — Completionist's Checklist</a>, de Amythyst34 — lista completa de itens e “How to Obtain”.</li>
-      <li>Forks que trouxeram correções e ideias:
+      <li><a href="https://github.com/hzla/Remnant-World-Analyzer" target="_blank" rel="noopener">hzla/Remnant-World-Analyzer</a> — the original project this is a fork of.</li>
+      <li><a href="https://github.com/Razzmatazzz/RemnantSaveManager" target="_blank" rel="noopener">Razzmatazzz/RemnantSaveManager</a> (GPL-3.0) — campaign/adventure/inventory parsing logic and the event → item database (GameInfo.xml).</li>
+      <li><a href="https://docs.google.com/spreadsheets/d/1rmmwn-kaVS44qWgub7ubXqL26fAgM7TBIi-dNc7VGdI" target="_blank" rel="noopener">Remnant: From the Ashes — Completionist's Checklist</a> by Amythyst34 — full item list and “How to Obtain”.</li>
+      <li><a href="https://remnantfromtheashes.wiki.fextralife.com/" target="_blank" rel="noopener">Remnant: From the Ashes Wiki</a> by Fextralife — the item and location pages linked by the 🌐 icons.</li>
+      <li>Forks that contributed fixes and ideas:
         <a href="https://github.com/axllency/Remnant-World-Analyzer" target="_blank" rel="noopener">axllency</a>,
         <a href="https://github.com/tkerzmann/Remnant-World-Analyzer" target="_blank" rel="noopener">tkerzmann</a>,
         <a href="https://github.com/paige404/Remnant-World-Analyzer" target="_blank" rel="noopener">paige404</a>,
         <a href="https://github.com/gmferise/Remnant-World-Analyzer" target="_blank" rel="noopener">gmferise</a>,
         <a href="https://github.com/northy/Remnant-World-Analyzer" target="_blank" rel="noopener">northy</a>,
         <a href="https://github.com/chris-faulkner/Remnant-World-Analyzer" target="_blank" rel="noopener">chris-faulkner</a>.</li>
-      <li>/u/FAOAB no Reddit, pela <a href="https://docs.google.com/spreadsheets/d/1VzmDx0ZXQWN5N_9_zP0gEqToyuB9ZjlxgZOEGdiuA6A" target="_blank" rel="noopener">planilha de nomes</a> usada pelo original.</li>
+      <li>/u/FAOAB on Reddit, for the <a href="https://docs.google.com/spreadsheets/d/1VzmDx0ZXQWN5N_9_zP0gEqToyuB9ZjlxgZOEGdiuA6A" target="_blank" rel="noopener">name spreadsheet</a> used by the original.</li>
     </ul>
   </footer>
 </body>
