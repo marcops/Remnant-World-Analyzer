@@ -46,6 +46,9 @@
           "Owned and missing items from profile.sav",
           "Missing items by world, item type and game mode",
           "Items obtainable in your current world",
+          "Character sheet: level, loadout, upgrade levels, traits, resources, kill stats, deaths per quest, achievement progress",
+          "World state: completed events, chests opened, map explored and loot left on the ground per area",
+          "DPS and build calculator: weapon DPS with traits, rings, amulets and armor sets; mod combinations and summon count",
           "Links to the Fextralife wiki for every location and item",
           "Supports Swamps of Corsus and Subject 2923 DLC",
           "Runs locally: save files are never uploaded"
@@ -78,6 +81,11 @@
   <script src="js/data.js"></script>
   <script src="js/wiki.js"></script>
   <script src="js/parser.js"></script>
+  <script src="js/gvas.js"></script>
+  <script src="js/character.js"></script>
+  <script src="js/worldstate.js"></script>
+  <script src="js/stats.js"></script>
+  <script src="js/dps.js"></script>
   <script src="js/app.js" defer></script>
 </head>
 <body>
@@ -115,6 +123,9 @@
       <nav class="tabs" role="tablist">
         <button class="tab active" data-tab="world" role="tab">Current world</button>
         <button class="tab" data-tab="missing" role="tab">Missing items</button>
+        <button class="tab" data-tab="state" role="tab">World state</button>
+        <button class="tab" data-tab="character" role="tab">My character</button>
+        <button class="tab" data-tab="build" role="tab">Build &amp; DPS</button>
       </nav>
 
       <div id="tab-world" class="tab-panel">
@@ -147,6 +158,18 @@
           <label class="check"><input id="missing-show-owned" type="checkbox"> Also show what I already have</label>
         </div>
         <div id="missing-list"></div>
+      </div>
+
+      <div id="tab-state" class="tab-panel" hidden>
+        <div id="state-view"></div>
+      </div>
+
+      <div id="tab-character" class="tab-panel" hidden>
+        <div id="character-view"></div>
+      </div>
+
+      <div id="tab-build" class="tab-panel" hidden>
+        <div id="build-view"></div>
       </div>
     </section>
   </main>

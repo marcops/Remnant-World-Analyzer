@@ -1,5 +1,7 @@
-# Saves pessoais nunca vao para o repositorio
+# Personal saves never go into the repository
 *.sav
 *.bak
 .DS_Store
 node_modules/
+# Wiki pages downloaded by tools/fetch-stats.ps1; only the generated js/stats.js is kept
+tools/source/wiki/

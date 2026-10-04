@@ -63,3 +63,52 @@ test('real save: campaign and adventure are read', { skip: !savePath && 'set RWA
   if (process.env.RWA_EXPECT_ADVENTURE) assert.equal(r.adventure && r.adventure.world, process.env.RWA_EXPECT_ADVENTURE);
   if (process.env.RWA_PROFILE) assert.ok(P.parseProfile(fs.readFileSync(process.env.RWA_PROFILE)).length > 0, 'no characters in profile');
 });
+
+const DPS = require('../js/dps.js');
+test('dps: upgrade, crit and weak spot math', () => {
+  // SMG: 7 damage, 16 RPS, 5% crit, +100% weak spot. +20 = 3× base; average crit adds 5% × 50%.
+  const smg = DPS.weaponDps('Submachine Gun', 20, []);
+  assert.equal(smg.hit, 21);
+  assert.ok(Math.abs(smg.dps - 21 * 1.025 * 16) < 1e-9);
+  assert.equal(smg.weakMult, 2);
+  // Boss weapons cap at +10 and also reach 3× base there.
+  const boss = DPS.weaponDps('Devastator', 10, []);
+  assert.equal(boss.maxLevel, 10);
+  assert.equal(boss.upgrade, 3);
+  // Kingslayer 20 + Exploiter 20, and a conditional bonus that only counts when switched on.
+  const list = [
+    { stat: 'critDamage', value: 0.25 }, { stat: 'weakspot', value: 0.2 },
+    { stat: 'allDamage', value: 0.1, when: 'while Song of Swords is active', source: 'Song of Swords' },
+  ];
+  const off = DPS.weaponDps('Submachine Gun', 20, list), on = DPS.weaponDps('Submachine Gun', 20, list, () => true);
+  assert.equal(off.critMult, 1.75);
+  assert.ok(Math.abs(off.weakMult - 2.2) < 1e-9);
+  assert.ok(Math.abs(on.hit - 21 * 1.1) < 1e-9);
+});
+
+const WS = require('../js/worldstate.js');
+test('real save: world state (quests, zones, chests, loot) is read', { skip: !savePath && 'set RWA_SAVE' }, () => {
+  const s = WS.read(fs.readFileSync(savePath));
+  assert.ok(s.zones.length > 0, 'no zones');
+  assert.ok(s.zones.every((z) => z.name), 'zone without a name');
+  assert.ok(s.events.length > 0, 'no quests');
+  assert.ok(s.chests.open <= s.chests.total);
+  assert.ok(s.loot.every((l) => l.name && l.quantity > 0), 'loot without name or quantity');
+});
+
+const CHAR = require('../js/character.js');
+test('real save: character details and world stats are read', { skip: !savePath && 'set RWA_SAVE' }, () => {
+  const w = CHAR.readWorld(fs.readFileSync(savePath));
+  assert.ok(w.timePlayed > 0, 'no time played');
+  assert.ok(w.difficulty, 'no difficulty');
+  if (!process.env.RWA_PROFILE) return;
+  const p = CHAR.readProfile(fs.readFileSync(process.env.RWA_PROFILE));
+  const ch = p.characters.find(Boolean);
+  assert.ok(ch && !ch.error, ch && ch.error);
+  assert.ok(ch.level > 0, 'no level');
+  assert.ok(ch.loadout.length > 0, 'nothing equipped');
+  assert.ok(ch.traits.length > 0, 'no traits');
+  assert.ok(p.achievements.every((a) => a.id), 'achievement without id');
+  const unnamed = ch.loadout.concat(ch.arsenal).filter((r) => (r.entry || r).category !== 'Consumable' && !(r.entry || r).item && !/Dragon Heart/.test((r.entry || r).name));
+  assert.deepEqual(unnamed.map((r) => (r.entry || r).name), [], 'equipment not matched to a sheet item');
+});

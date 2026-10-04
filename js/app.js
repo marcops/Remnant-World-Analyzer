@@ -1,8 +1,8 @@
-/* global RWA_DATA, RWA_PARSER, RWA_WIKI */
+/* global RWA_DATA, RWA_PARSER, RWA_WIKI, RWA_CHARACTER, RWA_DPS, RWA_WORLDSTATE */
 (function () {
   'use strict';
 
-  var DATA = RWA_DATA, P = RWA_PARSER;
+  var DATA = RWA_DATA, P = RWA_PARSER, CHAR = RWA_CHARACTER, DPS = RWA_DPS, WS = RWA_WORLDSTATE;
   var $ = function (id) { return document.getElementById(id); };
 
   var WORLD_LABEL = { Earth: 'Earth', 'Subject 2923': 'Subject 2923', Rhom: 'Rhom', Corsus: 'Corsus', Yaesha: 'Yaesha', Reisum: 'Reisum',
@@ -52,7 +52,14 @@
 
   function rebuild() {
     state.characters = state.files['profile.sav'] ? P.parseProfile(state.files['profile.sav']) : [];
+    // Full character details (loadout, traits, stats…) for the "My character" tab.
+    state.profile = null;
+    if (state.files['profile.sav']) {
+      try { state.profile = CHAR.readProfile(state.files['profile.sav']); } catch (e) { console.error(e); state.profile = { error: String(e) }; }
+    }
     state.parsed = {};
+    state.worlds = {};
+    state.worldStates = {};
     Object.keys(state.files).forEach(function (name) {
       var i = saveIndexOf(name);
       if (i == null) return;
@@ -60,6 +67,8 @@
       if (state.parsed[i] && /\.bak$/i.test(name)) return;
       try { state.parsed[i] = P.parseSave(state.files[name]); state.parsed[i].file = name; }
       catch (e) { console.error(e); state.parsed[i] = { error: String(e), file: name }; }
+      try { state.worlds[i] = CHAR.readWorld(state.files[name]); } catch (e) { console.error(e); state.worlds[i] = null; }
+      try { state.worldStates[i] = WS.read(state.files[name]); } catch (e) { console.error(e); state.worldStates[i] = { error: String(e) }; }
     });
     var indexes = Object.keys(state.parsed).map(Number);
     if (state.charIndex == null || !state.parsed[state.charIndex]) {
@@ -179,8 +188,14 @@
     document.querySelectorAll('.tab').forEach(function (b) { b.classList.toggle('active', b.dataset.tab === state.tab); });
     $('tab-world').hidden = state.tab !== 'world';
     $('tab-missing').hidden = state.tab !== 'missing';
+    $('tab-character').hidden = state.tab !== 'character';
+    $('tab-build').hidden = state.tab !== 'build';
+    $('tab-state').hidden = state.tab !== 'state';
     renderWorld();
     renderMissing();
+    renderStateTab();
+    renderCharacterTab();
+    renderBuildTab();
   }
 
   function renderCharacters() {
@@ -445,6 +460,320 @@
     $('missing-list').innerHTML = html || '<div class="empty">' + (hasProfile ? 'Nothing missing with these filters. 🎉' : 'Nothing matches these filters.') + '</div>';
   }
 
+  // ---- my character --------------------------------------------------------
+  function num(n) { return Math.round(n).toLocaleString('en-US'); }
+  function duration(sec) { var h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60); return h + 'h ' + (m < 10 ? '0' : '') + m + 'm'; }
+  function rowGlobe(row) { return row.item ? itemWikiLink(row.item) : globe(RWA_WIKI.items[row.name], row.name); }
+  function levelTag(row) { return row.level != null && (row.category === 'Weapon' || row.category === 'Armor') ? ' <span class="lvl">+' + row.level + '</span>' : ''; }
+  function panel(title, body, wide) { return '<section class="panel' + (wide ? ' wide' : '') + '"><h3>' + esc(title) + '</h3>' + body + '</section>'; }
+  // A labelled bar: label is HTML, shown is the text on the right, ratio is 0..1.
+  function meter(label, shown, ratio, done) {
+    var pct = Math.max(0, Math.min(100, Math.round(100 * (ratio || 0))));
+    return '<div class="meter' + (done ? ' done' : '') + '"><span class="ml">' + label + '</span><span class="mv">' + esc(String(shown)) + '</span><div class="bar"><i style="width:' + pct + '%"></i></div></div>';
+  }
+
+  function renderCharacterTab() {
+    var el = $('character-view');
+    var prof = state.profile, ch = prof && prof.characters && prof.characters[state.charIndex];
+    var world = state.worlds && state.worlds[state.charIndex];
+    if (!prof) { el.innerHTML = '<div class="empty">Load <b>profile.sav</b> too to see your character.</div>'; return; }
+    if (prof.error || !ch || ch.error) { el.innerHTML = '<div class="empty">Could not read this character from profile.sav' + (prof.error || (ch && ch.error) ? ': ' + esc(prof.error || ch.error) : '.') + '</div>'; return; }
+
+    var maxed = ch.traits.filter(function (t) { return t.level >= 20; }).length;
+    var leveled = ch.traits.filter(function (t) { return t.level > 0; });
+    var res = {}; ch.resources.forEach(function (r) { res[r.name] = r.quantity || 0; });
+    var heart = ch.loadout.filter(function (l) { return l.slot === 6; })[0];
+
+    var cards = [
+      ['Character', 'Level ' + ch.level, ch.archetype + ' · ' + num(ch.experience) + ' XP'],
+      ['Traits', num(ch.traitPointsSpent) + ' points', leveled.length + ' traits leveled · ' + maxed + ' at max'],
+      world ? ['Time played', duration(world.timePlayed), world.difficulty ? world.difficulty + ' difficulty' : ''] : null,
+      world && world.objective ? ['Current objective', world.objective, ''] : null,
+      ['Dragon Heart', (heart && heart.entry.quantity != null ? heart.entry.quantity : '?') + ' charges', (res['Dragon Heart upgrades'] || 0) + ' upgrades · used ' + num(ch.dragonHeartUses) + ' times'],
+      ['Scrap', num(res.Scrap || 0), num(ch.stats.scrapPickedUp) + ' picked up in total'],
+    ].filter(Boolean).map(function (c) {
+      return '<div class="card static"><div class="w">' + esc(c[0]) + '</div><div class="n neutral">' + esc(c[1]) + '</div><div class="of">' + esc(c[2]) + '</div></div>';
+    }).join('');
+
+    var loadout = '<table class="kv">' + ch.loadout.map(function (l) {
+      var e = l.entry;
+      var mods = e.mods.map(function (m) { return '<span class="tag mode">' + esc(m.name) + (m.level ? ' +' + m.level : '') + '</span>'; }).join('');
+      var qty = e.quantity != null && l.slot !== 6 ? ' <span class="cat">×' + e.quantity + '</span>' : '';
+      return '<tr><th>' + esc(l.label) + '</th><td>' + esc(e.name) + rowGlobe(e) + levelTag(e) + qty + mods + '</td></tr>';
+    }).join('') + '</table>';
+
+    var traits = leveled.length ? leveled.map(function (t) { return meter(esc(t.name) + rowGlobe(t), t.level, t.level / 20, t.level >= 20); }).join('') : '<p class="cat">No trait points spent yet.</p>';
+
+    var tiles = function (rows) {
+      return '<div class="tiles">' + rows.map(function (r) {
+        return '<div class="tile"><span class="tq">' + num(r.quantity || 1) + '</span><span class="tn">' + esc(r.name) + rowGlobe(r) + '</span></div>';
+      }).join('') + '</div>';
+    };
+    var resources = ch.resources.filter(function (r) { return r.name !== 'Dragon Heart upgrades'; });
+
+    // Only what has been upgraded; the rest is summed up in one line.
+    var arsenalList = function (cat) {
+      var rows = ch.arsenal.filter(function (a) { return a.category === cat; });
+      var up = rows.filter(function (a) { return a.level > 0; }), rest = rows.length - up.length;
+      return (up.length ? up.map(function (a) { return meter(esc(a.name) + rowGlobe(a), '+' + a.level, a.level / 20, a.level >= 20); }).join('') : '<p class="cat">None upgraded yet.</p>') +
+        (rest ? '<p class="cat">' + rest + ' more owned at +0.</p>' : '');
+    };
+
+    var topKills = ch.kills.length ? ch.kills[0].kills : 0;
+    var kills = ch.kills.map(function (k) { return meter(esc(k.name) + rowGlobe(k), num(k.kills), topKills ? k.kills / topKills : 0); }).join('');
+    var s = ch.stats;
+    var statRows = [
+      ['Weak spot kills', s.weakspotKills], ['Allies revived', s.revives], ['Times revived', s.timesRevived],
+      ['Downed by teammates', s.downedByTeammates], ['Damage to armored enemies', s.armoredDamage], ['Status effects applied', s.statusEffects],
+      ['Status effects cleansed', s.cleansed], ['Fall damage taken', s.fallDamage], ['Obstacles vaulted', s.vaults],
+      ['Weapon mods acquired', s.modsAcquired], ['Times the dog was petted', s.dogPets],
+    ];
+    var stats = '<table class="kv">' + statRows.map(function (r) { return '<tr><th>' + esc(r[0]) + '</th><td>' + num(r[1]) + '</td></tr>'; }).join('') + '</table>';
+
+    var deaths = world && world.deaths.length ? '<table class="kv">' + world.deaths.slice(0, 15).map(function (d) {
+      return '<tr><th>' + esc(d.name) + (d.type ? ' <span class="cat">' + esc(d.type) + '</span>' : '') + '</th><td>' + d.count + '</td></tr>';
+    }).join('') + '</table><p class="cat">The game counts a fail for every quest that was active when you died.</p>' : '<p class="cat">No deaths recorded in this world.</p>';
+
+    var achievements = prof.achievements.slice().sort(function (a, b) {
+      return (a.value >= a.target) - (b.value >= b.target) || b.value / b.target - a.value / a.target;
+    }).map(function (a) {
+      var done = a.value >= a.target;
+      var shown = a.target > 1 ? num(Math.min(a.value, a.target)) + ' / ' + num(a.target) : done ? 'done' : '—';
+      return meter((done ? '✔ ' : '') + esc(a.name), shown, a.value / a.target, done);
+    }).join('');
+    var achDone = prof.achievements.filter(function (a) { return a.value >= a.target; }).length;
+
+    var milestones = ch.milestones.map(function (m) { return '<span class="chip on">' + esc(m) + '</span>'; }).join('');
+
+    el.innerHTML =
+      '<div class="summary">' + cards + '</div>' +
+      '<div class="panels">' +
+      panel('Loadout', loadout) +
+      panel('Traits (' + num(ch.traitPointsSpent) + ' / ' + num(ch.traitPoints) + ' points spent)', traits) +
+      panel('Resources', tiles(resources)) +
+      panel('Consumables', ch.consumables.length ? tiles(ch.consumables) : '<p class="cat">None.</p>') +
+      panel('Weapon upgrades', arsenalList('Weapon')) +
+      panel('Armor upgrades', arsenalList('Armor')) +
+      panel('Kills by weapon', kills || '<p class="cat">No kills recorded.</p>') +
+      panel('Combat stats', stats) +
+      panel('Deaths by quest', deaths) +
+      panel('Achievement progress (' + achDone + ' / ' + prof.achievements.length + ')', achievements) +
+      (milestones ? panel('Story milestones', '<div class="chips">' + milestones + '</div>', true) : '') +
+      '</div>' + moreFromSave(ch, world);
+  }
+
+  // Everything else the save records, shown as-is.
+  function moreFromSave(ch, world) {
+    var x = ch.extra || {};
+    var kv = function (rows) {
+      return '<table class="kv">' + rows.filter(function (r) { return r[1] !== undefined && r[1] !== null && r[1] !== ''; }).map(function (r) {
+        return '<tr><th>' + esc(r[0]) + '</th><td>' + esc(String(r[1])) + '</td></tr>';
+      }).join('') + '</table>';
+    };
+    var chips = function (list) { return list && list.length ? '<div class="chips">' + list.map(function (t) { return '<span class="chip on">' + esc(t) + '</span>'; }).join('') + '</div>' : '<p class="cat">None.</p>'; };
+    var general = kv([
+      ['Power level', x.powerLevel], ['Stamina', x.stamina], ['Character level', ch.level], ['Experience', num(ch.experience)],
+      ['Audio logs (recorders) stored', x.recorders], ['Cryptolith phase', x.cryptolithPhase],
+      ['Equipped the Harsgaard root gun', x.usedHarsgaardRootGun ? 'yes' : 'no'], ['Finished the intro', x.finishedIntro ? 'yes' : 'no'],
+      world ? ['World has a campaign', world.hasCampaign ? 'yes' : 'no'] : null,
+      world ? ['Quests generated in this world', world.questsGenerated] : null,
+      world ? ['Zones generated in this world', world.zonesGenerated] : null,
+    ].filter(Boolean));
+    var ammo = (x.ammo || []).length ? '<table class="kv">' + x.ammo.map(function (a) {
+      return '<tr><th>' + esc(a.name) + '</th><td>' + (a.clip != null ? a.clip + ' in clip · ' : '') + num(Math.max(0, a.reserve)) + ' in reserve</td></tr>';
+    }).join('') + '</table>' : '<p class="cat">None.</p>';
+    var shortcuts = (x.shortcuts || []).slice().sort(function (a, b) { return a.slot - b.slot; }).map(function (s) { return s.radial + ' ' + (s.slot + 1) + ': ' + s.name; });
+    var counters = kv((x.counters || []).map(function (c) { return [c.name, c.value]; }));
+    var visuals = kv((x.visuals || []).map(function (v) { return [v.slot, String(v.value).replace(/([a-z])([A-Z])/g, '$1 $2').replace(/_/g, ' ')]; }));
+    return '<h3 class="section-title more">More from your save</h3><div class="panels">' +
+      panel('General', general) +
+      panel('Ammo', ammo) +
+      panel('Quick-use shortcuts', chips(shortcuts)) +
+      panel('Emotes unlocked (' + (x.emotes || []).length + ')', chips(x.emotes)) +
+      panel('Account rewards received', chips(x.awards)) +
+      panel('Counters', counters) +
+      panel('Tutorials seen (' + (x.tutorials || []).length + ')', chips(x.tutorials)) +
+      panel('Appearance', visuals) +
+      '</div>';
+  }
+
+  // ---- world state -----------------------------------------------------------
+  function renderStateTab() {
+    var el = $('state-view'), ws = state.worldStates && state.worldStates[state.charIndex];
+    var world = state.worlds && state.worlds[state.charIndex];
+    if (!ws) { el.innerHTML = '<div class="empty">Load a world save (save_N.sav) to see what you did in it.</div>'; return; }
+    if (ws.error) { el.innerHTML = '<div class="empty">Could not read the world state: ' + esc(ws.error) + '</div>'; return; }
+
+    // Boss/dungeon/siege quests record completion; item drops don't, so for those we check whether you own the item.
+    var status = function (e) {
+      if (e.done) return { cls: 'ok', text: 'Completed' };
+      if (e.type === 'Item drop') {
+        var items = e.items.filter(function (i) { return i.item; });
+        if (!items.length) return { cls: 'unk', text: e.name === 'Trait Book' ? 'Not recorded' : 'Not recorded' };
+        var owned = items.every(function (i) { return itemOwned(i.item) === true; });
+        if (!character()) return { cls: 'unk', text: 'Load profile.sav' };
+        return owned ? { cls: 'ok', text: 'Item owned' } : { cls: 'miss', text: 'Item not picked up' };
+      }
+      return { cls: 'miss', text: 'Not completed' };
+    };
+    var tracked = ws.events.filter(function (e) { return e.type !== 'Item drop'; });
+    var doneCount = tracked.filter(function (e) { return e.done; }).length;
+    var lootByName = {};
+    ws.loot.forEach(function (l) {
+      var g = lootByName[l.name] = lootByName[l.name] || { name: l.name, item: l.item, quantity: 0, piles: 0, areas: {} };
+      g.quantity += l.quantity; g.piles++; if (l.zoneLabel) g.areas[l.zoneLabel] = true;
+    });
+    var lootList = Object.keys(lootByName).map(function (k) { return lootByName[k]; });
+    // Gear and trait books first: those are worth going back for.
+    var precious = lootList.filter(function (g) { return g.item && /Ring|Amulet|Weapon|Armor|Mod|Trait/.test(g.item.category) || g.name === 'Trait Book'; });
+    var scrap = lootByName.Scrap ? lootByName.Scrap.quantity : 0;
+
+    var modeTime = ws.modes.map(function (m) { return (/Adventure/.test(m.cls) ? 'Adventure' : 'Campaign') + ' ' + duration(m.playTime); }).join(' · ');
+    var cards = [
+      ['Events completed', doneCount + ' of ' + tracked.length, 'bosses, dungeons, sieges, points of interest'],
+      ['Chests opened', ws.chests.open + ' of ' + ws.chests.total, ws.chests.total - ws.chests.open + ' still closed'],
+      ['Left on the ground', ws.loot.length + ' piles', num(scrap) + ' scrap' + (precious.length ? ' · ' + precious.length + ' gear / trait book' : '')],
+      ['Map interactions', num(ws.objects.broken) + ' broken', ws.objects.opened + ' opened · ' + ws.objects.unlocked + ' unlocked · ' + ws.objects.switchedOn + ' switched on'],
+      modeTime ? ['Time per mode', modeTime.split(' · ')[0], modeTime.split(' · ').slice(1).join(' · ') + (world ? ' · ' + duration(world.timePlayed) + ' in total' : '')] : null,
+    ].filter(Boolean).map(function (c) {
+      return '<div class="card static"><div class="w">' + esc(c[0]) + '</div><div class="n neutral">' + esc(c[1]) + '</div><div class="of">' + esc(c[2]) + '</div></div>';
+    }).join('');
+
+    var eventTable = function (mode) {
+      var list = ws.events.filter(function (e) { return e.mode === mode; });
+      if (!list.length) return '';
+      return panel(mode + ' events', '<table class="kv">' + list.map(function (e) {
+        var st = status(e);
+        var items = e.items.map(function (i) { return '<span class="evitem">' + (i.item ? statusIcon(itemOwned(i.item)) : '') + esc(i.name) + (i.item ? itemWikiLink(i.item) : '') + '</span>'; }).join('');
+        return '<tr><th><span class="st ' + st.cls + '">' + (st.cls === 'ok' ? '✔' : st.cls === 'miss' ? '✘' : '?') + '</span> ' + esc(e.name) +
+          ' <span class="cat">' + esc(e.type) + (e.area ? ' · ' + esc(e.area) : '') + '</span>' + (e.area ? wikiLink(e.area) : '') + '</th><td>' +
+          '<div class="cat">' + esc(st.text) + '</div>' + items + '</td></tr>';
+      }).join('') + '</table>', true);
+    };
+
+    var areas = '<table class="kv"><tr><th>Area</th><td><b>Level</b></td><td><b>Explored</b></td><td><b>Chests</b></td><td><b>Loot left</b></td></tr>' + ws.zones.map(function (z) {
+      var depth = 0, p = z; while (p && p.parent != null && depth < 4) { p = ws.zones.filter(function (x) { return x.id === p.parent; })[0]; depth++; }
+      return '<tr><th style="padding-left:' + depth * 14 + 'px">' + esc(z.name) + wikiLink(z.name) + '</th><td>' + (z.level || '—') + '</td><td>' + (z.explored ? num(z.explored) : '—') +
+        '</td><td>' + (z.chests ? z.chestsOpen + ' / ' + z.chests : '—') + '</td><td>' + (z.loot || '—') + '</td></tr>';
+    }).join('') + '</table><p class="cat">Explored = map cells revealed in that area. Chests are counted where the save keeps them (generated tiles).</p>';
+
+    var lootTable = lootList.length ? '<table class="kv">' + lootList.sort(function (a, b) {
+      return (precious.indexOf(b) >= 0) - (precious.indexOf(a) >= 0) || b.quantity - a.quantity;
+    }).map(function (g) {
+      var where = Object.keys(g.areas);
+      return '<tr><th>' + (precious.indexOf(g) >= 0 ? '★ ' : '') + esc(g.name) + (g.item ? itemWikiLink(g.item) : '') + '</th><td>' + num(g.quantity) +
+        (g.piles > 1 ? ' <span class="cat">in ' + g.piles + ' piles</span>' : '') + (where.length ? '<div class="cat">' + esc(where.slice(0, 4).join(', ') + (where.length > 4 ? '…' : '')) + '</div>' : '') + '</td></tr>';
+    }).join('') + '</table>' + (precious.length ? '<p class="cat">★ Gear or trait books you dropped or never picked up — still in your world.</p>' : '')
+      : '<p class="cat">Nothing left behind.</p>';
+
+    el.innerHTML = '<div class="summary">' + cards + '</div><div class="panels">' +
+      eventTable('Campaign') + eventTable('Adventure') +
+      panel('Areas', areas, true) +
+      panel('Left on the ground', lootTable) +
+      panel('Story progress flags', ws.flags.length ? '<div class="chips">' + ws.flags.map(function (f) { return '<span class="chip on">' + esc(f) + '</span>'; }).join('') + '</div>' : '<p class="cat">None.</p>') +
+      '</div>';
+  }
+
+  // ---- build & DPS -----------------------------------------------------------
+  var dpsOn = {};
+  function bonusKey(b) { return b.source + '|' + b.when + '|' + b.stat; }
+  function pct(v) { return (v >= 0 ? '+' : '') + (+(v * 100).toFixed(2)) + '%'; }
+  function fmt(v, d) { return v == null ? '—' : (+v).toLocaleString('en-US', { maximumFractionDigits: d == null ? 1 : d }); }
+
+  function renderBuildTab() {
+    var el = $('build-view');
+    var prof = state.profile, ch = prof && prof.characters && prof.characters[state.charIndex];
+    if (!prof || prof.error || !ch || ch.error) { el.innerHTML = '<div class="empty">Load <b>profile.sav</b> too to see your build and DPS.</div>'; return; }
+    var on = function (b) { return !!dpsOn[bonusKey(b)]; };
+    var a = DPS.analyze(ch, on);
+
+    var guns = a.equipped.filter(function (w) { return w.dps; });
+    var best = guns.slice().sort(function (x, y) { return y.dps - x.dps; })[0];
+    var cards = a.equipped.map(function (w) {
+      if (w.missing) return ['', w.slot, w.name, 'no stats on the wiki'];
+      return w.dps ? [w.slot, fmt(w.dps, 0) + ' DPS', w.name + ' +' + w.level, fmt(w.weakDps, 0) + ' DPS on weak spots']
+        : [w.slot, fmt(w.expectedHit, 0) + ' per hit', w.name + ' +' + w.level, fmt(w.expectedWeakHit, 0) + ' per weak spot hit'];
+    }).concat([
+      ['Summons', a.summonCount + ' at once', a.summons.length ? a.summons.map(function (s) { return s.count + '× ' + s.name; }).join(' + ') : 'no summoning mod equipped', a.summonDps ? fmt(a.summonDps, 0) + ' DPS from turrets' : ''],
+      best ? ['Total while firing', fmt(best.dps + a.summonDps, 0) + ' DPS', best.name + (a.summonDps ? ' + summons' : ''), fmt(best.weakDps + a.summonDps, 0) + ' DPS on weak spots'] : null,
+    ]).filter(Boolean).map(function (c) {
+      return '<div class="card static"><div class="w">' + esc(c[0]) + '</div><div class="n neutral">' + esc(c[1]) + '</div><div class="of">' + esc(c[2]) + '</div><div class="now">' + esc(c[3] || '') + '</div></div>';
+    }).join('');
+
+    // Conditional bonuses the player can switch on.
+    var conds = a.bonuses.filter(function (b) { return b.when; });
+    var toggles = conds.length ? '<div class="toggles">' + conds.map(function (b) {
+      return '<label class="check"><input type="checkbox" data-bonus="' + esc(bonusKey(b)) + '"' + (on(b) ? ' checked' : '') + '> ' +
+        '<b>' + esc(b.source) + '</b> ' + esc(DPS.STAT_LABEL[b.stat] || b.stat) + ' ' + pct(b.value) + ' <span class="cat">' + esc(b.when) + '</span></label>';
+    }).join('') + '</div><p><button type="button" class="btn small" data-bonus-all="1">All on</button> <button type="button" class="btn small" data-bonus-all="0">All off</button></p>'
+      : '<p class="cat">Your build has no conditional bonuses.</p>';
+
+    var weaponPanel = function (w) {
+      if (w.missing) return panel(w.slot + ' — ' + w.name, '<p class="cat">No stats for this weapon on the wiki.</p>');
+      var s = w.stats, max = DPS.weaponDps(w.name, w.maxLevel, a.bonuses, on);
+      var rows = [
+        ['Upgrade', '+' + w.level + ' of +' + w.maxLevel + (w.boss ? ' (boss weapon)' : '') + ' · ×' + fmt(w.upgrade, 2) + ' base damage'],
+        ['Base damage', fmt(s.damage) + (s.damageNote ? ' (' + s.damageNote + ')' : '')],
+        ['Damage bonus', pct(w.bonus)],
+        ['Damage per hit', fmt(w.hit)],
+        ['Crit chance', fmt(w.critChance * 100) + '% (weapon ' + s.crit + '%)'],
+        ['Crit damage', '×' + fmt(w.critMult, 2)],
+        ['Weak spot', '×' + fmt(w.weakMult, 2) + ' (weapon +' + s.weakspot + '%)'],
+        ['Average hit (with crits)', fmt(w.expectedHit) + ' · ' + fmt(w.expectedWeakHit) + ' on weak spots'],
+      ];
+      if (w.rps) rows = rows.concat([
+        ['Fire rate', fmt(w.rps, 2) + ' shots/s (weapon ' + s.rps + ')'],
+        ['Magazine', s.magazine + ' · ' + fmt(w.perMagazine, 0) + ' damage · empties in ' + fmt(w.secondsPerMagazine, 1) + 's'],
+        ['Ideal range', s.range ? s.range + ' m' : null],
+        ['DPS', fmt(w.dps, 0) + ' · ' + fmt(w.weakDps, 0) + ' on weak spots'],
+        max && w.level < w.maxLevel ? ['DPS at +' + w.maxLevel, fmt(max.dps, 0) + ' · ' + fmt(max.weakDps, 0) + ' on weak spots'] : null,
+      ]);
+      else if (s.special) rows.push(['Special', s.special]);
+      var body = '<table class="kv">' + rows.filter(function (r) { return r && r[1] != null; }).map(function (r) { return '<tr><th>' + esc(r[0]) + '</th><td>' + esc(String(r[1])) + '</td></tr>'; }).join('') + '</table>';
+      if (w.reloadBound) body += '<p class="cat">Only ' + s.magazine + ' shot' + (s.magazine > 1 ? 's' : '') + ' per magazine: real DPS is lower because of reloads (reload times are not on the wiki).</p>';
+      if (!w.rps) body += '<p class="cat">The wiki has no attack speed for melee weapons, so this shows damage per hit.</p>';
+      return panel(w.slot + ' — ' + w.name, body);
+    };
+
+    var modsBody = a.mods.length ? a.mods.map(function (m) {
+      var facts = [m.type, m.summons ? m.summons + (m.summons > 1 ? ' summons' : ' summon') + ' at once' : '', m.hit != null ? fmt(m.hit) + ' damage per hit' : '', m.duration ? m.duration + 's' : ''].filter(Boolean).join(' · ');
+      return '<div class="mod"><b>' + esc(m.name) + '</b> <span class="cat">on ' + esc(m.weapon) + '</span><div class="cat">' + esc(facts) + '</div><p>' + esc(m.effect || 'No description on the wiki.') + '</p></div>';
+    }).join('') : '<p class="cat">No mods on your guns.</p>';
+    var buffs = a.bonuses.filter(function (b) { return /^while /.test(b.when || ''); });
+    var combo = a.mods.length > 1 ? '<p><b>Both together:</b> ' + (a.summonCount ? a.summonCount + ' summons at once' : 'no summons') +
+      (buffs.length ? '; while active: ' + buffs.map(function (b) { return (DPS.STAT_LABEL[b.stat] || b.stat) + ' ' + pct(b.value) + ' (' + b.source + ')'; }).join(', ') : '') + '.</p>' : '';
+
+    var totals = '<table class="kv"><tr><th></th><td><b>Always</b></td><td><b>With selected</b></td></tr>' + a.totals.filter(function (t) { return t.always || t.active; }).map(function (t) {
+      return '<tr><th>' + esc(t.label) + '</th><td>' + pct(t.always) + '</td><td>' + pct(t.active) + '</td></tr>';
+    }).join('') + '</table>';
+    var sources = '<table class="kv">' + a.bonuses.map(function (b) {
+      return '<tr><th>' + esc(b.source) + '</th><td>' + esc(DPS.STAT_LABEL[b.stat] || b.stat) + ' ' + (b.stat === 'noWeakspot' ? 'off' : pct(b.value)) + (b.when ? ' <span class="cat">' + esc(b.when) + '</span>' : '') + '</td></tr>';
+    }).join('') + '</table>';
+
+    // Guns that fire a few shots per magazine go last: their DPS ignores the reloads they spend most of their time in.
+    var ranked = a.owned.slice().sort(function (x, y) { return (x.reloadBound - y.reloadBound) || (!x.rps - !y.rps); });
+    var ranking = '<table class="kv"><tr><th>Weapon</th><td><b>Now</b></td><td><b>At max level</b></td></tr>' + ranked.map(function (w) {
+      var max = DPS.weaponDps(w.name, w.maxLevel, a.bonuses, on);
+      var now = w.dps ? fmt(w.dps, 0) + ' DPS' : fmt(w.expectedHit, 0) + ' per hit';
+      var top = max.dps ? fmt(max.dps, 0) + ' DPS' : fmt(max.expectedHit, 0) + ' per hit';
+      return '<tr><th>' + esc(w.name) + ' <span class="lvl">+' + w.level + '</span>' + (w.reloadBound ? ' <span class="cat">reload-bound</span>' : '') + '</th><td>' + now + '</td><td>' + top + '</td></tr>';
+    }).join('') + '</table>';
+
+    el.innerHTML = '<div class="summary">' + cards + '</div><div class="panels">' +
+      panel('Conditional bonuses', toggles, true) +
+      a.equipped.map(weaponPanel).join('') +
+      panel('Skills (weapon mods)', modsBody + combo) +
+      panel('Build bonuses', totals) +
+      panel('Where the bonuses come from', sources) +
+      panel('All your weapons by DPS', ranking) +
+      panel('How this is calculated', '<p class="cat">Base weapon stats from the Fextralife wiki. Damage per hit = base × upgrade (+10% of base per level, +20% for boss weapons) × (1 + damage bonuses). ' +
+        'Crits deal ×1.5 plus crit damage bonuses; weak spots add the weapon\'s weak spot bonus plus weak spot bonuses. Same-kind bonuses add up. ' +
+        'DPS is while firing — the wiki has no reload times. Elemental, status, mod-power and defensive effects are not counted. Summon DPS is only shown when the wiki gives an attack rate.</p>', true) +
+      '</div>';
+  }
+
+  // ---- events ------------------------------------------------------------
+
   // ---- events ------------------------------------------------------------
   function wire() {
     var drop = $('drop');
@@ -486,6 +815,16 @@
         if (p[1] === 'missingType' && !v) v = null;
         state[p[1]] = state[p[1]] === v ? null : v; renderMissing();
       });
+    });
+    $('build-view').addEventListener('change', function (e) {
+      var k = e.target.dataset && e.target.dataset.bonus; if (!k) return;
+      dpsOn[k] = e.target.checked; renderBuildTab();
+    });
+    $('build-view').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-bonus-all]'); if (!b) return;
+      var all = b.dataset.bonusAll === '1';
+      $('build-view').querySelectorAll('input[data-bonus]').forEach(function (i) { dpsOn[i.dataset.bonus] = all; });
+      renderBuildTab();
     });
     ['world-search', 'world-only-missing', 'world-hide-owned'].forEach(function (id) { $(id).addEventListener('input', renderWorld); });
     ['missing-search', 'missing-only-now', 'missing-show-owned'].forEach(function (id) { $(id).addEventListener('input', renderMissing); });

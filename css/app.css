@@ -144,6 +144,41 @@ details.item[open] summary::before { content: "▾"; }
 
 .empty { padding: 20px; text-align: center; color: var(--muted); background: var(--panel); border-radius: var(--radius); }
 
+/* My character */
+.card.static { cursor: default; }
+.panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 12px; align-items: start; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; min-width: 0; }
+.panel.wide { grid-column: 1 / -1; }
+.panel h3 { margin: 0 0 10px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+.panel p { margin: 6px 0 0; }
+table.kv { width: 100%; border-collapse: collapse; font-size: 14px; }
+.kv th { text-align: left; font-weight: 400; color: var(--muted); padding: 5px 10px 5px 0; vertical-align: top; width: 1%; white-space: nowrap; }
+.kv td { padding: 5px 0; text-align: left; }
+.panel .kv td:last-child:not(:first-child) { text-align: right; }
+.panel .kv tr + tr th, .panel .kv tr + tr td { border-top: 1px solid var(--line); }
+.lvl { display: inline-block; font-size: 12px; font-weight: 700; color: var(--ok); margin-left: 4px; }
+.meter { display: grid; grid-template-columns: 1fr auto; column-gap: 8px; font-size: 14px; margin-bottom: 7px; }
+.meter .mv { color: var(--muted); font-variant-numeric: tabular-nums; }
+.meter .bar { grid-column: 1 / -1; margin-top: 2px; }
+.meter .bar > i { background: var(--accent); }
+.meter.done .bar > i { background: var(--ok); }
+.meter.done .mv { color: var(--ok); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+.tile { background: var(--panel-2); border-radius: 6px; padding: 6px 9px; display: flex; flex-direction: column; }
+.tile .tq { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tile .tn { font-size: 13px; color: var(--muted); }
+.section-title.more { margin-top: 22px; }
+.panel .chips .chip { cursor: default; }
+
+/* World state */
+.evitem { display: inline-block; margin: 1px 12px 1px 0; font-size: 14px; }
+
+/* Build & DPS */
+.toggles { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 6px 16px; }
+.toggles .check { align-items: baseline; }
+.mod + .mod { border-top: 1px solid var(--line); margin-top: 8px; padding-top: 8px; }
+.mod p { margin: 4px 0 0; font-size: 14px; }
+
 .about { margin-top: 40px; color: var(--muted); font-size: 15px; line-height: 1.55; border-top: 1px solid var(--line); }
 .about h2 { font-size: 18px; color: var(--text); margin: 20px 0 10px; }
 .about h3 { font-size: 15px; color: var(--text); margin: 16px 0 4px; }
@@ -163,4 +198,5 @@ details.item[open] summary::before { content: "▾"; }
   .events tr { border-top: 1px solid var(--line); padding: 6px 0; }
   .events td { border: none; padding: 2px 10px; }
   input[type=search] { min-width: 0; }
+  .panels { grid-template-columns: 1fr; }
 }

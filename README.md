@@ -38,6 +38,9 @@ Other options: `-Port 9000` (different port), `-NoBrowser` (don't open the brows
 
 - **Current world** — campaign and adventure, each event with location, type and items. Click an item to see *how to obtain* it. Filters by world, event type, item category, search and "only events with a missing item".
 - **Missing items** — one card per world ("Corsus: 12 missing · 4 obtainable now"). Click a card to filter. Items that drop in your current world come first, tagged **available now**, with the exact location. Items bought in Ward 13 are under **Ward 13**; achievements and items with no world are under **General / achievements**.
+- **World state** — what the world save remembers about each area: which bosses, dungeons, sieges and points of interest you completed (and whether you own the item from each item drop), every area with its level, how much of its map you revealed, chests opened, and the loot left on the ground — including gear and trait books you never picked up. Also map objects broken/opened, time per mode and story progress flags.
+- **My character** — everything else the saves record: level and XP, time played, difficulty and current objective, your loadout (weapon and armor +levels, mods, rings, amulet), traits and their levels, resources (scrap, iron, lumenite…) and consumables, every weapon and armor upgrade, kills per weapon and other combat stats, deaths per quest, achievement progress and story milestones. Needs `profile.sav`.
+- **Build & DPS** — damage per second of your equipped guns and every weapon you own, at your upgrade levels and at max level: damage per hit, crit chance and multiplier, weak spot multiplier, fire rate, damage per magazine. Counts traits (Executioner, Kingslayer, Exploiter, Mind's Eye, Trigger Happy…), rings, amulet and armor set bonuses; conditional bonuses (after a kill, set stacks, Song of Swords…) can be switched on. Also shows your two weapon mods together: how many summons you can have at once (e.g. 2 Iron Sentinel turrets) and their damage. Weapon stats come from the Fextralife wiki; the wiki has no reload times, so DPS is "while firing".
 - Mods that come built into weapons (e.g. Skewer on the Devastator) count as yours when you have the weapon.
 - Summary tiles by item type (hand guns, long guns, melee, armor, …) and by mode (Normal, Survival, Hardcore) with "x of y" and %. Type, mode and world all filter each other and the list.
 - **Skins and consumables** are left out of the counts: the save doesn't store them in a way that can be checked. They still show up (with a **?**) in the current world view.
@@ -47,6 +50,13 @@ Other options: `-Port 9000` (different port), `-NoBrowser` (don't open the brows
 ```
 index.html, css/app.css, js/app.js   page
 js/parser.js                          save and profile parsing (runs in the browser and in Node)
+js/gvas.js                            reader for the game's property format (objects, nested character blobs)
+js/character.js                       character details and world stats built on js/gvas.js
+js/worldstate.js                      per-area state from the world save (quests, zones, chests, loot left behind)
+js/stats.js                           GENERATED — weapon, trait, ring, amulet, mod and armor set stats from the wiki
+js/dps.js                             DPS model; ring/amulet/set/mod effects are written out by hand in it
+tools/fetch-stats.ps1                 downloads the wiki pages into tools/source/wiki/ (not committed)
+tools/build-stats.mjs                 generates js/stats.js from those pages
 js/data.js                            GENERATED — items, events, locations
 tools/build-data.mjs                  generates js/data.js from tools/source/
 tools/overrides.mjs                   manual name → game path fixes
@@ -59,6 +69,8 @@ test/parser.test.mjs                  tests
 ```sh
 node tools/build-data.mjs --download --report   # re-download the sheet and regenerate js/data.js
 powershell -ExecutionPolicy Bypass -File tools/build-wiki.ps1   # re-check item wiki pages (after build-data)
+powershell -ExecutionPolicy Bypass -File tools/fetch-stats.ps1  # download weapon/trait/ring/mod pages
+node tools/build-stats.mjs                     # …and regenerate js/stats.js from them
 node --test test/                              # data and parser tests
 RWA_SAVE=path/save_0.sav RWA_PROFILE=path/profile.sav node --test test/   # + with your own save
 ```
