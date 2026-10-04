@@ -39,7 +39,8 @@ Other options: `-Port 9000` (different port), `-NoBrowser` (don't open the brows
 - **Current world** — campaign and adventure, each event with location, type and items. Click an item to see *how to obtain* it. Filters by world, event type, item category, search and "only events with a missing item".
 - **Missing items** — one card per world ("Corsus: 12 missing · 4 obtainable now"). Click a card to filter. Items that drop in your current world come first, tagged **available now**, with the exact location. Items bought in Ward 13 are under **Ward 13**; achievements and items with no world are under **General / achievements**.
 - Mods that come built into weapons (e.g. Skewer on the Devastator) count as yours when you have the weapon.
-- **Skins and consumables** are shown as a reference list: the save doesn't store them in a way that can be checked.
+- Summary tiles by item type (hand guns, long guns, melee, armor, …) and by mode (Normal, Survival, Hardcore) with "x of y" and %. Type, mode and world all filter each other and the list.
+- **Skins and consumables** are left out of the counts: the save doesn't store them in a way that can be checked. They still show up (with a **?**) in the current world view.
 
 ## For developers
 

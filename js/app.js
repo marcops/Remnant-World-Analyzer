@@ -20,13 +20,11 @@
     characters: [],     // from profile.sav
     charIndex: null,
     tab: 'world', mode: 'campaign',
-    worldZones: {}, worldTypes: {}, worldCats: {}, missingCats: {}, missingWorld: null, missingKind: null,
+    worldZones: {}, worldTypes: {}, worldCats: {}, missingWorld: null, missingType: null, missingMode: null,
   };
   P.ZONES.forEach(function (z) { state.worldZones[z] = true; });
   Object.keys(TYPE_LABEL).forEach(function (t) { state.worldTypes[t] = true; });
   CATEGORIES.forEach(function (c) { state.worldCats[c] = true; });
-  CATEGORIES.forEach(function (c) { state.missingCats[c] = !UNTRACKED[c]; });
-
   function store(k, v) { try { localStorage.setItem('rwa.' + k, JSON.stringify(v)); } catch (e) { /* private mode */ } }
   function recall(k, d) { try { var v = localStorage.getItem('rwa.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }
   state.tab = recall('tab', 'world');
@@ -343,78 +341,94 @@
   // The tutorial blade is taken away when the tutorial ends, so it can never be collected.
   function collectible(it) { return !UNTRACKED[it.category] && !(/^New characters begin/.test(it.how) && /removed/.test(it.how)); }
 
-  function kindTest(label) {
-    var c = COLLECTION.filter(function (x) { return x[0] === label; })[0];
+  // Items that only drop in a given game mode (the sheet's "Mode" column); Normal is everything else.
+  var MODE_COLLECTION = [['Normal', function (it) { return it.mode !== 'Survival' && it.mode !== 'Hardcore'; }]].concat(
+    ['Survival', 'Hardcore'].map(function (m) { return [m, function (it) { return it.mode === m; }]; }));
+
+  function testFor(list, label) {
+    var c = list.filter(function (x) { return x[0] === label; })[0];
     return c ? c[1] : null;
   }
+  function worldOf(it) { return WORLD_LABEL[it.world] !== undefined ? it.world : ''; }
 
-  function renderCollection() {
-    $('collection-title').hidden = !character();
-    if (!character()) { $('collection').innerHTML = ''; return; }
-    var rows = COLLECTION.map(function (c) { return { label: c[0], test: c[1], have: 0, total: 0 }; });
-    var all = { label: 'Total', have: 0, total: 0 };
+  // World, type and mode selections filter each other: each group's numbers apply the other two.
+  function passes(it, skip) {
+    if (skip !== 'world' && state.missingWorld != null && worldOf(it) !== state.missingWorld) return false;
+    var t = skip !== 'type' && state.missingType != null && testFor(COLLECTION, state.missingType);
+    if (t && !t(it)) return false;
+    var m = skip !== 'mode' && state.missingMode != null && testFor(MODE_COLLECTION, state.missingMode);
+    if (m && !m(it)) return false;
+    return true;
+  }
+
+  // Type and mode tiles: always shown, a click filters by it; an empty tile (0 of 0) reads "complete".
+  function tile(r, value, on, hasProfile) {
+    var pct = r.total ? Math.round(100 * r.have / r.total) : 100;
+    var done = r.have === r.total;
+    var status = !hasProfile ? 'load profile.sav' : done ? 'complete' : (r.total - r.have) + ' missing · ' + pct + '%';
+    return '<button type="button" class="coll' + (r.isTotal ? ' total' : '') + (hasProfile && done ? ' done' : '') + (on ? ' on' : '') +
+      '" data-value="' + esc(value) + '">' +
+      '<div class="w">' + esc(r.label) + '</div>' +
+      '<div class="n">' + (hasProfile ? r.have + ' <small>of ' + r.total + '</small>' : r.total + ' <small>items</small>') + '</div>' +
+      '<div class="of">' + status + '</div>' +
+      '<div class="now">' + (hasProfile && r.now ? r.now + ' obtainable now' : '&nbsp;') + '</div>' +
+      '<div class="bar"><i style="width:' + (hasProfile ? pct : 0) + '%"></i></div></button>';
+  }
+
+  function renderTiles(hasProfile) {
+    var row = function (label, test) { return { label: label, test: test, have: 0, total: 0, now: 0 }; };
+    var all = row('Total'); all.isTotal = true;
+    var types = COLLECTION.map(function (c) { return row(c[0], c[1]); });
+    var modes = MODE_COLLECTION.map(function (c) { return row(c[0], c[1]); });
+    var worlds = WORLD_ORDER.map(function (w) { return row(WORLD_LABEL[w], function (it) { return worldOf(it) === w; }); });
     DATA.items.forEach(function (it) {
       if (!collectible(it)) return;
       var have = itemOwned(it) === true ? 1 : 0;
-      all.total++; all.have += have;
-      rows.forEach(function (r) { if (r.test(it)) { r.total++; r.have += have; } });
+      var key = itemKeyForAvailability(it);
+      var now = !have && key && state.available[key] ? 1 : 0;
+      var add = function (r) { if (!r.test || r.test(it)) { r.total++; r.have += have; r.now += now; } };
+      if (passes(it, 'type')) [all].concat(types).forEach(add);
+      if (passes(it, 'mode')) modes.forEach(add);
+      if (passes(it, 'world')) worlds.forEach(add);
     });
-    // Clicking a type filters the list below like the world cards do; Total clears it.
-    $('collection').innerHTML = [all].concat(rows).map(function (r) {
-      var pct = r.total ? Math.round(100 * r.have / r.total) : 0;
-      var on = r === all ? state.missingKind == null : state.missingKind === r.label;
-      return '<button type="button" class="coll' + (r === all ? ' total' : '') + (r.have === r.total ? ' done' : '') + (on && state.missingKind != null ? ' on' : '') +
-        '" data-kind="' + (r === all ? '' : esc(r.label)) + '">' +
-        '<div class="w">' + esc(r.label) + '</div>' +
-        '<div class="n">' + r.have + ' <small>of ' + r.total + '</small></div>' +
-        '<div class="of">' + (r.have === r.total ? 'complete' : (r.total - r.have) + ' missing · ' + pct + '%') + '</div>' +
-        '<div class="bar"><i style="width:' + pct + '%"></i></div></button>';
-    }).join('');
+    $('collection').innerHTML = tile(all, '', false, hasProfile) +
+      types.map(function (r) { return tile(r, r.label, state.missingType === r.label, hasProfile); }).join('');
+    $('modes').innerHTML = modes.map(function (r) { return tile(r, r.label, state.missingMode === r.label, hasProfile); }).join('');
+    $('summary').innerHTML = worlds.map(function (r, i) { return worldCard(r, WORLD_ORDER[i], state.missingWorld === WORLD_ORDER[i], hasProfile); }).join('');
+  }
+
+  // World cards keep their original look: "N missing" up top, "x of y items · %" below.
+  function worldCard(r, value, on, hasProfile) {
+    var missing = r.total - r.have, pct = r.total ? Math.round(100 * r.have / r.total) : 100;
+    var big = hasProfile ? (missing ? missing + ' missing' : 'complete') : r.total + ' items';
+    return '<button type="button" class="card' + (on ? ' on' : '') + '" data-value="' + esc(value) + '">' +
+      '<div class="w">' + esc(r.label) + '</div>' +
+      '<div class="n' + (!hasProfile ? ' neutral' : !missing ? ' done' : '') + '">' + esc(big) + '</div>' +
+      (hasProfile ? '<div class="of">' + r.have + ' of ' + r.total + ' items · ' + pct + '%</div>' : '<div class="of">load profile.sav</div>') +
+      (hasProfile && r.now ? '<div class="now">' + r.now + ' obtainable now</div>' : '') +
+      (hasProfile ? '<div class="bar"><i style="width:' + pct + '%"></i></div>' : '') + '</button>';
   }
 
   function renderMissing() {
-    renderCollection();
     var hasProfile = !!character();
+    renderTiles(hasProfile);
     var q = $('missing-search').value.trim().toLowerCase();
     var onlyNow = $('missing-only-now').checked;
     var showOwned = $('missing-show-owned').checked || !hasProfile;
 
-    $('missing-cats').innerHTML = CATEGORIES.map(function (c) {
-      return chip(c + (UNTRACKED[c] ? ' (not trackable)' : ''), state.missingCats[c], 'data-cat="' + esc(c) + '"');
-    }).join('');
-
-    var stats = {};
-    WORLD_ORDER.forEach(function (w) { stats[w] = { total: 0, missing: 0, now: 0 }; });
     var groups = {};
-    var kind = state.missingKind != null && kindTest(state.missingKind);
     DATA.items.forEach(function (it) {
-      if (!state.missingCats[it.category]) return;
-      if (kind && !kind(it)) return;
-      var w = WORLD_LABEL[it.world] !== undefined ? it.world : '';
+      // Same items as the tiles above.
+      if (!collectible(it) || !passes(it)) return;
+      var w = worldOf(it);
       var owned = itemOwned(it);
       var key = itemKeyForAvailability(it);
       var where = key && state.available[key];
-      if (!UNTRACKED[it.category]) {
-        stats[w].total++;
-        if (owned === false) { stats[w].missing++; if (where) stats[w].now++; }
-      }
-      if (state.missingWorld != null && state.missingWorld !== w) return;
       if (owned === true && !showOwned) return;
       if (onlyNow && !where) return;
       if (q && (it.name + ' ' + it.how + ' ' + it.group).toLowerCase().indexOf(q) === -1) return;
       (groups[w] = groups[w] || []).push({ it: it, owned: owned, where: where });
     });
-
-    $('summary').innerHTML = WORLD_ORDER.filter(function (w) { return stats[w].total; }).map(function (w) {
-      var s = stats[w], pct = s.total ? Math.round(100 * (s.total - s.missing) / s.total) : 0;
-      var big = hasProfile ? (s.missing ? s.missing + ' missing' : 'complete') : s.total + ' items';
-      return '<button class="card' + (state.missingWorld === w ? ' on' : '') + '" data-world="' + esc(w) + '">' +
-        '<div class="w">' + esc(WORLD_LABEL[w]) + '</div>' +
-        '<div class="n' + (!hasProfile ? ' neutral' : !s.missing ? ' done' : '') + '">' + esc(big) + '</div>' +
-        (hasProfile ? '<div class="of">' + (s.total - s.missing) + ' of ' + s.total + ' items · ' + pct + '%</div>' : '<div class="of">load profile.sav</div>') +
-        (hasProfile && s.now ? '<div class="now">' + s.now + ' obtainable now</div>' : '') +
-        (hasProfile ? '<div class="bar"><i style="width:' + pct + '%"></i></div>' : '') + '</button>';
-    }).join('');
 
     var html = WORLD_ORDER.filter(function (w) { return groups[w]; }).map(function (w) {
       var list = groups[w].sort(function (a, b) { return (a.where ? 0 : 1) - (b.where ? 0 : 1) || a.it.category.localeCompare(b.it.category) || a.it.name.localeCompare(b.it.name); });
@@ -463,15 +477,15 @@
       else state.worldCats[cat] = !state.worldCats[cat];
       renderWorld();
     });
-    $('missing-cats').addEventListener('click', function (e) { var c = e.target.closest('.chip'); if (c) { state.missingCats[c.dataset.cat] = !state.missingCats[c.dataset.cat]; renderMissing(); } });
-    $('collection').addEventListener('click', function (e) {
-      var c = e.target.closest('.coll'); if (!c) return;
-      var k = c.dataset.kind || null;
-      state.missingKind = state.missingKind === k ? null : k; renderMissing();
-    });
-    $('summary').addEventListener('click', function (e) {
-      var c = e.target.closest('.card'); if (!c) return;
-      state.missingWorld = state.missingWorld === c.dataset.world ? null : c.dataset.world; renderMissing();
+    // Same behaviour for every group: click selects, clicking the selected tile again clears it.
+    // Total has an empty value and clears the type; '' is a real world ("General / achievements").
+    [['collection', 'missingType'], ['modes', 'missingMode'], ['summary', 'missingWorld']].forEach(function (p) {
+      $(p[0]).addEventListener('click', function (e) {
+        var c = e.target.closest('.coll, .card'); if (!c) return;
+        var v = c.dataset.value;
+        if (p[1] === 'missingType' && !v) v = null;
+        state[p[1]] = state[p[1]] === v ? null : v; renderMissing();
+      });
     });
     ['world-search', 'world-only-missing', 'world-hide-owned'].forEach(function (id) { $(id).addEventListener('input', renderWorld); });
     ['missing-search', 'missing-only-now', 'missing-show-owned'].forEach(function (id) { $(id).addEventListener('input', renderMissing); });
