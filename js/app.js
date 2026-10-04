@@ -192,11 +192,13 @@
     $('tab-build').hidden = state.tab !== 'build';
     $('tab-state').hidden = state.tab !== 'state';
     $('tab-map').hidden = state.tab !== 'map';
+    $('tab-tips').hidden = state.tab !== 'tips';
     $('tab-raw').hidden = state.tab !== 'raw';
     renderWorld();
     renderMissing();
     renderStateTab();
     renderMapTab();
+    renderTipsTab();
     renderRawTab();
     renderCharacterTab();
     renderBuildTab();
@@ -215,16 +217,52 @@
     }).join('');
   }
 
+  // ---- Cryptolith -----------------------------------------------------------
+  // What you get in Corsus is the Cryptolith Sigil (from the Iskal Queen), not the rewards: those come from
+  // using the Sigil on a Cryptolith tower (Earth, Rhom or Corsus), once per world — 1st Concentration,
+  // 2nd Blood Bond, 3rd the Labyrinth set. The Sigil is shown in their place.
+  var CRYPTOLITH_REWARDS = ((DATA.events.Cryptolith || {}).items || []).map(function (p) { return itemsByKey[p]; }).filter(Boolean);
+  var SIGIL_KEY = '__cryptolith_sigil';
+  var SIGIL = {
+    name: 'Cryptolith Sigil', category: 'Quest item', sigil: true, key: SIGIL_KEY, world: 'Corsus', dlc: 'Swamps of Corsus', mode: '', group: '',
+    how: 'Drops from the Iskal Queen (Corsus, The Mist Fen). Use it on a Cryptolith tower — it can be in Earth, Rhom or Corsus — once per world, rerolling in between: ' +
+      '1st use gives the Concentration trait, 2nd the Blood Bond trait, 3rd opens the Labyrinth room with the Labyrinth armor set (Labyrinth Helm, Armor and Greaves).',
+  };
+  // Everything the Missing items tab counts: the sheet's items plus the Sigil (a "Quest item").
+  var TRACKED_ITEMS = DATA.items.concat([SIGIL]);
+  function isCryptolithReward(it) { return CRYPTOLITH_REWARDS.indexOf(it) >= 0; }
+  function hasSigil() {
+    var ch = state.profile && state.profile.characters && state.profile.characters[state.charIndex];
+    return !!(ch && ch.extra && (ch.extra.questItems || []).some(function (q) { return /Sigil|Cryptolith/i.test(q.cls); }));
+  }
+
+  // Events that only hand out some items in exchange for another one: Brabus gives the Bandit set
+  // for the Pocket Watch you get from Mudtooth.
+  var EXCHANGES = {
+    Brabus: { needs: 'Pocket Watch', items: /\/Armor\/Bandit\//, note: 'The Bandit set needs the Pocket Watch from Mudtooth.' },
+  };
+  function exchangeReady(ev) {
+    var x = EXCHANGES[ev.key]; if (!x) return true;
+    var need = DATA.items.filter(function (i) { return i.name === x.needs; })[0];
+    return !!(need && state.owns && state.owns(need) === true);
+  }
+
   // key -> where it can drop in the currently loaded world
   function availability() {
-    var map = {}, save = current();
+    var map = {}, save = current(), sigil = hasSigil();
     if (!save) return map;
     [['campaign', save.campaign], ['adventure', save.adventure]].forEach(function (pair) {
       var block = pair[1];
       if (!block) return;
       block.events.forEach(function (ev) {
+        var at = { block: block.label + (block.world ? ' (' + block.world + ')' : ''), event: ev.name, location: ev.location };
+        // The tower's rewards only count as available when you carry a Sigil.
+        if (ev.key === 'Cryptolith' && !sigil) return;
+        if (ev.key === 'IskalQueen') (map[SIGIL_KEY] = map[SIGIL_KEY] || []).push(at);
+        var x = EXCHANGES[ev.key], ready = exchangeReady(ev);
         ev.items.forEach(function (p) {
-          (map[p] = map[p] || []).push({ block: block.label + (block.world ? ' (' + block.world + ')' : ''), event: ev.name, location: ev.location });
+          if (x && !ready && x.items.test(p)) return;
+          (map[p] = map[p] || []).push(at);
         });
       });
     });
@@ -237,7 +275,14 @@
     return '<span class="st unk" title="Unknown">?</span>';
   }
 
-  function itemOwned(it) { return UNTRACKED[it.category] ? null : state.owns(it); }
+  // The Sigil counts as done when you carry one or already have every tower reward.
+  function itemOwned(it) {
+    if (it.sigil) {
+      if (!character()) return null;
+      return hasSigil() || CRYPTOLITH_REWARDS.every(function (r) { return state.owns(r) === true; });
+    }
+    return UNTRACKED[it.category] ? null : state.owns(it);
+  }
 
   function itemDetails(it, extra) {
     var meta = [it.category, it.world && WORLD_LABEL[it.world] !== undefined ? WORLD_LABEL[it.world] : it.world, it.mode && 'Mode: ' + it.mode, it.dlc && 'DLC: ' + it.dlc]
@@ -323,20 +368,26 @@
     block.events.forEach(function (ev) {
       if (!state.worldZones[ev.zone] || !state.worldTypes[ev.type]) return;
       var items = ev.items.map(itemForPath);
+      // The Iskal Queen also gives the Cryptolith Sigil; it matters while a tower reward is still missing.
+      var sigilWanted = ev.key === 'IskalQueen' && CRYPTOLITH_REWARDS.some(function (it) { return itemOwned(it) !== true; });
+      if (sigilWanted) items.push(SIGIL);
+      var wanted = function (it) { return itemOwned(it) === false || (it.sigil && sigilWanted); };
       if (!allCats) {
-        items = items.filter(function (it) { return state.worldCats[it.category]; });
+        items = items.filter(function (it) { return it.sigil || state.worldCats[it.category]; });
         if (!items.length) return;
       }
       if (hideOwned) {
-        items = items.filter(function (it) { return itemOwned(it) === false; });
+        items = items.filter(wanted);
         if (!items.length) return;
       }
-      if (onlyMissing && !items.some(function (it) { return itemOwned(it) === false; })) return;
+      if (onlyMissing && !items.some(wanted)) return;
       if (q && (ev.name + ' ' + ev.location + ' ' + items.map(function (i) { return i.name; }).join(' ')).toLowerCase().indexOf(q) === -1) return;
       if (ev.zone !== lastZone) { rows.push('<tr class="zone-row"><td colspan="4">' + esc(WORLD_LABEL[ev.zone]) + '</td></tr>'); lastZone = ev.zone; }
       shown++;
       rows.push('<tr><td class="loc">' + esc(ev.location) + wikiLink(ev.location) + '</td><td class="type"><span class="type-badge">' + esc(TYPE_LABEL[ev.type] || ev.type) +
-        '</span></td><td class="name">' + esc(ev.name) + '</td><td>' +
+        '</span></td><td class="name">' + esc(ev.name) +
+        (ev.key === 'Cryptolith' ? '<div class="cat">' + (hasSigil() ? 'You carry a Cryptolith Sigil — use it here.' : 'Needs a Cryptolith Sigil (Iskal Queen, Corsus).') + '</div>' : '') +
+        (EXCHANGES[ev.key] ? '<div class="cat">' + esc(EXCHANGES[ev.key].note) + (exchangeReady(ev) ? ' You have it.' : '') + '</div>' : '') + '</td><td>' +
         (items.length ? items.map(function (it) { return itemDetails(it); }).join('') : '<span class="cat">—</span>') + '</td></tr>');
     });
     $('world-body').innerHTML = rows.join('');
@@ -356,6 +407,7 @@
     ['Mods', function (it) { return it.category === 'Mod'; }],
     ['Traits', function (it) { return it.category === 'Trait'; }],
     ['Emotes', function (it) { return it.category === 'Emote'; }],
+    ['Quest items', function (it) { return it.category === 'Quest item'; }],
   ];
   // The tutorial blade is taken away when the tutorial ends, so it can never be collected.
   function collectible(it) { return !UNTRACKED[it.category] && !(/^New characters begin/.test(it.how) && /removed/.test(it.how)); }
@@ -404,7 +456,7 @@
     var types = COLLECTION.map(function (c) { return row(c[0], c[1]); });
     var modes = MODE_COLLECTION.map(function (c) { return row(c[0], c[1]); });
     var worlds = WORLD_ORDER.map(function (w) { return row(WORLD_LABEL[w], function (it) { return worldOf(it) === w; }); });
-    DATA.items.forEach(function (it) {
+    TRACKED_ITEMS.forEach(function (it) {
       if (!collectible(it)) return;
       var have = itemOwned(it) === true ? 1 : 0;
       var key = itemKeyForAvailability(it);
@@ -440,7 +492,7 @@
     var showOwned = $('missing-show-owned').checked || !hasProfile;
 
     var groups = {};
-    DATA.items.forEach(function (it) {
+    TRACKED_ITEMS.forEach(function (it) {
       // Same items as the tiles above.
       if (!collectible(it) || !passes(it)) return;
       var w = worldOf(it);
@@ -451,6 +503,13 @@
       if (onlyNow && !where) return;
       if (q && (it.name + ' ' + it.how + ' ' + it.group).toLowerCase().indexOf(q) === -1) return;
       (groups[w] = groups[w] || []).push({ it: it, owned: owned, where: where });
+    });
+
+    // In Corsus you get the Cryptolith Sigil, not the tower rewards: the list shows the Sigil (counted
+    // as a Quest item) and leaves the rewards out; they still count in their own types above.
+    Object.keys(groups).forEach(function (w) {
+      groups[w] = groups[w].filter(function (r) { return !isCryptolithReward(r.it); });
+      if (!groups[w].length) delete groups[w];
     });
 
     var html = WORLD_ORDER.filter(function (w) { return groups[w]; }).map(function (w) {
@@ -708,6 +767,120 @@
         ['Map objects remembered without a known effect', num(ws.objects.other)],
       ].map(function (r) { return '<tr><th>' + esc(r[0]) + '</th><td>' + esc(String(r[1])) + '</td></tr>'; }).join('') + '</table>') +
       '</div>';
+  }
+
+  // ---- tips ------------------------------------------------------------------
+  // Next steps worked out from your saves: each tip comes from something the files record.
+  function sheetItem(name) { return DATA.items.filter(function (i) { return i.name === name; })[0]; }
+  function tipList(list, empty) {
+    return list.length ? '<ul class="tips">' + list.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul>' : '<p class="cat">' + (empty || 'Nothing here.') + '</p>';
+  }
+  function ownedMark(it) { return it ? statusIcon(itemOwned(it)) : ''; }
+  function mapLink(zoneId, label) { return zoneId != null ? '<a class="link" href="#zone-' + zoneId + '" data-goto-map="' + zoneId + '">' + esc(label) + '</a>' : esc(label); }
+
+  function cryptolithPanel(ch, ws) {
+    var x = ch.extra || {}, phase = x.cryptolithPhase || 0;
+    var sigil = (x.questItems || []).filter(function (q) { return /Sigil|Cryptolith/i.test(q.cls); })[0];
+    var rewards = [['1st use', ['Concentration']], ['2nd use', ['Blood Bond']], ['3rd use', ['Labyrinth Helm', 'Labyrinth Armor', 'Labyrinth Greaves']]];
+    var towers = (ws && ws.cryptolith) || [];
+    var queen = ws ? ws.events.filter(function (e) { return e.key === 'IskalQueen'; })[0] : null;
+    var soul = sheetItem('Soul Link');
+
+    var next;
+    if (phase >= 3) next = 'All three Cryptolith rewards unlocked.';
+    else if (sigil) next = towers.length ? 'Use the Sigil on the Cryptolith tower in ' + towers[0].area + ' (tile ' + towers[0].tileId + ').' : 'Use the Sigil on a Cryptolith tower — this world has none; reroll an adventure until one shows up.';
+    else next = queen ? (queen.done ? 'You defeated the Iskal Queen in this world — if you didn\'t get the Sigil, it drops from her.' : 'Defeat the Iskal Queen in ' + queen.area + ' to get the Cryptolith Sigil.')
+      : 'Get the Cryptolith Sigil from the Iskal Queen (Corsus, The Mist Fen) — she is not in this world.';
+
+    var rows = [
+      ['Next step', '<b>' + esc(next) + '</b>'],
+      ['Sigil in your inventory', sigil ? '<span class="st ok">✔</span> yes' : '<span class="st miss">✘</span> no'],
+      ['Times used on a tower', phase + ' of 3' + (phase < 3 ? ' — reroll the world between uses' : '')],
+      ['Rewards', rewards.map(function (r, i) {
+        return '<div>' + (phase > i ? '✔ ' : '') + '<span class="cat">' + r[0] + ':</span> ' + r[1].map(function (n) { var it = sheetItem(n); return ownedMark(it) + esc(n) + (it ? itemWikiLink(it) : ''); }).join(', ') + '</div>';
+      }).join('')],
+      ['Tower in this world', towers.length ? towers.map(function (t) {
+        return mapLink(t.zoneId, t.area) + ' <span class="cat">' + t.mode + ', tile ' + t.tileId + ' · teleporter to the Labyrinth ' + (t.teleporterUsed ? 'used' : t.teleporterActive ? 'active, never used' : 'inactive') + '</span>';
+      }).join('<br>') : 'none — the tower appears in Earth, Rhom or Corsus adventures/campaigns'],
+      ['Iskal Queen in this world', queen ? (queen.done ? '✔ defeated' : 'yes, not defeated') + ' <span class="cat">' + esc(queen.area) + '</span>' : 'no'],
+      ['Soul Link ring', ownedMark(soul) + 'looted from the cave below the Cryptolith tower on Rhom' + (soul ? itemWikiLink(soul) : '')],
+    ];
+    return panel('Cryptolith', '<table class="kv">' + rows.map(function (r) { return '<tr><th>' + esc(r[0]) + '</th><td>' + r[1] + '</td></tr>'; }).join('') + '</table>' +
+      '<p class="cat">The tower progress is per character (CryptolithPhase in profile.sav); the Sigil is a quest item in your inventory.</p>', true);
+  }
+
+  function renderTipsTab() {
+    var el = $('tips-view');
+    if (state.tab !== 'tips') return;
+    var prof = state.profile, ch = prof && prof.characters && prof.characters[state.charIndex];
+    var ws = state.worldStates && state.worldStates[state.charIndex];
+    if (ws && ws.error) ws = null;
+    if (!ch || ch.error) { el.innerHTML = '<div class="empty">Load <b>profile.sav</b> (and your save_N.sav) to get tips.</div>'; return; }
+    var missing = function (it) { return it && itemOwned(it) === false; };
+
+    // In this world, right now.
+    var world = [];
+    if (ws) {
+      ws.loot.filter(function (l) { return (l.item && /Ring|Amulet|Weapon|Armor|Mod|Trait/.test(l.item.category) && missing(l.item)) || l.name === 'Trait Book'; }).forEach(function (l) {
+        world.push('★ <b>Pick up ' + esc(l.name) + '</b> lying on the ground in ' + mapLink(l.zone, l.zoneLabel) + (l.item ? itemWikiLink(l.item) : ''));
+      });
+      // Skip the Cryptolith (it has its own panel) and item drops already listed as lying on the ground.
+      var onGround = {}; ws.loot.forEach(function (l) { if (l.item) onGround[l.item.name] = true; });
+      ws.events.filter(function (e) {
+        return !e.done && e.key !== 'Cryptolith' && e.items.some(function (i) { return missing(i.item) && !onGround[i.name]; });
+      }).forEach(function (e) {
+        var need = e.items.filter(function (i) { return missing(i.item); });
+        var verb = { Boss: 'Defeat', Miniboss: 'Defeat', Dungeon: 'Clear', Siege: 'Survive', 'Item drop': 'Find', 'Point of interest': 'Visit' }[e.type] || 'Do';
+        world.push(verb + ' <b>' + esc(e.name) + '</b> <span class="cat">' + esc(e.type) + '</span> in ' + mapLink(e.zoneId, e.area) + ' → ' +
+          need.map(function (i) { return esc(i.name) + itemWikiLink(i.item); }).join(', '));
+      });
+      ws.npcs.forEach(function (n) {
+        var sells = n.items.map(sheetItem).filter(missing);
+        if (sells.length) world.push('<b>' + esc(n.name.replace(/^Merchant /, '')) + '</b> sells ' + sells.map(function (i) { return esc(i.name) + itemWikiLink(i); }).join(', ') + ' — you don\'t have ' + (sells.length > 1 ? 'them' : 'it'));
+      });
+      var closed = ws.zones.filter(function (z) { return z.chests > z.chestsOpen; });
+      if (closed.length) world.push((ws.chests.total - ws.chests.open) + ' chests still closed: ' + closed.map(function (z) { return mapLink(z.id, z.name) + ' ' + (z.chests - z.chestsOpen); }).join(', '));
+      var undone = ws.events.filter(function (e) { return !e.done && e.type !== 'Item drop' && !e.items.some(function (i) { return missing(i.item); }); });
+      if (undone.length) world.push('Not done yet (nothing new for you, but XP and scrap): ' + undone.map(function (e) { return esc(e.name); }).join(', '));
+    }
+
+    // Your character.
+    var me = [], x = ch.extra || {};
+    var spare = (ch.traitPoints || 0) - (ch.traitPointsSpent || 0);
+    if (spare > 0) me.push('<b>' + spare + ' trait point' + (spare > 1 ? 's' : '') + ' to spend.</b>');
+    var lvl = ch.traits.filter(function (t) { return t.level > 0 && t.level < 20; });
+    if (lvl.length) me.push('Traits not maxed: ' + lvl.map(function (t) { return esc(t.name) + ' ' + t.level + '/20'; }).join(', '));
+    ch.loadout.forEach(function (l) {
+      var e = l.entry; if (!(e.category === 'Weapon' || e.category === 'Armor') || e.level == null) return;
+      var max = e.item && e.item.key && /\/Weapons\/Boss\//.test(e.item.key) ? 10 : 20;
+      if (e.level < max) me.push('Upgrade your ' + esc(l.label.toLowerCase()) + ' <b>' + esc(e.name) + '</b> +' + e.level + ' → +' + max);
+    });
+    // Quest items that aren't regular gear (the Pocket Watch is also an amulet in the sheet).
+    (x.questItems || []).filter(function (q) { return !q.item; }).forEach(function (q) { me.push('You carry <b>' + esc(q.name) + '</b>' + (q.item ? itemWikiLink(q.item) : '') + (/Sigil|Cryptolith/i.test(q.cls) ? ' — use it on a Cryptolith tower' : '')); });
+    if ((x.newItems || []).length) me.push('New items you haven\'t looked at: ' + x.newItems.map(esc).join(', '));
+    prof.achievements.filter(function (a) { return a.target > 1 && a.value < a.target && a.value / a.target >= 0.5; }).forEach(function (a) {
+      me.push('Almost there: <b>' + esc(a.name) + '</b> ' + num(a.value) + ' / ' + num(a.target));
+    });
+
+    // Collection.
+    var coll = [], gaps = {}, modeOnly = { Survival: [], Hardcore: [] };
+    DATA.items.forEach(function (it) {
+      if (!collectible(it) || itemOwned(it) !== false) return;
+      if (modeOnly[it.mode]) { modeOnly[it.mode].push(it); return; }
+      if (/^(Earth|Rhom|Corsus|Yaesha|Reisum)$/.test(it.world)) (gaps[it.world] = gaps[it.world] || []).push(it);
+    });
+    var ranked = Object.keys(gaps).sort(function (a, b) { return gaps[b].length - gaps[a].length; });
+    if (ranked.length) coll.push('<b>Best world to roll next:</b> ' + ranked.map(function (w) { return esc(WORLD_LABEL[w] || w) + ' (' + gaps[w].length + ' missing)'; }).join(' · '));
+    Object.keys(modeOnly).forEach(function (m) { if (modeOnly[m].length) coll.push('<b>' + m + ' mode</b> only: ' + modeOnly[m].length + ' items missing — ' + modeOnly[m].map(function (i) { return esc(i.name) + itemWikiLink(i); }).join(', ')); });
+    if (state.available) {
+      var now = DATA.items.filter(function (it) { var k = itemKeyForAvailability(it); return collectible(it) && itemOwned(it) === false && k && state.available[k]; });
+      if (now.length) coll.push(now.length + ' missing items drop in the world you have loaded — see <b>Missing items</b> › "Only what I can get in my world right now".');
+    }
+
+    el.innerHTML = '<div class="panels">' + cryptolithPanel(ch, ws) +
+      panel('In this world', ws ? tipList(world, 'Nothing left to do here for your collection — time to reroll.') : '<p class="cat">Load your save_N.sav to get tips for your world.</p>', true) +
+      panel('Your character', tipList(me, 'Nothing pending.')) +
+      panel('Collection', tipList(coll, 'You have everything trackable.')) + '</div>';
   }
 
   // ---- map -------------------------------------------------------------------
@@ -1009,6 +1182,13 @@
         if (p[1] === 'missingType' && !v) v = null;
         state[p[1]] = state[p[1]] === v ? null : v; renderMissing();
       });
+    });
+    // Links from tips to the map: switch to the Map tab, then jump to the area.
+    $('tips-view').addEventListener('click', function (e) {
+      var a = e.target.closest('[data-goto-map]'); if (!a) return;
+      e.preventDefault();
+      state.tab = 'map'; store('tab', state.tab); render();
+      var z = $('zone-' + a.dataset.gotoMap); if (z && z.scrollIntoView) z.scrollIntoView({ behavior: 'smooth' });
     });
     // Raw data: fill a node the first time it is opened ('toggle' doesn't bubble, so listen while capturing).
     $('raw-view').addEventListener('toggle', function (e) {

@@ -174,6 +174,10 @@ table.kv { width: 100%; border-collapse: collapse; font-size: 14px; }
 /* World state */
 .evitem { display: inline-block; margin: 1px 12px 1px 0; font-size: 14px; }
 
+/* Tips */
+ul.tips { margin: 0; padding-left: 18px; }
+ul.tips li { margin: 5px 0; font-size: 14px; }
+
 /* Map */
 .map-index { margin-bottom: 8px; }
 .map-index a { text-decoration: none; }

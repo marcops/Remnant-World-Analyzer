@@ -137,6 +137,11 @@
         var e = items.filter(function (i) { return i.ID === h; })[0];
         return e && e.ItemBP ? itemFromPath(e.ItemBP.path).name : (h != null ? 'item #' + h : null);
       })(),
+      // Quest items you carry (Cryptolith Sigil, keys, story items…).
+      questItems: items.filter(function (e) { return e.ItemBP && /\/Quest|Quest_/.test(e.ItemBP.path); }).map(function (e) {
+        var info = itemFromPath(e.ItemBP.path), cls = className(e.ItemBP.path);
+        return { cls: cls, name: info.item ? info.name : splitWords(cls.replace(/^Quest_(Item_)?/, '')), item: info.item };
+      }),
       newItems: items.filter(function (e) { return e.New && !e.Hidden && e.ItemBP; }).map(function (e) { return RESOURCE_NAMES[className(e.ItemBP.path)] || itemFromPath(e.ItemBP.path).name; }),
       hiddenItems: items.filter(function (e) { return e.Hidden; }).length,
       ammoPools: { handGun: comps.HandGunAmmo && comps.HandGunAmmo.Value, longGun: comps.LongGunAmmo && comps.LongGunAmmo.Value, special: comps.SpecialAmmo && comps.SpecialAmmo.Value },

@@ -36,7 +36,7 @@
         "operatingSystem": "Any (web browser); automatic mode on Windows",
         "browserRequirements": "Requires JavaScript",
         "isAccessibleForFree": true,
-        "softwareVersion": "2.0",
+        "softwareVersion": "2.1",
         "dateModified": "2026-10-04",
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
         "license": "https://www.gnu.org/licenses/gpl-3.0.html",
@@ -128,6 +128,7 @@
       <nav class="tabs" role="tablist">
         <button class="tab active" data-tab="world" role="tab">Current world</button>
         <button class="tab" data-tab="missing" role="tab">Missing items</button>
+        <button class="tab" data-tab="tips" role="tab">Tips</button>
         <button class="tab" data-tab="state" role="tab">World state</button>
         <button class="tab" data-tab="map" role="tab">Map</button>
         <button class="tab" data-tab="character" role="tab">My character</button>
@@ -167,6 +168,10 @@
         <div id="missing-list"></div>
       </div>
 
+      <div id="tab-tips" class="tab-panel" hidden>
+        <div id="tips-view"></div>
+      </div>
+
       <div id="tab-state" class="tab-panel" hidden>
         <div id="state-view"></div>
       </div>
@@ -202,7 +207,7 @@
   </section>
 
   <footer class="credits">
-    <p class="version" id="version">Version 2.0 · Updated on <time datetime="2026-10-04">October 4, 2026</time></p>
+    <p class="version" id="version">Version 2.1 · Updated on <time datetime="2026-10-04">October 4, 2026</time></p>
     <p class="repo">Open source (GPL-3.0) — <a href="https://github.com/marcops/Remnant-World-Analyzer" target="_blank" rel="noopener">github.com/marcops/Remnant-World-Analyzer</a> · <a href="https://github.com/marcops/Remnant-World-Analyzer/archive/refs/heads/master.zip">download to run locally (automatic mode)</a></p>
     <h2>Credits</h2>
     <ul>

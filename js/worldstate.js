@@ -185,10 +185,12 @@
       var parts = q.cls.split('_'), type = QUEST_TYPE[parts[1]];
       if (!type) return null;
       var key = parts.slice(2).join('_'), ev = DATA.events[key];
+      // The Cryptolith tower has one quest per world (Cryptolith_City, _Swamp, _Wasteland) but one reward list.
+      if (/^Cryptolith_/.test(key)) { ev = DATA.events.Cryptolith; key = 'Cryptolith'; }
       var z = zones[q.zoneId] || zones[q.inZone];
       var r = rootOf(q), mode = r && /AdventureMode/.test(r.cls) ? 'Adventure' : r && /Campaign/.test(r.cls) ? 'Campaign' : '';
       var e = {
-        name: /^TraitBook/.test(key) ? 'Trait Book' : ev && ev.altName ? splitWords(ev.altName.trim()) : splitWords(key), type: type, key: key,
+        name: /^TraitBook/.test(key) ? 'Trait Book' : key === 'Cryptolith' ? 'Cryptolith Tower' : ev && ev.altName ? splitWords(ev.altName.trim()) : splitWords(key), type: type, key: key,
         area: z ? z.name : '', zoneId: q.inZone, ownZone: q.zoneId !== q.inZone ? q.zoneId : null, tileId: q.tileId,
         state: q.state, done: q.state === 'Complete', mode: mode,
         items: ev ? ev.items.map(function (p) { return CHAR.itemFromPath(p); }) : [],
@@ -204,12 +206,25 @@
       z.entranceTile = entrance ? entrance.id : null;
     });
 
+    // Cryptolith towers in this world: where, and whether their teleporter to the Labyrinth room was used.
+    var cryptolith = quests.filter(function (q) { return /^Quest_OverworldPOI_Cryptolith_/.test(q.cls); }).map(function (q) {
+      var z = zones[q.inZone], world = /_Cryptolith_(\w+)$/.exec(q.cls)[1];
+      var link = z ? z.links.filter(function (l) { return /CryptolithTeleporter/.test(l.name || ''); })[0] : null;
+      var r = rootOf(q);
+      return {
+        world: WORLD_OF[world] || world, area: z ? z.name : '', zoneId: q.inZone, tileId: q.tileId, done: q.state === 'Complete',
+        mode: r && /AdventureMode/.test(r.cls) ? 'Adventure' : 'Campaign',
+        teleporterActive: link ? link.active : null, teleporterUsed: link ? link.used : null,
+        labyrinth: quests.some(function (x) { return x.cls === 'Quest_Cryptolith_Labyrinth' && x.parent === q.parent; }),
+      };
+    });
+
     var zoneList = Object.keys(zones).map(function (k) { return zones[k]; }).sort(function (a, b) { return a.id - b.id; });
     var top = file.root.props;
     return {
       zones: zoneList, events: events, loot: loot, objects: objects,
       chests: { total: chests.length, open: chests.filter(function (c) { return c.open; }).length },
-      modes: modes, flags: Object.keys(flags).sort(), conversations: conversations, keyItems: keyItems, npcs: npcs,
+      modes: modes, flags: Object.keys(flags).sort(), conversations: conversations, keyItems: keyItems, npcs: npcs, cryptolith: cryptolith,
       header: {
         newGame: !!top.NewGame, hasCampaign: !!top.HasMainCampaign, requiresFullGame: !!top.RequiresFullGame, lastRootSlot: top.LastActiveRootSlot,
         location: splitWords(className(top.LocationImage).replace(/^T_UI_Waypoint_|_A$/g, '')), uniqueIds: top.UniqueIDGenerator,
