@@ -37,7 +37,7 @@ body {
   color: var(--text);
   font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
-main, .top, .credits { max-width: 1280px; margin: 0 auto; padding: 0 16px; }
+main, .top, .about, .credits { max-width: 1280px; margin: 0 auto; padding: 0 16px; }
 
 .top { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding-top: 20px; padding-bottom: 12px; }
 h1 { margin: 0; font-size: 24px; letter-spacing: .3px; }
@@ -144,10 +144,10 @@ details.item[open] summary::before { content: "▾"; }
 
 .empty { padding: 20px; text-align: center; color: var(--muted); background: var(--panel); border-radius: var(--radius); }
 
-.about { margin-top: 40px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
-.about h2 { font-size: 16px; color: var(--text); margin: 18px 0 8px; }
-.about h3 { font-size: 14px; color: var(--text); margin: 14px 0 4px; }
-.about p { margin: 0 0 8px; max-width: 80ch; }
+.about { margin-top: 40px; color: var(--muted); font-size: 15px; line-height: 1.55; border-top: 1px solid var(--line); }
+.about h2 { font-size: 18px; color: var(--text); margin: 20px 0 10px; }
+.about h3 { font-size: 15px; color: var(--text); margin: 16px 0 4px; }
+.about p { margin: 0 0 10px; }
 .about code { background: var(--panel-2); padding: 1px 5px; border-radius: 4px; word-break: break-all; }
 .credits { margin-top: 24px; padding-bottom: 40px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
 .credits h2 { font-size: 16px; color: var(--text); margin: 18px 0 8px; }
