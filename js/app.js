@@ -20,10 +20,11 @@
     characters: [],     // from profile.sav
     charIndex: null,
     tab: 'world', mode: 'campaign',
-    worldZones: {}, worldTypes: {}, missingCats: {}, missingWorld: null,
+    worldZones: {}, worldTypes: {}, worldCats: {}, missingCats: {}, missingWorld: null,
   };
   P.ZONES.forEach(function (z) { state.worldZones[z] = true; });
   Object.keys(TYPE_LABEL).forEach(function (t) { state.worldTypes[t] = true; });
+  CATEGORIES.forEach(function (c) { state.worldCats[c] = true; });
   CATEGORIES.forEach(function (c) { state.missingCats[c] = !UNTRACKED[c]; });
 
   function store(k, v) { try { localStorage.setItem('rwa.' + k, JSON.stringify(v)); } catch (e) { /* private mode */ } }
@@ -288,6 +289,9 @@
 
     $('world-zones').innerHTML = P.ZONES.map(function (z) { return chip(WORLD_LABEL[z], state.worldZones[z], 'data-zone="' + z + '"'); }).join('');
     $('world-types').innerHTML = Object.keys(TYPE_LABEL).map(function (t) { return chip(TYPE_LABEL[t], state.worldTypes[t], 'data-type="' + esc(t) + '"'); }).join('');
+    $('world-cats').innerHTML = CATEGORIES.map(function (c) { return chip(c, state.worldCats[c], 'data-cat="' + esc(c) + '"'); }).join('');
+    // With every category on, nothing is filtered (events without items stay visible).
+    var allCats = CATEGORIES.every(function (c) { return state.worldCats[c]; });
 
     var block = save[state.mode];
     if (!block) {
@@ -296,10 +300,20 @@
     }
     var q = $('world-search').value.trim().toLowerCase();
     var onlyMissing = $('world-only-missing').checked;
+    // Without profile.sav nothing is known to be missing, so this would hide every item.
+    var hideOwned = $('world-hide-owned').checked && !!character();
     var rows = [], lastZone = null, shown = 0;
     block.events.forEach(function (ev) {
       if (!state.worldZones[ev.zone] || !state.worldTypes[ev.type]) return;
       var items = ev.items.map(itemForPath);
+      if (!allCats) {
+        items = items.filter(function (it) { return state.worldCats[it.category]; });
+        if (!items.length) return;
+      }
+      if (hideOwned) {
+        items = items.filter(function (it) { return itemOwned(it) === false; });
+        if (!items.length) return;
+      }
       if (onlyMissing && !items.some(function (it) { return itemOwned(it) === false; })) return;
       if (q && (ev.name + ' ' + ev.location + ' ' + items.map(function (i) { return i.name; }).join(' ')).toLowerCase().indexOf(q) === -1) return;
       if (ev.zone !== lastZone) { rows.push('<tr class="zone-row"><td colspan="4">' + esc(WORLD_LABEL[ev.zone]) + '</td></tr>'); lastZone = ev.zone; }
@@ -393,12 +407,21 @@
     });
     $('world-zones').addEventListener('click', function (e) { var c = e.target.closest('.chip'); if (c) { state.worldZones[c.dataset.zone] = !state.worldZones[c.dataset.zone]; renderWorld(); } });
     $('world-types').addEventListener('click', function (e) { var c = e.target.closest('.chip'); if (c) { state.worldTypes[c.dataset.type] = !state.worldTypes[c.dataset.type]; renderWorld(); } });
+    // With every category on, a click shows only that one; turning off the last one shows all again.
+    $('world-cats').addEventListener('click', function (e) {
+      var c = e.target.closest('.chip'); if (!c) return;
+      var cat = c.dataset.cat, on = CATEGORIES.filter(function (x) { return state.worldCats[x]; });
+      if (on.length === CATEGORIES.length) CATEGORIES.forEach(function (x) { state.worldCats[x] = x === cat; });
+      else if (on.length === 1 && on[0] === cat) CATEGORIES.forEach(function (x) { state.worldCats[x] = true; });
+      else state.worldCats[cat] = !state.worldCats[cat];
+      renderWorld();
+    });
     $('missing-cats').addEventListener('click', function (e) { var c = e.target.closest('.chip'); if (c) { state.missingCats[c.dataset.cat] = !state.missingCats[c.dataset.cat]; renderMissing(); } });
     $('summary').addEventListener('click', function (e) {
       var c = e.target.closest('.card'); if (!c) return;
       state.missingWorld = state.missingWorld === c.dataset.world ? null : c.dataset.world; renderMissing();
     });
-    ['world-search', 'world-only-missing'].forEach(function (id) { $(id).addEventListener('input', renderWorld); });
+    ['world-search', 'world-only-missing', 'world-hide-owned'].forEach(function (id) { $(id).addEventListener('input', renderWorld); });
     ['missing-search', 'missing-only-now', 'missing-show-owned'].forEach(function (id) { $(id).addEventListener('input', renderMissing); });
   }
 

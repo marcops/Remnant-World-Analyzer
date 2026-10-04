@@ -51,9 +51,11 @@
         <div class="seg" id="mode-switch"></div>
         <div class="filters">
           <input id="world-search" type="search" placeholder="Search event, location or item…">
-          <div class="chips" id="world-zones"></div>
-          <div class="chips" id="world-types"></div>
+          <div class="filter-row"><span class="filter-label">World</span><div class="chips" id="world-zones"></div></div>
+          <div class="filter-row"><span class="filter-label">Event</span><div class="chips" id="world-types"></div></div>
+          <div class="filter-row"><span class="filter-label">Item</span><div class="chips" id="world-cats"></div></div>
           <label class="check"><input id="world-only-missing" type="checkbox"> Only events with a missing item</label>
+          <label class="check"><input id="world-hide-owned" type="checkbox" checked> Only items I don't have (<span class="st miss">✘</span>)</label>
         </div>
         <div id="world-empty" class="empty" hidden></div>
         <table class="events">
@@ -66,7 +68,7 @@
         <div id="summary" class="summary"></div>
         <div class="filters">
           <input id="missing-search" type="search" placeholder="Search item or how to obtain…">
-          <div class="chips" id="missing-cats"></div>
+          <div class="filter-row"><span class="filter-label">Item</span><div class="chips" id="missing-cats"></div></div>
           <label class="check"><input id="missing-only-now" type="checkbox"> Only what I can get in my world right now</label>
           <label class="check"><input id="missing-show-owned" type="checkbox"> Also show what I already have</label>
         </div>

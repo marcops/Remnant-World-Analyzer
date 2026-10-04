@@ -77,6 +77,8 @@ input[type=search] { min-width: 260px; flex: 1 1 260px; }
 
 .filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.filter-row { display: flex; gap: 8px; align-items: baseline; width: 100%; }
+.filter-label { flex: 0 0 48px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
 .chip { background: var(--panel); border: 1px solid var(--line); color: var(--muted); border-radius: 999px; padding: 3px 10px; font-size: 13px; cursor: pointer; user-select: none; }
 .chip.on { color: var(--text); border-color: var(--accent); background: var(--panel-2); }
 .check { font-size: 14px; color: var(--muted); display: flex; gap: 6px; align-items: center; cursor: pointer; }
