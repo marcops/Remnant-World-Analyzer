@@ -1,5 +1,9 @@
 # Remnant World Analyzer
 
+### ▶ [Use it here — runs in your browser](https://marcops.github.io/Remnant-World-Analyzer/)
+
+Just drop your `save_N.sav` and `profile.sav` on the page. Nothing is uploaded: the files are read locally by your browser.
+
 Shows what rolled in your **Remnant: From the Ashes** world (campaign and adventure), what each event drops, **what you already have (✔) and what you're missing (✘)**, and a per-world summary of what's left — Earth, Subject 2923, Rhom, Corsus, Yaesha, Reisum, Ward 13, Ward 17, Ward Prime — with a description of how to obtain each item.
 
 Fork of [hzla/Remnant-World-Analyzer](https://github.com/hzla/Remnant-World-Analyzer), with a rewritten parser (the original showed nothing for saves with an active adventure).
