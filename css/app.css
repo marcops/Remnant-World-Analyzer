@@ -121,6 +121,17 @@ details.item[open] summary::before { content: "▾"; }
 .card .n.neutral { color: var(--text); }
 .card .of { color: var(--muted); font-size: 12px; }
 .card .now { color: var(--now); font-size: 12px; }
+.section-title { margin: 0 0 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+.collection { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin-bottom: 14px; }
+.coll { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; cursor: pointer; text-align: left; color: var(--text); font: inherit; }
+.coll.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.coll .w { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+.coll .n { font-size: 20px; font-weight: 700; line-height: 1.3; }
+.coll .n small { font-size: 13px; font-weight: 400; color: var(--muted); }
+.coll .of { color: var(--miss); font-size: 12px; }
+.coll.done .of { color: var(--ok); }
+.coll.total { grid-column: 1 / -1; border-color: var(--accent); }
+.coll.total .n { font-size: 26px; }
 .bar { height: 4px; background: var(--panel-2); border-radius: 2px; margin-top: 6px; overflow: hidden; }
 .bar > i { display: block; height: 100%; background: var(--ok); }
 
