@@ -1,0 +1,5 @@
+# Saves pessoais nunca vao para o repositorio
+*.sav
+*.bak
+.DS_Store
+node_modules/

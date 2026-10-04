@@ -1,123 +1,94 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-        <!-- Global site tag (gtag.js) - Google Analytics -->
-            <script async src="https://www.googletagmanager.com/gtag/js?id=UA-146791562-1"></script>
-            <script>
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Remnant World Analyzer</title>
+  <link rel="stylesheet" href="css/app.css">
+  <script src="js/data.js"></script>
+  <script src="js/parser.js"></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <h1>Remnant World Analyzer</h1>
+      <p class="sub">Remnant: From the Ashes — o que rolou no seu mundo e o que ainda falta pegar</p>
+    </div>
+    <div id="status" class="status" hidden></div>
+  </header>
 
-              gtag('config', 'UA-146791562-1');
-           </script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <link rel="stylesheet" type="text/css" href="index.css">
-        <script src="index.js?version=2.1"></script>
-
-    </head>
-     <body>
-        <h1>Remnant: From the Ashes World Analyzer</h1>
-
-         <p>
-            How to use:<br>
-            Navigate to %LOCALAPPDATA%/Remnant/Saved/SaveGames and locate the file named something like save_0.bak or save_0.sav. Upload to see what you rolled.<br><br>
-            For Adventure Mode, make sure to use the right side filters to filter by the selected world. Worlds other than what you chose should be ignored as they are just past rolls for those worlds. There is currently no way to determine which world was chosen in adventure mode so the tool lists all of them.
-            <br><br>
-            Known Issues:<br>
-             Adventure mode seems to not be working correctly, currently working on a fix.<br>
-             Ad block can mess with the tool functionality.<br>
-            <b>You must use the red crystal to travel to the location before the world can be analyzed.<b>
-			<br><br>
-            Credits to /u/FAOAB on reddit for this <a href="https://docs.google.com/spreadsheets/d/1VzmDx0ZXQWN5N_9_zP0gEqToyuB9ZjlxgZOEGdiuA6A/edit#gid=2123178902" style='color:white;'> spreadsheet</a> that helped me sort out some of the more confusing names. 
-            <br><br>
-
-             
-
-
+  <main>
+    <section id="loader" class="loader">
+      <div id="drop" class="drop" tabindex="0">
+        <p class="drop-title">Arraste aqui o <b>save_N.sav</b> e o <b>profile.sav</b></p>
+        <p class="drop-hint">ou <label class="link">clique para escolher<input id="file" type="file" accept=".sav,.bak" multiple hidden></label> — na pasta, aperte <kbd>Ctrl</kbd>+<kbd>A</kbd> para pegar os dois de uma vez</p>
+        <p class="drop-path">Pasta dos saves (Steam/Epic):
+          <code id="save-path">%LOCALAPPDATA%\Remnant\Saved\SaveGames</code>
+          <button id="copy-path" class="btn small" type="button">Copiar</button>
         </p>
-        <div id="drop-area">
-        <input type="file" onchange="loadFile(this)">
-        <p style="text-align: center; font-size:25px;">Choose or drop file</p>
+        <p class="drop-hint">Quer que abra sozinho e atualize quando o jogo salvar? Use o <b>Iniciar.bat</b> (veja o README).</p>
+      </div>
+      <p id="load-error" class="error" hidden></p>
+    </section>
+
+    <section id="app" hidden>
+      <div class="toolbar">
+        <label class="field">Personagem
+          <select id="character"></select>
+        </label>
+        <p id="profile-note" class="note" hidden>Sem <b>profile.sav</b>: não dá para saber o que você já tem. Carregue também o profile.sav.</p>
+        <button id="reload" class="btn small" type="button">Carregar outros arquivos</button>
+      </div>
+
+      <nav class="tabs" role="tablist">
+        <button class="tab active" data-tab="world" role="tab">Mundo atual</button>
+        <button class="tab" data-tab="missing" role="tab">O que falta</button>
+      </nav>
+
+      <div id="tab-world" class="tab-panel">
+        <div class="seg" id="mode-switch"></div>
+        <div class="filters">
+          <input id="world-search" type="search" placeholder="Buscar evento, local ou item…">
+          <div class="chips" id="world-zones"></div>
+          <div class="chips" id="world-types"></div>
+          <label class="check"><input id="world-only-missing" type="checkbox"> Só eventos com item faltando</label>
         </div>
+        <div id="world-empty" class="empty" hidden></div>
+        <table class="events">
+          <thead><tr><th>Local</th><th>Tipo</th><th>Evento</th><th>Itens</th></tr></thead>
+          <tbody id="world-body"></tbody>
+        </table>
+      </div>
 
-        <div id="filters">
-            <button id="toggle-adv">Show Adventure Mode</button>
-
-            <br />
-
-            <div id="select-filters">
-                <fieldset>
-                <legend>Regions:</legend>
-
-                <label><input type="checkbox" id="f-earth" class="filter" checked>Earth</label>
-                <label><input type="checkbox" id="f-rhom" class="filter" checked>Rhom</label>
-                <label><input type="checkbox" id="f-corsus" class="filter" checked>Corsus</label>
-                <label><input type="checkbox" id="f-yaesha" class="filter" checked>Yaesha</label>
-                <label><input type="checkbox" id="f-reisum" class="filter" checked>Reisum</label>
-                </fieldset>
-
-                <br/>
-
-                <fieldset>
-                <legend>Type:</legend>
-                <label><input type="checkbox" id="f-items" class="filter" checked>Items</label>
-                <label><input type="checkbox" id="f-sidedgs" class="filter" checked>Side Dungeons</label>
-                <label><input type="checkbox" id="f-sieges" class="filter" checked>Sieges</label>
-                <label><input type="checkbox" id="f-poi" class="filter" checked>Points of Interest</label>
-                <label><input type="checkbox" id="f-minibosses" class="filter" checked>Mini Bosses</label>
-                <label><input type="checkbox" id="f-bosses" class="filter" checked>Bosses</label>
-                </fieldset>
-
-                <br/>
-                
-                <fieldset>
-                <legend>Name filter:</legend>
-
-                <label><input type="text" id="f-name" class="filter" placeholder="Input event name filter"></label><button class="clear-button" onclick="document.getElementById('f-name').value=''">X</button>
-                </fieldset>
-
-                <br/>
-
-                <button class="half-button" onclick="updateFilters(false)">Hide all</button> <button class="half-button" onclick="updateFilters(true)">Show all</button>
-                <br/>
-                <button id="apply">Apply</button>
-            </div>
+      <div id="tab-missing" class="tab-panel" hidden>
+        <div id="summary" class="summary"></div>
+        <div class="filters">
+          <input id="missing-search" type="search" placeholder="Buscar item ou como obter…">
+          <div class="chips" id="missing-cats"></div>
+          <label class="check"><input id="missing-only-now" type="checkbox"> Só o que dá para pegar no meu mundo agora</label>
+          <label class="check"><input id="missing-show-owned" type="checkbox"> Mostrar também o que já tenho</label>
         </div>
+        <div id="missing-list"></div>
+      </div>
+    </section>
+  </main>
 
-
-        <table class="piece-table main-mode" style="display:none;">
-            <thead>
-                <tr class="header-row">
-                    <th class="headerSort" tabindex="0" role="columnheader button">Location
-                    </th>
-                    <th class="headerSort" tabindex="0" role="columnheader button">Event Type
-                    </th>
-                     <th class="headerSort" tabindex="0" role="columnheader button">Event Name
-                    </th>
-                </tr>
-            </thead>
-            <tbody id="main">
-                
-            </tbody>
-            <tfoot></tfoot>
-        </table>
-
-         <table class="piece-table adventure-mode">
-            <thead>
-                <tr class="header-row">
-                    <th class="headerSort" tabindex="0" role="columnheader button">Location
-                    </th>
-                    <th class="headerSort" tabindex="0" role="columnheader button">Event Type
-                    </th>
-                     <th class="headerSort" tabindex="0" role="columnheader button">Event Name
-                    </th>
-                </tr>
-            </thead>
-            <tbody id="adventure">
-                
-            </tbody>
-            <tfoot></tfoot>
-        </table>
-    </body>
+  <footer class="credits">
+    <h2>Agradecimentos</h2>
+    <ul>
+      <li><a href="https://github.com/hzla/Remnant-World-Analyzer" target="_blank" rel="noopener">hzla/Remnant-World-Analyzer</a> — o projeto original, do qual este é um fork.</li>
+      <li><a href="https://github.com/Razzmatazzz/RemnantSaveManager" target="_blank" rel="noopener">Razzmatazzz/RemnantSaveManager</a> (GPL-3.0) — lógica de leitura de campanha/aventura/inventário e a base de eventos → itens (GameInfo.xml).</li>
+      <li><a href="https://docs.google.com/spreadsheets/d/1rmmwn-kaVS44qWgub7ubXqL26fAgM7TBIi-dNc7VGdI" target="_blank" rel="noopener">Remnant: From the Ashes — Completionist's Checklist</a>, de Amythyst34 — lista completa de itens e “How to Obtain”.</li>
+      <li>Forks que trouxeram correções e ideias:
+        <a href="https://github.com/axllency/Remnant-World-Analyzer" target="_blank" rel="noopener">axllency</a>,
+        <a href="https://github.com/tkerzmann/Remnant-World-Analyzer" target="_blank" rel="noopener">tkerzmann</a>,
+        <a href="https://github.com/paige404/Remnant-World-Analyzer" target="_blank" rel="noopener">paige404</a>,
+        <a href="https://github.com/gmferise/Remnant-World-Analyzer" target="_blank" rel="noopener">gmferise</a>,
+        <a href="https://github.com/northy/Remnant-World-Analyzer" target="_blank" rel="noopener">northy</a>,
+        <a href="https://github.com/chris-faulkner/Remnant-World-Analyzer" target="_blank" rel="noopener">chris-faulkner</a>.</li>
+      <li>/u/FAOAB no Reddit, pela <a href="https://docs.google.com/spreadsheets/d/1VzmDx0ZXQWN5N_9_zP0gEqToyuB9ZjlxgZOEGdiuA6A" target="_blank" rel="noopener">planilha de nomes</a> usada pelo original.</li>
+    </ul>
+  </footer>
+</body>
 </html>

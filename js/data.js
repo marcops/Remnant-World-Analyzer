@@ -1,0 +1,5432 @@
+// Gerado por tools/build-data.mjs - nao editar a mao.
+var RWA_DATA = {
+ "generated": "2026-10-04",
+ "items": [
+  {
+   "name": "Adventurer Goggles",
+   "category": "Armadura",
+   "group": "Adventurer Set",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Defeat 5 bosses in a row (must be done in a single run).",
+   "key": "/Items/Armor/Adventurer/Armor_Head_Adventurer",
+   "id": 0
+  },
+  {
+   "name": "Adventurer Leggings",
+   "category": "Armadura",
+   "group": "Adventurer Set",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "New characters begin the game with this item.",
+   "key": null,
+   "id": 1,
+   "starter": true
+  },
+  {
+   "name": "Adventurer Tunic",
+   "category": "Armadura",
+   "group": "Adventurer Set",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "New characters begin the game with this item.",
+   "key": null,
+   "id": 2,
+   "starter": true
+  },
+  {
+   "name": "Akari Garb",
+   "category": "Armadura",
+   "group": "Akari Set",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "At the end of the Vault of the Herald dungeon you will find three doors. Use a Glowing Rod (found in various dungeons on Rhom) on each door to obtain a piece of the set. The Garb is found behind the middle door.",
+   "key": "/Items/Armor/Akari/Armor_Body_Akari",
+   "id": 3
+  },
+  {
+   "name": "Akari Leggings",
+   "category": "Armadura",
+   "group": "Akari Set",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "At the end of the Vault of the Herald dungeon you will find three doors. Use a Glowing Rod (found in various dungeons on Rhom) on each door to obtain a piece of the set. The Leggings are found behind the right door.",
+   "key": "/Items/Armor/Akari/Armor_Legs_Akari",
+   "id": 4
+  },
+  {
+   "name": "Akari Mask",
+   "category": "Armadura",
+   "group": "Akari Set",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "At the end of the Vault of the Herald dungeon you will find three doors. Use a Glowing Rod (found in various dungeons on Rhom) on each door to obtain a piece of the set. The Mask is found behind the left door.",
+   "key": "/Items/Armor/Akari/Armor_Head_Akari",
+   "id": 5
+  },
+  {
+   "name": "Bandit Jacket",
+   "category": "Armadura",
+   "group": "Bandit Set",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Get the Pocket Watch amulet from Mudtooth. Then confront Brabus in The Depot. Give Brabus the Pocket Watch and he will give you the complete Bandit armor set.",
+   "key": "/Items/Armor/Bandit/Armor_Body_Bandit",
+   "id": 6
+  },
+  {
+   "name": "Bandit Trousers",
+   "category": "Armadura",
+   "group": "Bandit Set",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Get the Pocket Watch amulet from Mudtooth. Then confront Brabus in The Depot. Give Brabus the Pocket Watch and he will give you the complete Bandit armor set.",
+   "key": "/Items/Armor/Bandit/Armor_Legs_Bandit",
+   "id": 7
+  },
+  {
+   "name": "Bandit's Mask",
+   "category": "Armadura",
+   "group": "Bandit Set",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Get the Pocket Watch amulet from Mudtooth. Then confront Brabus in The Depot. Give Brabus the Pocket Watch and he will give you the complete Bandit armor set.",
+   "key": "/Items/Armor/Bandit/Armor_Head_Bandit",
+   "id": 8
+  },
+  {
+   "name": "Bomber Hat",
+   "category": "Armadura",
+   "group": "Bomber Hat",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Rewarded to Twitch Prime members that pre-ordered through Amazon during the Prime Day promotion. A green version can also be found as a random drop on Earth (PC only).",
+   "key": null,
+   "id": 9
+  },
+  {
+   "name": "Carapace Great Helm",
+   "category": "Armadura",
+   "group": "Carapace Set",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "Swamps of Corsus",
+   "how": "You must be infected with the Parasite effect from an Iskal Infector. This allows you to purchase this item from Mar'Gosh for 1 Hardened Carapace and 500 Scrap. Hardened Carapaces drop from Black Vikorian Beetles during the \"Sketterling Temple\" event in Corsus dungeons.",
+   "key": "/Items/Armor/Carapace/Armor_Head_Carapace",
+   "id": 10
+  },
+  {
+   "name": "Carapace Greaves",
+   "category": "Armadura",
+   "group": "Carapace Set",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "Swamps of Corsus",
+   "how": "You must be infected with the Parasite effect from an Iskal Infector. This allows you to purchase this item from Mar'Gosh for 1 Hardened Carapace and 1,000 Scrap. Hardened Carapaces drop from Black Vikorian Beetles during the \"Sketterling Temple\" event in Corsus dungeons.",
+   "key": "/Items/Armor/Carapace/Armor_Legs_Carapace",
+   "id": 11
+  },
+  {
+   "name": "Carapace Shell",
+   "category": "Armadura",
+   "group": "Carapace Set",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "Swamps of Corsus",
+   "how": "You must be infected with the Parasite effect from an Iskal Infector. This allows you to purchase this item from Mar'Gosh for 1 Hardened Carapace and 1,500 Scrap. Hardened Carapaces drop from Black Vikorian Beetles during the \"Sketterling Temple\" event in Corsus dungeons.",
+   "key": "/Items/Armor/Carapace/Armor_Body_Carapace",
+   "id": 12
+  },
+  {
+   "name": "Cultist Britches",
+   "category": "Armadura",
+   "group": "Cultist Set",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "The Ex-Cultist archtype begins the game with this item. It can also be purchased from Rigs for 350 Scrap.",
+   "key": "/Items/Armor/Cultist/Armor_Legs_Cultist",
+   "id": 13
+  },
+  {
+   "name": "Cultist Duster",
+   "category": "Armadura",
+   "group": "Cultist Set",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "The Ex-Cultist archtype begins the game with this item. It can also be purchased from Rigs for 500 Scrap.",
+   "key": "/Items/Armor/Cultist/Armor_Body_Cultist",
+   "id": 14
+  },
+  {
+   "name": "Cultist Hat",
+   "category": "Armadura",
+   "group": "Cultist Set",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "The Ex-Cultist archtype begins the game with this item. It can also be purchased from Rigs for 150 Scrap.",
+   "key": "/Items/Armor/Cultist/Armor_Head_Cultist",
+   "id": 15
+  },
+  {
+   "name": "Drifter's Mask",
+   "category": "Armadura",
+   "group": "Drifter Set",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Armor/Drifter/Armor_Head_Drifter",
+   "id": 16
+  },
+  {
+   "name": "Drifter's Overcoat",
+   "category": "Armadura",
+   "group": "Drifter Set",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Found in a secret room in the Founder's Hideout. You can find the entrance to the secret room hidden behind a destroyable bookcase.",
+   "key": "/Items/Armor/Drifter/Armor_Body_Drifter",
+   "id": 17
+  },
+  {
+   "name": "Drifter's Trousers",
+   "category": "Armadura",
+   "group": "Drifter Set",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Found in a secret room in the Founder's Hideout. You can find the entrance to the secret room hidden behind a destroyable bookcase.",
+   "key": "/Items/Armor/Drifter/Armor_Legs_Drifter",
+   "id": 18
+  },
+  {
+   "name": "Elder Headdress",
+   "category": "Armadura",
+   "group": "Elder Set",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Complete the \"Survive the Attack\" event in Martyr's Sanctuary.",
+   "key": "/Items/Armor/Elder/Armor_Head_Elder",
+   "id": 19
+  },
+  {
+   "name": "Elder Leggings",
+   "category": "Armadura",
+   "group": "Elder Set",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Complete the \"Survive the Attack\" event in Martyr's Sanctuary.",
+   "key": "/Items/Armor/Elder/Armor_Legs_Elder",
+   "id": 20
+  },
+  {
+   "name": "Elder Raiment",
+   "category": "Armadura",
+   "group": "Elder Set",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Complete the \"Survive the Attack\" event in Martyr's Sanctuary.",
+   "key": "/Items/Armor/Elder/Armor_Body_Elder",
+   "id": 21
+  },
+  {
+   "name": "Hunter Pants",
+   "category": "Armadura",
+   "group": "Hunter Set",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "The Hunter archtype begins the game with this item. It can also be purchased from Rigs for 350 Scrap.",
+   "key": "/Items/Armor/Hunter/Armor_Legs_Hunter",
+   "id": 22
+  },
+  {
+   "name": "Hunter Shroud",
+   "category": "Armadura",
+   "group": "Hunter Set",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "The Hunter archtype begins the game with this item. It can also be purchased from Rigs for 150 Scrap.",
+   "key": "/Items/Armor/Hunter/Armor_Head_Hunter",
+   "id": 23
+  },
+  {
+   "name": "Hunter Trenchcoat",
+   "category": "Armadura",
+   "group": "Hunter Set",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "The Hunter archtype begins the game with this item. It can also be purchased from Rigs for 500 Scrap.",
+   "key": "/Items/Armor/Hunter/Armor_Body_Hunter",
+   "id": 24
+  },
+  {
+   "name": "Labyrinth Armor",
+   "category": "Armadura",
+   "group": "Labyrinth Set",
+   "world": "Corsus",
+   "mode": "Adventure",
+   "dlc": "Swamps of Corsus",
+   "how": "Obtain the Cryptolith Sigil from the Iskal Queen, then use it on the Cryptolith Tower. This must be done 3 separate times (re-rolling the world in between each use). After the third use, a portal will open that leads to this armor set.",
+   "key": "/Items/Armor/Armor_Body_Labyrinth",
+   "id": 25
+  },
+  {
+   "name": "Labyrinth Greaves",
+   "category": "Armadura",
+   "group": "Labyrinth Set",
+   "world": "Corsus",
+   "mode": "Adventure",
+   "dlc": "Swamps of Corsus",
+   "how": "Obtain the Cryptolith Sigil from the Iskal Queen, then use it on the Cryptolith Tower. This must be done 3 separate times (re-rolling the world in between each use). After the third use, a portal will open that leads to this armor set.",
+   "key": "/Items/Armor/Armor_Legs_Labyrinth",
+   "id": 26
+  },
+  {
+   "name": "Labyrinth Helm",
+   "category": "Armadura",
+   "group": "Labyrinth Set",
+   "world": "Corsus",
+   "mode": "Adventure",
+   "dlc": "Swamps of Corsus",
+   "how": "Obtain the Cryptolith Sigil from the Iskal Queen, then use it on the Cryptolith Tower. This must be done 3 separate times (re-rolling the world in between each use). After the third use, a portal will open that leads to this armor set.",
+   "key": "/Items/Armor/Armor_Head_Labyrinth",
+   "id": 27
+  },
+  {
+   "name": "Leto's Armor",
+   "category": "Armadura",
+   "group": "Leto's Set",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Complete the \"Leto's Lab\" event in Research Station Alpha. This set of armor can be found after using the teleporter, in the room with the burning corpses.",
+   "key": "/Items/Armor/Leto/Armor_Body_Leto",
+   "id": 28
+  },
+  {
+   "name": "Leto's Helmet",
+   "category": "Armadura",
+   "group": "Leto's Set",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Complete the \"Leto's Lab\" event in Research Station Alpha. This set of armor can be found after using the teleporter, in the room with the burning corpses.",
+   "key": "/Items/Armor/Leto/Armor_Head_Leto",
+   "id": 29
+  },
+  {
+   "name": "Leto's Leggings",
+   "category": "Armadura",
+   "group": "Leto's Set",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Complete the \"Leto's Lab\" event in Research Station Alpha. This set of armor can be found after using the teleporter, in the room with the burning corpses.",
+   "key": "/Items/Armor/Leto/Armor_Legs_Leto",
+   "id": 30
+  },
+  {
+   "name": "Osseous Helm",
+   "category": "Armadura",
+   "group": "Osseus Set",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchase all of the secrets from Wud for 500 Scrap. He will then sell you this item for 700 Scrap.",
+   "key": "/Items/Armor/Osseous/Armor_Head_Osseous",
+   "id": 31
+  },
+  {
+   "name": "Osseous Husk",
+   "category": "Armadura",
+   "group": "Osseus Set",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchase all of the secrets from Wud for 500 Scrap. He will then sell you this item for 1,750 Scrap.",
+   "key": "/Items/Armor/Osseous/Armor_Body_Osseous",
+   "id": 32
+  },
+  {
+   "name": "Osseous Kilt",
+   "category": "Armadura",
+   "group": "Osseus Set",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchase all of the secrets from Wud for 500 Scrap. He will then sell you this item for 1,050 Scrap.",
+   "key": "/Items/Armor/Osseous/Armor_Legs_Osseous",
+   "id": 33
+  },
+  {
+   "name": "Radiant Greaves",
+   "category": "Armadura",
+   "group": "Radiant Set",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from the Stuck Merchant for 1,350 Scrap.",
+   "key": "/Items/Armor/Radiant/Armor_Legs_Radiant",
+   "id": 34
+  },
+  {
+   "name": "Radiant Protector",
+   "category": "Armadura",
+   "group": "Radiant Set",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from the Stuck Merchant for 2,250 Scrap.",
+   "key": "/Items/Armor/Radiant/Armor_Body_Radiant",
+   "id": 35
+  },
+  {
+   "name": "Radiant Visage",
+   "category": "Armadura",
+   "group": "Radiant Set",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Find the Stuck Merchant. Warning: Purchase the Protector and Greaves before proceeding or you will lock yourself out of getting them this playthrough. Get the Strange Curio from the back of of the merchant's wagon and use it to open the door to the Guardian Shrine. This item is looted from a statue at the end of the dungeon.",
+   "key": "/Items/Armor/Radiant/Armor_Head_Radiant",
+   "id": 36
+  },
+  {
+   "name": "Scavenger Armor",
+   "category": "Armadura",
+   "group": "Scavenger Set",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Complete the \"Magir Test\" event in Judgement's Spear.",
+   "key": "/Items/Armor/Scavenger/Armor_Body_Scavenger",
+   "id": 37
+  },
+  {
+   "name": "Scavenger Boots",
+   "category": "Armadura",
+   "group": "Scavenger Set",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Complete the \"Magir Test\" event in Judgement's Spear.",
+   "key": "/Items/Armor/Scavenger/Armor_Legs_Scavenger",
+   "id": 38
+  },
+  {
+   "name": "Scavenger Helmet",
+   "category": "Armadura",
+   "group": "Scavenger Set",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Complete the \"Magir Test\" event in Judgement's Spear.",
+   "key": "/Items/Armor/Scavenger/Armor_Head_Scavenger",
+   "id": 39
+  },
+  {
+   "name": "Scrapper Bodyplate",
+   "category": "Armadura",
+   "group": "Scrapper Set",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "The Scrapper archtype begins the game with this item. It can also be purchased from Rigs for 500 Scrap.",
+   "key": "/Items/Armor/Scrapper/Armor_Body_Scrapper",
+   "id": 40
+  },
+  {
+   "name": "Scrapper Helmet",
+   "category": "Armadura",
+   "group": "Scrapper Set",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "The Scrapper archtype begins the game with this item. It can also be purchased from Rigs for 150 Scrap.",
+   "key": "/Items/Armor/Scrapper/Armor_Head_Scrapper",
+   "id": 41
+  },
+  {
+   "name": "Scrapper Workboots",
+   "category": "Armadura",
+   "group": "Scrapper Set",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "The Scrapper archtype begins the game with this item. It can also be purchased from Rigs for 350 Scrap.",
+   "key": "/Items/Armor/Scrapper/Armor_Legs_Scrapper",
+   "id": 42
+  },
+  {
+   "name": "Slayer Boots",
+   "category": "Armadura",
+   "group": "Slayer Set",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Received from the Iskal Queen after giving her the Guardian's Heart.",
+   "key": "/Items/Armor/Slayer/Armor_Legs_Slayer",
+   "id": 43
+  },
+  {
+   "name": "Slayer Mantle",
+   "category": "Armadura",
+   "group": "Slayer Set",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Received from the Iskal Queen after giving her the Guardian's Heart.",
+   "key": "/Items/Armor/Slayer/Armor_Body_Slayer",
+   "id": 44
+  },
+  {
+   "name": "Slayer Mask",
+   "category": "Armadura",
+   "group": "Slayer Set",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Received from the Iskal Queen after giving her the Guardian's Heart.",
+   "key": "/Items/Armor/Slayer/Armor_Head_Slayer",
+   "id": 45
+  },
+  {
+   "name": "Twisted Cage",
+   "category": "Armadura",
+   "group": "Twisted Set",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Defend the tree in \"The Root Shrine\" event at The Gallows. You will then be able to craft this set piece at the tree for 5 Lumenite Crystals and 1,000 Scrap.",
+   "key": "/Items/Armor/Twisted/Armor_Body_Twisted",
+   "id": 46
+  },
+  {
+   "name": "Twisted Hood",
+   "category": "Armadura",
+   "group": "Twisted Set",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Defend the tree in \"The Root Shrine\" event at The Gallows. You will then be able to craft this set piece at the tree for 2 Lumenite Crystals and 300 Scrap. The Mask and the Hood are interchangeable to complete this set.",
+   "key": "/Items/Armor/Twisted/Armor_Head_Twisted",
+   "id": 47
+  },
+  {
+   "name": "Twisted Mask",
+   "category": "Armadura",
+   "group": "Twisted Set",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "When you encounter the Twisted Mask Merchant in Junktown, insist on talking to him about his mask and he will eventually turn hostile. Kill him to obtain the Mask. The Mask and the Hood are interchangeable to complete this set.",
+   "key": "/Items/QuestItems/TwistedMask/Quest_TwistedMask",
+   "id": 48
+  },
+  {
+   "name": "Twisted Tassets",
+   "category": "Armadura",
+   "group": "Twisted Set",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Defend the tree in \"The Root Shrine\" event at The Gallows. You will then be able to craft this set piece at the tree for 3 Lumenite Crystals and 700 Scrap.",
+   "key": "/Items/Armor/Twisted/Armor_Legs_Twisted",
+   "id": 49
+  },
+  {
+   "name": "Void Carapace",
+   "category": "Armadura",
+   "group": "Void Set",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Complete the floor puzzle at The Monolith. Find the 10 glyphs written on a nearby wall - this is the solution to the puzzle. The glyphs on the center tile are a compass. Start from the center tile and use the solution to walk across the floor panels. The center tile should open if the sequence was performed correctly.",
+   "key": "/Items/Armor/Void/Armor_Body_Void",
+   "id": 50
+  },
+  {
+   "name": "Void Greaves",
+   "category": "Armadura",
+   "group": "Void Set",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Complete the floor puzzle at The Monolith. Find the 10 glyphs written on a nearby wall - this is the solution to the puzzle. The glyphs on the center tile are a compass. Start from the center tile and use the solution to walk across the floor panels. The center tile should open if the sequence was performed correctly.",
+   "key": "/Items/Armor/Void/Armor_Legs_Void",
+   "id": 51
+  },
+  {
+   "name": "Void Skull",
+   "category": "Armadura",
+   "group": "Void Set",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Complete the floor puzzle at The Monolith. Find the 10 glyphs written on a nearby wall - this is the solution to the puzzle. The glyphs on the center tile are a compass. Start from the center tile and use the solution to walk across the floor panels. The center tile should open if the sequence was performed correctly.",
+   "key": "/Items/Armor/Void/Armor_Head_Void",
+   "id": 52
+  },
+  {
+   "name": "Warlord Armor",
+   "category": "Armadura",
+   "group": "Warlord's Set",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Before you get the Master's Tusk, drop down to the left of Sebum's ship and hug the hull. Break some crates, then climb up the platforms on the other side. At the top, interact with the hole in the side of the ship. Then, when you bring the Master's Tusk to Sebum, ask him about the armor.",
+   "key": "/Items/Armor/Warlord/Armor_Body_Warlord",
+   "id": 53
+  },
+  {
+   "name": "Warlord Boots",
+   "category": "Armadura",
+   "group": "Warlord's Set",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Before you get the Master's Tusk, drop down to the left of Sebum's ship and hug the hull. Break some crates, then climb up the platforms on the other side. At the top, interact with the hole in the side of the ship. Then, when you bring the Master's Tusk to Sebum, ask him about the armor.",
+   "key": "/Items/Armor/Warlord/Armor_Legs_Warlord",
+   "id": 54
+  },
+  {
+   "name": "Warlord Skull",
+   "category": "Armadura",
+   "group": "Warlord's Set",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Before you get the Master's Tusk, drop down to the left of Sebum's ship and hug the hull. Break some crates, then climb up the platforms on the other side. At the top, interact with the hole in the side of the ship. Then, when you bring the Master's Tusk to Sebum, ask him about the armor.",
+   "key": "/Items/Armor/Warlord/Armor_Head_Warlord",
+   "id": 55
+  },
+  {
+   "name": "Alternator",
+   "category": "Arma",
+   "group": "Long Gun",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Crafted from the Cold Cell, which is acquired in the boss fight with Brudvaak, the Rider and Vargr, the Warg by defeating Brudvaak FIRST.",
+   "key": "/Items/Weapons/Boss/Alternator/Weapon_Snow_Alternator",
+   "id": 56
+  },
+  {
+   "name": "Assault Rifle",
+   "category": "Arma",
+   "group": "Long Gun",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Complete the \"Supply Run\" event in the Sorrow's Field dungeon. Find the Monkey Key to open the door to the room where this weapon can be found.",
+   "key": "/Items/Weapons/Basic/LongGuns/AssaultRifle/Weapon_AssaultRifle",
+   "id": 57
+  },
+  {
+   "name": "Beam Rifle",
+   "category": "Arma",
+   "group": "Long Gun",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Complete \"The Lost Gantry\" event. You will have to survive waves of enemies in order to obtain this weapon as a reward.",
+   "key": "/Items/Weapons/Basic/Wasteland_BeamRifle/Weapon_Wasteland_BeamRifle",
+   "id": 58
+  },
+  {
+   "name": "Blade of Adventure",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "New characters begin the game with this item, but it is removed from your inventory upon leaving the tutorial area.",
+   "key": null,
+   "id": 59
+  },
+  {
+   "name": "Butcher's Flail",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted from Hammerhead's Ore, which is acquired in the boss fight with The Unclean One by hiding in one of the pots in the basement BEFORE defeating him.",
+   "key": "/Items/Weapons/Boss/ButchersFlail/Weapon_Swamp_ButchersFlail",
+   "id": 60
+  },
+  {
+   "name": "Chain Blade",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Crafted from the Steel of Agony, which is acquired in the boss fight with Brudvaak, the Rider and Vargr, the Warg by defeating Vargr FIRST.",
+   "key": "/Items/Weapons/Boss/ChainBlade/Weapon_Snow_ChainBlade",
+   "id": 61
+  },
+  {
+   "name": "Chicago Typewriter",
+   "category": "Arma",
+   "group": "Long Gun",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Complete \"A Tale of Two Liz's\" event in Land's End and The Warren. Defend the two NPCs to be rewarded with the Liz's Key. It will open the door where you will find this weapon.",
+   "key": "/Items/Weapons/Basic/LongGuns/MachineGun/Weapon_Machinegun",
+   "id": 62
+  },
+  {
+   "name": "Coach Gun",
+   "category": "Arma",
+   "group": "Long Gun",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Ace gives the Ex-Cultist archtype this item. It can also be purchased from Rigs for 600 Scrap.",
+   "key": "/Items/Weapons/Basic/LongGuns/Coachgun/Weapon_Coachgun",
+   "id": 63
+  },
+  {
+   "name": "Crossbow",
+   "category": "Arma",
+   "group": "Long Gun",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Acquired from the Iskal Queen after giving her the Guardian's Heart.",
+   "key": "/Items/Weapons/Basic/LongGuns/Crossbow/Weapon_Swamp_Crossbow",
+   "id": 64
+  },
+  {
+   "name": "Curse of the Jungle God",
+   "category": "Arma",
+   "group": "Hand Gun",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted from the Tentacle Pod, which is acquired in the boss fight with The Ravager by defeating him normally.",
+   "key": "/Items/Weapons/Boss/Pan_CurseOfTheJungleGod/Weapon_Pan_CurseOfTheJungleGod",
+   "id": 65
+  },
+  {
+   "name": "Defiler",
+   "category": "Arma",
+   "group": "Hand Gun",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted from the Thermal Geode, which is acquired in the boss fight with The Harrow by not taking the Lost Harpoon.",
+   "key": "/Items/Weapons/Boss/Defiler/Weapon_Wasteland_Defiler",
+   "id": 66
+  },
+  {
+   "name": "Devastator",
+   "category": "Arma",
+   "group": "Long Gun",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted from the Unclean Heart, which is acquired in the boss fight with The Unclean One by defeating him normally.",
+   "key": "/Items/Weapons/Boss/Devastator/Weapon_Swamp_Devastator",
+   "id": 67
+  },
+  {
+   "name": "Eye of the Storm",
+   "category": "Arma",
+   "group": "Long Gun",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted from the Totem Antler, which is acquired in the boss fight with the Totem Father after setting the totem outside the fog wall to blue.",
+   "key": "/Items/Weapons/Boss/Pan_EyeOfTheStorm/Weapon_Pan_EyeOfTheStorm",
+   "id": 68
+  },
+  {
+   "name": "Frostborne",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Complete the \"Felmourn Burrow\" event. Destroy the bookshelves and the wooden wall to reveal the secret area where this weapon is found.",
+   "key": "/Items/Weapons/Boss/Frostborne/Weapon_Frostborne",
+   "id": 69
+  },
+  {
+   "name": "Fusion Rifle",
+   "category": "Arma",
+   "group": "Long Gun",
+   "world": "Ward Prime",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Rewarded for defeating Harsgaard.",
+   "key": "/Items/Weapons/Boss/FusionRifle/Weapon_Rural_FusionRifle",
+   "id": 70
+  },
+  {
+   "name": "Guardian Axe",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted from the Guardian Tentacle, which is acquired in the boss fight with Ixillis by NOT allowing either of the bosses to become enraged.",
+   "key": "/Items/Weapons/Boss/GuardianAxe/Weapon_Swamp_GuardianAxe",
+   "id": 71
+  },
+  {
+   "name": "Hero's Sword",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Kill 10 bosses (must be done in a single run). Alternatively, it can be purchased from Rigs for 100 Glowing Fragments and 2,000 Scrap.",
+   "key": "/Items/Weapons/Human/Melee/Sword/Weapon_HerosSword",
+   "id": 72
+  },
+  {
+   "name": "Hive Cannon",
+   "category": "Arma",
+   "group": "Hand Gun",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted from the Hivestone, which is acquired in the boss fight with Ixillis by allowing one of the bosses to become enraged over the other one's death.",
+   "key": "/Items/Weapons/Boss/HiveCannon/Weapon_Swamp_HiveCannon",
+   "id": 73
+  },
+  {
+   "name": "Hunting Pistol",
+   "category": "Arma",
+   "group": "Hand Gun",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Complete the Hunter's Hideout dungeon in Hidden Grotto. Get the key from the dying Hunter at the beginning of the dungeon. The key will unlock the door to the Safehouse at the end of the dungeon. This weapon is inside of a locker in the Safehouse.",
+   "key": "/Items/Weapons/Basic/HandGuns/HuntingPistol/Weapon_HuntingPistol",
+   "id": 74
+  },
+  {
+   "name": "Hunting Rifle",
+   "category": "Arma",
+   "group": "Long Gun",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Ace gives the Hunter archtype this item. It can also be purchased from Rigs for 600 Scrap.",
+   "key": "/Items/Weapons/Basic/LongGuns/HuntingRifle/Weapon_HuntingRifle",
+   "id": 75
+  },
+  {
+   "name": "Lost Harpoon",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "When fighting The Harrow, stagger him multiple times by shooting him in the legs. He will drop to the ground. Go behind him and pick up this weapon, then defeat him. If you die during the fight, you will have to re-aquire this weapon during the fight.",
+   "key": "/Items/Weapons/Boss/LostHarpoon/Weapon_Wasteland_LostHarpoon",
+   "id": 76
+  },
+  {
+   "name": "Machine Pistol",
+   "category": "Arma",
+   "group": "Hand Gun",
+   "world": "Ward Prime",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Restore power to Ward Prime and work your way through the facility. In the \"Main Bay\" area, enter Dr. Enji Sato and Dr. Sebastian Weisskoof's office. Interact with the computer on the desk in the middle of the room and select \"Enter Password\". The password is 2-4-1-3-5-1. Then select the option to \"Unlock Storage Room\". Go through the open doorway to enter the storage room and loot this weapon.",
+   "key": "/Items/Weapons/Basic/MachinePistol/Weapon_MachinePistol",
+   "id": 77
+  },
+  {
+   "name": "Magnum Revolver",
+   "category": "Arma",
+   "group": "Hand Gun",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Find the Strange Coin. It will randomly spawn anywhere on Earth. Return it to Ace in Ward 13 and she will give you this weapon.",
+   "key": "/Items/Weapons/Basic/HandGuns/Revolver/Weapon_Revolver",
+   "id": 78
+  },
+  {
+   "name": "Particle Accelerator",
+   "category": "Arma",
+   "group": "Long Gun",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted from the Void Sliver, which is acquired in the boss fight with Claviger by NOT allowing him to absorb any summoned minions.",
+   "key": "/Items/Weapons/Boss/ParticleAccelerator/Weapon_Wasteland_ParticleAccelerator",
+   "id": 79
+  },
+  {
+   "name": "Petrified Maul",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted from the Twisted Heart, which is acquired in the boss fight with The Ent by destroying his legs BEFORE you kill him.",
+   "key": "/Items/Weapons/Boss/Root_PetrifiedMaul/Weapon_Root_PetrifiedMaul",
+   "id": 80
+  },
+  {
+   "name": "Pride of the Iskal",
+   "category": "Arma",
+   "group": "Hand Gun",
+   "world": "Corsus",
+   "mode": "Adventure",
+   "dlc": "Swamps of Corsus",
+   "how": "Crafted from the Crystalline Plasma, which is acquired in the boss fight with the Iskal Queen by defeating her normally.",
+   "key": "/Items/Weapons/Boss/PrideOfTheIskal/Weapon_Swamp_PrideOfTheIskal",
+   "id": 81
+  },
+  {
+   "name": "Repeater Pistol",
+   "category": "Arma",
+   "group": "Hand Gun",
+   "world": "Ward 13",
+   "mode": "Campaign",
+   "dlc": "",
+   "how": "Acquired from Ace after selecting an archetype.",
+   "key": "/Items/Weapons/Basic/HandGuns/RepeaterPistol/Weapon_RepeaterPistol",
+   "id": 82
+  },
+  {
+   "name": "Repulsor",
+   "category": "Arma",
+   "group": "Long Gun",
+   "world": "Ward 17",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted from the Dreamer's Mana, which is acquired in the boss fight with the Dreamer/Nightmare by defeating him normally.",
+   "key": "/Items/Weapons/Boss/Guns/LongGuns/Repulsor/Weapon_Atoll_Repulsor",
+   "id": 83
+  },
+  {
+   "name": "Ricochet Rifle",
+   "category": "Arma",
+   "group": "Long Gun",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Found in the Forgotten Undercroft dungeon, where the Blink Thief will steal the weapon before you can loot it. You are given a very short window at three different locations throughout the dungeon to defeat the Blink Thief and obtain the weapon.",
+   "key": "/Items/Weapons/Basic/RicochetRifle/Weapon_Pan_RicochetRifle",
+   "id": 84
+  },
+  {
+   "name": "Riven",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Acquired from the Undying King after giving him the Guardian's Heart.",
+   "key": "/Items/Weapons/Boss/Riven/Weapon_Wasteland_Riven",
+   "id": 85
+  },
+  {
+   "name": "Ruin",
+   "category": "Arma",
+   "group": "Long Gun",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted from the Undying Heart, which is acquired in the boss fight with The Undying King by defeating him normally.",
+   "key": "/Items/Weapons/Boss/Ruin/Weapon_Wasteland_Ruin",
+   "id": 86
+  },
+  {
+   "name": "Sawed-Off",
+   "category": "Arma",
+   "group": "Hand Gun",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Purchased from Sebum for 450 Scrap.",
+   "key": "/Items/Weapons/Basic/SawedOffShotgun/Weapon_SawedOffShotgun",
+   "id": 87
+  },
+  {
+   "name": "Scar of the Jungle God",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted from the Stalker's Claw, which is acquired by putting The Ravager to sleep by playing the lullaby on the bells, then talking to him (it does not matter what you say to him during the conversation). There is a time limit for entering the right sequence, but the lullaby can be attempted multiple times as long as the fight has not been started. Facing the bells from the entrance, the sequence is: FR-NR-FR-NR-NL-C-FL-NR (where FR = far right, NR = near right, FL = far left, NL = near left, and C = center).",
+   "key": "/Items/Weapons/Boss/Pan_ScarOfTheJungleGod/Weapon_Pan_ScarOfTheJungleGod",
+   "id": 88
+  },
+  {
+   "name": "Scrap Hammer",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Ace gives the Scrapper archtype this item. It can also be purchased from Rigs for 450 Scrap.",
+   "key": "/Items/Weapons/Human/Melee/Hammer/Weapon_Hammer",
+   "id": 89
+  },
+  {
+   "name": "Scrap Hatchet",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Ace gives the Ex-Cultist archtype this item. It can also be purchased from Rigs for 450 Scrap.",
+   "key": "/Items/Weapons/Human/Melee/Hatchet/Weapon_Hatchet",
+   "id": 90
+  },
+  {
+   "name": "Scrap Sword",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Ace gives the Hunter archtype this item. It can also be purchased from Rigs for 450 Scrap.",
+   "key": "/Items/Weapons/Human/Melee/Sword/Weapon_Sword",
+   "id": 91
+  },
+  {
+   "name": "Scythe",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from the Iskal Queen for 750 Scrap.",
+   "key": "/Items/Weapons/Basic/Melee/Weapon_Swamp_Scythe",
+   "id": 92
+  },
+  {
+   "name": "Shotgun",
+   "category": "Arma",
+   "group": "Long Gun",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Ace gives the Scrapper archtype this item. It can also be purchased from Rigs for 600 Scrap.",
+   "key": "/Items/Weapons/Basic/LongGuns/Shotgun/Weapon_Shotgun",
+   "id": 93
+  },
+  {
+   "name": "Smolder",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted from the Dragon Links, which is acquired in the boss fight with Singe by severing his tail BEFORE defeating him.",
+   "key": "/Items/Weapons/Boss/Root_Smolder/Weapon_Root_Smolder",
+   "id": 94
+  },
+  {
+   "name": "Sniper Rifle",
+   "category": "Arma",
+   "group": "Long Gun",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Found in the basement of the Church. Go through the doorway to the left of the Root Mother (it will be blocked until you complete the event to defend her), then down the stairs at the end of the hallway. This weapon is in a locker behind some breakable pallets.",
+   "key": "/Items/Weapons/Basic/LongGuns/SniperRifle/Weapon_SniperRifle",
+   "id": 95
+  },
+  {
+   "name": "Spear",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from the Stuck Merchant for 750 Scrap.",
+   "key": "/Items/Weapons/Basic/Spear/Weapon_Pan_Spear",
+   "id": 96
+  },
+  {
+   "name": "Spitfire",
+   "category": "Arma",
+   "group": "Hand Gun",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted from the Blazing Heart, which is acquired in the boss fight with Singe by NOT severing its tail before it dies.",
+   "key": "/Items/Weapons/Boss/Root_Spitfire/Weapon_Root_Spitfire",
+   "id": 97
+  },
+  {
+   "name": "Sporebloom",
+   "category": "Arma",
+   "group": "Long Gun",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted from the Spore Gland, which is acquired in the boss fight with The Ent by killing him WITHOUT destroying his legs.",
+   "key": "/Items/Weapons/Boss/Root_SporeLauncher/Weapon_Root_SporeLauncher",
+   "id": 98
+  },
+  {
+   "name": "Submachine Gun",
+   "category": "Arma",
+   "group": "Hand Gun",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Get the Ward 13 Keycard from the Founder's Hideout (on Earth). Travel back to Ward 13. Use the keycard on the door on Level B2. Get the fuse. Go to Level B3 and use the fuse in the fusebox. Use the keycard to open the door. Go back to the fusebox and turn off the fans. Go behind the fan and get the Ward 13 Master Key. Go to Level B2. Use the master key to open the door at the end. This weapon can be looted from the table in the room.",
+   "key": "/Items/Weapons/Basic/HandGuns/SubMachineGun/Weapon_Submachinegun",
+   "id": 99
+  },
+  {
+   "name": "Twin Shot",
+   "category": "Arma",
+   "group": "Hand Gun",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Complete the \"Creeper's Peepers\" event in the Watcher's Hollow dungeon. After acquiring the Creeper's Peeper item, go outside the dungeon and find the statue with the missing eye. Insert the Creeper's Peeper into the statue and the door behind it will open. Go inside and loot this weapon.",
+   "key": "/Items/Weapons/Basic/MiniCrossbow/Weapon_MiniCrossbow",
+   "id": 100
+  },
+  {
+   "name": "Voice of the Tempest",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted from the Tempest Heartstring, which is acquired in the boss fight with the Totem Father after setting the totem outside the fog wall to red.",
+   "key": "/Items/Weapons/Boss/Pan_VoiceOfTheTempest/Weapon_Pan_VoiceOfTheTempest",
+   "id": 101
+  },
+  {
+   "name": "Wastelander Flail",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Complete \"The Clean Room\" event in The Cursed Trial dungeon. Survive the Citadel's Curse debuff until you get to the end of the dungeon, where this weapon can be found.",
+   "key": "/Items/Weapons/Basic/Wasteland_Flail/Weapon_Wasteland_Flail",
+   "id": 102
+  },
+  {
+   "name": "World Breaker",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted from the Stone of the Guardian, which is acquired in the boss fight with Claviger by allowing him to absorb at least one minion BEFORE killing him.",
+   "key": "/Items/Weapons/Boss/WorldBreaker/Weapon_Wasteland_WorldBreaker",
+   "id": 103
+  },
+  {
+   "name": "World's Edge",
+   "category": "Arma",
+   "group": "Melee",
+   "world": "Ward Prime",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Crafted from the Root Neoplasm, which is acquired in the boss fight with Harsgaard, Root Harbinger by defeating him normally.",
+   "key": "/Items/Weapons/Boss/WorldsEdge/Weapon_Rural_WorldsEdge",
+   "id": 104
+  },
+  {
+   "name": "Abrasive Amulet",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_AbrasiveAmulet",
+   "id": 105
+  },
+  {
+   "name": "Amulet of Epicaricacy",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "Swamps of Corsus",
+   "how": "This is one of several items that have a chance to drop from Red Vikorian Beetles during the \"Sketterling Temple\" event in Corsus dungeons.",
+   "key": "/Items/Trinkets/AmuletOfEpicaricacy",
+   "id": 106
+  },
+  {
+   "name": "Black Rose",
+   "category": "Amuleto",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Kill 100 bosses (can be done across multiple runs).",
+   "key": "/Items/Trinkets/BlackRose",
+   "id": 107
+  },
+  {
+   "name": "Blessed Necklace",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Complete the \"Rescue the Krall Baby\" event in Wuthering Keep or The Wild Reach. Afterward, find and speak with the Krall Mother. She will reward you with this item.",
+   "key": "/Items/Trinkets/BlessedNecklace",
+   "id": 108
+  },
+  {
+   "name": "Brutal Mark",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/BrutalMark",
+   "id": 109
+  },
+  {
+   "name": "Butcher's Fetish",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/ButchersFetish",
+   "id": 110
+  },
+  {
+   "name": "Charcoal Necklace",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/CharcoalNecklace",
+   "id": 111
+  },
+  {
+   "name": "Cleansing Jewel",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/CleansingJewel",
+   "id": 112
+  },
+  {
+   "name": "Daredevil's Charm",
+   "category": "Amuleto",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Kill 75 bosses (can be done across multiple runs).",
+   "key": "/Items/Trinkets/DaredevilsCharm",
+   "id": 113
+  },
+  {
+   "name": "Driftstone",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/DriftStone",
+   "id": 114
+  },
+  {
+   "name": "Galenic Charm",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_GalenicCharm",
+   "id": 115
+  },
+  {
+   "name": "Gunslinger's Charm",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_GunslingersCharm",
+   "id": 116
+  },
+  {
+   "name": "Hangman's Memento",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Earth",
+   "mode": "Campaign",
+   "dlc": "Subject 2923",
+   "how": "Survive the Barn Siege in the Rural Areas.",
+   "key": "/Items/Trinkets/HangmansMemento",
+   "id": 117
+  },
+  {
+   "name": "Heart of Darkness",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "Swamps of Corsus",
+   "how": "Find the Fetid Pools dungeon and obtain an Acid Cleaned Key. To obtain an Acid Cleaned Key, you must find and wear a Rusted Amulet, then crouch in one of the acid pools. Open the second door to loot this item.",
+   "key": "/Items/Trinkets/HeartOfDarkness",
+   "id": 118
+  },
+  {
+   "name": "Leto's Amulet",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "This area very rarely spawns within the Sunken Passage or Hidden Sanctum dungeons. When you see a wall with the words \"Only the Penitent Man May Pass\", crouch and walk towards the wall. The wall should fade away, revealing a secret room where this item can be looted.",
+   "key": "/Items/Trinkets/Trinket_LetosAmulet",
+   "id": 119
+  },
+  {
+   "name": "Mender's Charm",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from Wud for 400 Scrap.",
+   "key": "/Items/Trinkets/MendersCharm",
+   "id": 120
+  },
+  {
+   "name": "Nightmare Spiral",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Ward 17",
+   "mode": "Hardcore",
+   "dlc": "",
+   "how": "Defeat the Dreamer/Nightmare.",
+   "key": "/Items/Trinkets/Trinket_NightmareSpiral",
+   "id": 121
+  },
+  {
+   "name": "Onyx Pendulum",
+   "category": "Amuleto",
+   "group": "",
+   "world": "",
+   "mode": "Hardcore",
+   "dlc": "Subject 2923",
+   "how": "Complete both the base game campaign and the Subject 2923 DLC campaign on Hardcore Mode to be rewarded with this amulet. (You do not need to complete both campaigns on the same character.)",
+   "key": "/Items/Trinkets/OnyxPendulum",
+   "id": 122
+  },
+  {
+   "name": "Pocket Watch",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Speak with Mudtooth. After exhausting his dialogue, he will give you this item.",
+   "key": "/Quests/Quest_OverworldPOI_MudTooth/Quest_BrabusPocketWatch",
+   "id": 123
+  },
+  {
+   "name": "Polished Whetstone",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/PolishedWhetstone",
+   "id": 124
+  },
+  {
+   "name": "Radioactive Ember",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/RadioactiveEmber",
+   "id": 125
+  },
+  {
+   "name": "Razorwire Necklace",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/RazorwireNecklace",
+   "id": 126
+  },
+  {
+   "name": "Rock of Anguish",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/RockOfAnguish",
+   "id": 127
+  },
+  {
+   "name": "Rusted Amulet",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "Swamps of Corsus",
+   "how": "Found in the Fetid Pools dungeon.",
+   "key": "/Items/Trinkets/Trinket_RustedAmulet",
+   "id": 128
+  },
+  {
+   "name": "Scavenger's Bauble",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Complete the \"Song of the Doe Puzzle\" event to be rewarded with this item. The correct bell sequence is 5-4-3-3-4-1-2-3-2-1.",
+   "key": "/Items/Trinkets/Trinket_ScavengersBauble",
+   "id": 129
+  },
+  {
+   "name": "Shattered Vertebrae",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Reisum",
+   "mode": "Hardcore",
+   "dlc": "Subject 2923",
+   "how": "Complete the Subject 2923 campaign on Hardcore Mode.",
+   "key": "/Items/Trinkets/ShatteredVertebrae",
+   "id": 130
+  },
+  {
+   "name": "Soul Anchor",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Complete \"The Risen\" event in The Radiant Tomb.",
+   "key": "/Items/Trinkets/SoulAnchor",
+   "id": 131
+  },
+  {
+   "name": "Stalker's Brand",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_StalkersBrand",
+   "id": 132
+  },
+  {
+   "name": "Storm Amulet",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_StormAmulet",
+   "id": 133
+  },
+  {
+   "name": "Talisman of Animosity",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/TalismanOfAnimosity",
+   "id": 134
+  },
+  {
+   "name": "Talisman of Perseverance",
+   "category": "Amuleto",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Kill 50 bosses (can be done across multiple runs).",
+   "key": "/Items/Trinkets/TalismanOfPerseverance",
+   "id": 135
+  },
+  {
+   "name": "Terror Margin",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Random drop from the Rural Areas.",
+   "key": "/Items/Trinkets/TerrorMargin",
+   "id": 136
+  },
+  {
+   "name": "Twisted Idol",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Defeat the Wailing Tree.",
+   "key": "/Items/Trinkets/Trinket_TwistedIdol",
+   "id": 137
+  },
+  {
+   "name": "Vengeance Idol",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/VengeanceIdol",
+   "id": 138
+  },
+  {
+   "name": "Vulcan's Detonator",
+   "category": "Amuleto",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Complete the \"Warning Totems\" event in the Magir's Dirge dungeon. If you complete the event while alerting all of the totems, you will be awarded this item.",
+   "key": "/Items/Trinkets/VulcansDetonator",
+   "id": 139
+  },
+  {
+   "name": "White Rose",
+   "category": "Amuleto",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Subject 2923",
+   "how": "Defeat all bosses twice. Alternatively, can be purchased from Whispers for 30,000 Scrap and 300 Glowing Fragments.",
+   "key": "/Items/Trinkets/WhiteRose",
+   "id": 140
+  },
+  {
+   "name": "Aggressor's Bane",
+   "category": "Anel",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/AggressorsBane",
+   "id": 141
+  },
+  {
+   "name": "Akari War Band",
+   "category": "Anel",
+   "group": "",
+   "world": "Rhom",
+   "mode": "Hardcore",
+   "dlc": "",
+   "how": "Rewarded for defeating The Harrow or Claviger.",
+   "key": "/Items/Trinkets/AkariWarBand",
+   "id": 142
+  },
+  {
+   "name": "Alchemist's Jewel",
+   "category": "Anel",
+   "group": "",
+   "world": "Earth",
+   "mode": "Campaign",
+   "dlc": "Subject 2923",
+   "how": "Random drop in Rural Areas.",
+   "key": "/Items/Trinkets/Trinket_AlchemistsJewel",
+   "id": 143
+  },
+  {
+   "name": "Amber Moonstone",
+   "category": "Anel",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Obtain the Janitor's Watch, which can randomly drop in Drolniir Woods. Return it to Clementine to be rewarded with this ring.",
+   "key": "/Items/Trinkets/AmberMoonstone",
+   "id": 144
+  },
+  {
+   "name": "Backbreaker Ring",
+   "category": "Anel",
+   "group": "",
+   "world": "Earth",
+   "mode": "Campaign",
+   "dlc": "Subject 2923",
+   "how": "Random drop in Rural Areas.",
+   "key": "/Items/Trinkets/BackbreakerRing",
+   "id": 145
+  },
+  {
+   "name": "Band of Accord",
+   "category": "Anel",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "Acquired after using the High Five Emote with another player.",
+   "key": "/Items/Trinkets/Trinket_BandOfAccord",
+   "id": 146
+  },
+  {
+   "name": "Band of Castor",
+   "category": "Anel",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/BandsOfCastorAndPollux/Trinket_BandOfCastor",
+   "id": 147
+  },
+  {
+   "name": "Band of Discord",
+   "category": "Anel",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Purchased from Sebum for 400 Scrap.",
+   "key": "/Items/Trinkets/BandOfDiscord",
+   "id": 148
+  },
+  {
+   "name": "Band of Pollux",
+   "category": "Anel",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/BandsOfCastorAndPollux/Trinket_BandOfPollux",
+   "id": 149
+  },
+  {
+   "name": "Band of Strength",
+   "category": "Anel",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/BandOfStrength",
+   "id": 150
+  },
+  {
+   "name": "Black Cat Band",
+   "category": "Anel",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Subject 2923",
+   "how": "Rewarded for defeating every non-world boss twice. Alternatively, it can be purchased from Whispers for 20,000 Scrap and 200 Glowing Fragments.",
+   "key": "/Items/Trinkets/BlackCatBand",
+   "id": 151
+  },
+  {
+   "name": "Blood Font",
+   "category": "Anel",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_BloodFont",
+   "id": 152
+  },
+  {
+   "name": "Bloodletter's Insignia",
+   "category": "Anel",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "This ring can be looted from a corpse located near the end of the Magir's Dirge dungeon.",
+   "key": "/Items/Trinkets/BloodlettersInsignia",
+   "id": 153
+  },
+  {
+   "name": "Braided Thorns",
+   "category": "Anel",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Dropped by the Root Cultist in Marrow Pass. You must attack the pulsing root hearts to turn the Cultist hostile.",
+   "key": "/Items/Trinkets/BraidedThorns",
+   "id": 154
+  },
+  {
+   "name": "Bright Steel Ring",
+   "category": "Anel",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Subject 2923",
+   "how": "Rewarded for defeating every world boss twice. Alternatively, it can be purchased from Whispers for 25,000 Scrap and 250 Glowing Fragments.",
+   "key": "/Items/Trinkets/BrightSteelRing",
+   "id": 155
+  },
+  {
+   "name": "Burden of the Devoted",
+   "category": "Anel",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/BurdenOfTheDevoted",
+   "id": 156
+  },
+  {
+   "name": "Burden of the Follower",
+   "category": "Anel",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_BurdenOfTheFollower",
+   "id": 157
+  },
+  {
+   "name": "Burden of the Gambler",
+   "category": "Anel",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/BurdenOfTheGambler",
+   "id": 158
+  },
+  {
+   "name": "Burden of the Reckless",
+   "category": "Anel",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/BurdenOfTheReckless",
+   "id": 159
+  },
+  {
+   "name": "Burden of the Warlord",
+   "category": "Anel",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_BurdenOfTheWarlord",
+   "id": 160
+  },
+  {
+   "name": "Celerity Stone",
+   "category": "Anel",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Located near the end of the Forgotten Undercroft dungeon.",
+   "key": "/Items/Trinkets/Trinket_CelerityStone",
+   "id": 161
+  },
+  {
+   "name": "Compulsion Loop",
+   "category": "Anel",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/CompulsionLoop",
+   "id": 162
+  },
+  {
+   "name": "Deceiver's Band",
+   "category": "Anel",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/DeceiversBand",
+   "id": 163
+  },
+  {
+   "name": "Devouring Loop",
+   "category": "Anel",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/DevouringLoop",
+   "id": 164
+  },
+  {
+   "name": "Empowering Loop",
+   "category": "Anel",
+   "group": "",
+   "world": "Corsus",
+   "mode": "Hardcore",
+   "dlc": "",
+   "how": "Rewarded for defeating Ixillis.",
+   "key": "/Items/Trinkets/Trinket_EmpoweringLoop",
+   "id": 165
+  },
+  {
+   "name": "Evoker's Seal",
+   "category": "Anel",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Complete the \"Warning Totems\" event in the Magir's Dirge dungeon. If you complete the event without alerting any of the totems, you will be awarded this item.",
+   "key": "/Items/Trinkets/Trinket_EvokersSeal",
+   "id": 166
+  },
+  {
+   "name": "Ezlan's Band",
+   "category": "Anel",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_EzlansBand",
+   "id": 167
+  },
+  {
+   "name": "Five Fingered Ring",
+   "category": "Anel",
+   "group": "",
+   "world": "Earth",
+   "mode": "Campaign",
+   "dlc": "Subject 2923",
+   "how": "Random drop in Rural Areas.",
+   "key": "/Items/Trinkets/FiveFingeredRing",
+   "id": 168
+  },
+  {
+   "name": "Gift of the Iskal",
+   "category": "Anel",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "Swamps of Corsus",
+   "how": "Complete the \"Brain Bug\" event in the Mar'Gosh's Lair dungeon. This is triggered by approaching Mar'Gosh without the Parasite status effect or by choosing the \"Fight\" dialogue option. He will become hostile. Defeating him rewards this item.",
+   "key": "/Items/Trinkets/GIftOfTheIskal",
+   "id": 169
+  },
+  {
+   "name": "Gravity Stone",
+   "category": "Anel",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/GravityStone",
+   "id": 170
+  },
+  {
+   "name": "Grim Coil",
+   "category": "Anel",
+   "group": "",
+   "world": "Corsus",
+   "mode": "Adventure",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from the Graveyard Elf for 400 Scrap.",
+   "key": "/Items/Trinkets/GrimCoil",
+   "id": 171
+  },
+  {
+   "name": "Guardian's Ring",
+   "category": "Anel",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from the Stuck Merchant for 100,000 Scrap. Alternatively, it can be looted from her corpse if she is killed by the Root Horror.",
+   "key": "/Items/Trinkets/Trinket_GuardiansRing",
+   "id": 172
+  },
+  {
+   "name": "Gunslinger's Ring",
+   "category": "Anel",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_GunslingersRing",
+   "id": 173
+  },
+  {
+   "name": "Heart of the Wolf",
+   "category": "Anel",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Complete the \"Pan Flautist Puzzle\" event. The correct bell sequence is 3-4-5-3-2-1.",
+   "key": "/Items/Trinkets/Trinket_HeartOfTheWolf",
+   "id": 174
+  },
+  {
+   "name": "Heartseeker",
+   "category": "Anel",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/HeartSeeker",
+   "id": 175
+  },
+  {
+   "name": "Hero's Ring",
+   "category": "Anel",
+   "group": "",
+   "world": "Corsus",
+   "mode": "Multiplayer",
+   "dlc": "Swamps of Corsus",
+   "how": "This requires 1 or 2 other players. Find the Fetid Pools dungeon and obtain 3 Acid Cleaned Keys. To obtain an Acid Cleaned Key, you must find and wear a Rusted Amulet, then crouch in one of the acid pools. Once you have 3 keys, open the door that accesses the stairs up. Then open the door to the upstairs room. Use the final key to open the door that leads into the chamber where this item can be found.",
+   "key": "/Items/Trinkets/HerosRing",
+   "id": 176
+  },
+  {
+   "name": "Hunter's Band",
+   "category": "Anel",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/HuntersBand",
+   "id": 177
+  },
+  {
+   "name": "Hunter's Halo",
+   "category": "Anel",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_HuntersHalo",
+   "id": 178
+  },
+  {
+   "name": "Iskal Hunter Band",
+   "category": "Anel",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "Swamps of Corsus",
+   "how": "This is one of several items that have a chance to drop from Red Vikorian Beetles during the \"Sketterling Temple\" event in Corsus dungeons.",
+   "key": "/Items/Trinkets/Trinket_IskalHunterBand",
+   "id": 179
+  },
+  {
+   "name": "Jewel of the Black Sun",
+   "category": "Anel",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from Wud for 400 Scrap.",
+   "key": "/Items/Trinkets/JewelOfTheBlackSun",
+   "id": 180
+  },
+  {
+   "name": "Juggernaut Band",
+   "category": "Anel",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Complete the \"Warning Totems\" event in the Magir's Dirge dungeon. If you complete the event while alerting some (but not all) of the totems, you will be awarded this item.",
+   "key": "/Items/Trinkets/JuggernautBand",
+   "id": 181
+  },
+  {
+   "name": "Keeper's Ring",
+   "category": "Anel",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_KeepersRing",
+   "id": 182
+  },
+  {
+   "name": "Leech Ember",
+   "category": "Anel",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_LeechEmber",
+   "id": 183
+  },
+  {
+   "name": "Loop of Prosperity",
+   "category": "Anel",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Defeat a total of 25 bosses (can be done across multiple runs).",
+   "key": "/Items/Trinkets/Trinket_LoopOfProsperity",
+   "id": 184
+  },
+  {
+   "name": "Mother's Ring",
+   "category": "Anel",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_MothersRing",
+   "id": 185
+  },
+  {
+   "name": "Pearl of Luminescence",
+   "category": "Anel",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_PearlOfLuminescence",
+   "id": 186
+  },
+  {
+   "name": "Pillar of Stone",
+   "category": "Anel",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_PillarOfStone",
+   "id": 187
+  },
+  {
+   "name": "Prismatic Diamond Ring",
+   "category": "Anel",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Complete the \"Grave Siege\" event at the Grave of the Elders. After defeating all enemies, go through the second door to loot this item.",
+   "key": "/Items/Trinkets/Trinket_PrismaticDiamondRing",
+   "id": 188
+  },
+  {
+   "name": "Provisioner Ring",
+   "category": "Anel",
+   "group": "",
+   "world": "Earth",
+   "mode": "Hardcore",
+   "dlc": "",
+   "how": "Defeat Singe or The Ent.",
+   "key": "/Items/Trinkets/Trinket_ProvisionerRing",
+   "id": 189
+  },
+  {
+   "name": "Razorstone",
+   "category": "Anel",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Razorstone",
+   "id": 190
+  },
+  {
+   "name": "Restriction Cord",
+   "category": "Anel",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/RestrictionCord",
+   "id": 191
+  },
+  {
+   "name": "Ring of Elusion",
+   "category": "Anel",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/RingOfElusion",
+   "id": 192
+  },
+  {
+   "name": "Ring of Evasion",
+   "category": "Anel",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_RingOfEvasion",
+   "id": 193
+  },
+  {
+   "name": "Ring of Flawless Beauty",
+   "category": "Anel",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Subject 2923",
+   "how": "Purchase 250 items.",
+   "key": "/Items/Trinkets/RingOfFlawlessBeauty",
+   "id": 194
+  },
+  {
+   "name": "Ring of Honor",
+   "category": "Anel",
+   "group": "",
+   "world": "Ward Prime",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "At the top of the dead end stairs, look through the hole in the wall and shoot the lock on the door. Then go through the door marked \"Medical Bay\", through the door you unlocked, and up the stairs to find the room where you can loot this item.",
+   "key": "/Items/Trinkets/Trinket_RingOfHonor",
+   "id": 195
+  },
+  {
+   "name": "Ring of Shadows",
+   "category": "Anel",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_RingOfShadows",
+   "id": 196
+  },
+  {
+   "name": "Ring of Supremacy",
+   "category": "Anel",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "Hardcore",
+   "dlc": "",
+   "how": "Defeat the Totem Father or The Ravager.",
+   "key": "/Items/Trinkets/RingOfSumpremacy",
+   "id": 197
+  },
+  {
+   "name": "Ring of Synergy",
+   "category": "Anel",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Purchased from Sebum for 400 Scrap.",
+   "key": "/Items/Trinkets/RingOfSynergy",
+   "id": 198
+  },
+  {
+   "name": "Ring of the Admiral",
+   "category": "Anel",
+   "group": "",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from Reggie for 2 Scrap.",
+   "key": "/Items/Trinkets/RingOfTheAdmiral",
+   "id": 199
+  },
+  {
+   "name": "Ring of the Mantis",
+   "category": "Anel",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "Swamps of Corsus",
+   "how": "This is one of several items that have a chance to drop from Red Vikorian Beetles during the \"Sketterling Temple\" event in Corsus dungeons.",
+   "key": "/Items/Trinkets/RingOfTheMantis",
+   "id": 200
+  },
+  {
+   "name": "Ring of the Punisher",
+   "category": "Anel",
+   "group": "",
+   "world": "Reisum",
+   "mode": "Hardcore",
+   "dlc": "Subject 2923",
+   "how": "Defeat Brudvaak, the Rider and Vargr, the Warg.",
+   "key": "/Items/Trinkets/RingOfThePunisher",
+   "id": 201
+  },
+  {
+   "name": "Ring of the Unclean",
+   "category": "Anel",
+   "group": "",
+   "world": "Corsus",
+   "mode": "Adventure",
+   "dlc": "Swamps of Corsus",
+   "how": "You must be infected with the Parasite effect from an Iskal Infector. Speak with the Iskal Queen and agree to help her. She will give you an Iskal Vial. Go to the graveyard. Crouch and stealthily approach the Graveyard Elf's cauldron to avoid waking her up. Interact with the cauldron to use the Iskal Vial. Go to a checkpoint, then return. This item will be inside the hut.",
+   "key": "/Items/Trinkets/Trinket_RingOfTheUnclean",
+   "id": 202
+  },
+  {
+   "name": "Root Circlet",
+   "category": "Anel",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "During the event \"Cult of the Root\" in Marrow Pass, do not kill any of the root hearts. Go all the way to the end of the dungeon and talk to the Root Cultist. He will give you the ring. Warning: If you attack any of the root hearts on your way to the Cultist, he will be hostile when you get to him and you will not be able to obtain the ring this playthrough.",
+   "key": "/Items/Trinkets/Trinket_RootCirclet",
+   "id": 203
+  },
+  {
+   "name": "Sagestone",
+   "category": "Anel",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_Sagestone",
+   "id": 204
+  },
+  {
+   "name": "Scavenger's Ring",
+   "category": "Anel",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Purchased from the Krall Mother for 400 Scrap.",
+   "key": "/Items/Trinkets/ScavengersRing",
+   "id": 205
+  },
+  {
+   "name": "Serpent's Fang",
+   "category": "Anel",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/SerpentsFang",
+   "id": 206
+  },
+  {
+   "name": "Soul Ember",
+   "category": "Anel",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "Swamps of Corsus",
+   "how": "Destroy all of the hives during the \"Circlet Hatchery\" event.",
+   "key": "/Items/Trinkets/SoulEmber",
+   "id": 207
+  },
+  {
+   "name": "Soul Link",
+   "category": "Anel",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "Swamps of Corsus",
+   "how": "This item is looted from the cave below the Cryptolith Tower on Rhom.",
+   "key": "/Items/Trinkets/SoulLink",
+   "id": 208
+  },
+  {
+   "name": "Spirit Stone",
+   "category": "Anel",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_SpiritStone",
+   "id": 209
+  },
+  {
+   "name": "Stockpile Circlet",
+   "category": "Anel",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_StockpileCirclet",
+   "id": 210
+  },
+  {
+   "name": "Stone of Balance",
+   "category": "Anel",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/Trinket_StoneOfBalance",
+   "id": 211
+  },
+  {
+   "name": "Swashbuckler's Signet",
+   "category": "Anel",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Complete the \"Creeper's Peepers\" event at Watcher's Hollow. Kill only the correct Emin (the one with the false green eye) and you will be rewarded with this item.",
+   "key": "/Items/Trinkets/SwashbucklersSignet",
+   "id": 212
+  },
+  {
+   "name": "Vanguard Ring",
+   "category": "Anel",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Get the Homestead Basement Key from Dr. Enji Sato and Dr. Sebastian Weisskoof's office in Ward Prime. Then go to the Homestead waypoint in the Rural Areas. Enter the house, destroy the shelves to reveal the stairs down to the basement, and unlock the door in the basement. This item can be looted from the room behind the door.",
+   "key": "/Items/Trinkets/VanguardRing",
+   "id": 213
+  },
+  {
+   "name": "Volatile Gem",
+   "category": "Anel",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Random drop.",
+   "key": "/Items/Trinkets/VolatileGem",
+   "id": 214
+  },
+  {
+   "name": "Banish",
+   "category": "Mod",
+   "group": "",
+   "world": "Ward 17",
+   "mode": "",
+   "dlc": "",
+   "how": "Comes equipped in the Repulsor, when that weapon is crafted. This mod cannot be removed.",
+   "key": null,
+   "id": 215,
+   "comesWith": 83
+  },
+  {
+   "name": "Beckon",
+   "category": "Mod",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted using the Sentinel Shard, which is obtained from defeating Raze.",
+   "key": "/Items/Mods/Beckon",
+   "id": 216
+  },
+  {
+   "name": "Blink Token",
+   "category": "Mod",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted using the Blink Spear Shard, which is obtained from defeating Onslaught.",
+   "key": "/Items/Mods/BlinkToken",
+   "id": 217
+  },
+  {
+   "name": "Blizzard",
+   "category": "Mod",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Crafted using the Glacial Scepter, which is obtained from defeating Ikro, the Ice Conjurer.",
+   "key": "/Items/Mods/Blizzard",
+   "id": 218
+  },
+  {
+   "name": "Breath of the Desert",
+   "category": "Mod",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted using the Radioactive Skull, which is obtained from defeating Scourge.",
+   "key": "/Items/Mods/BreathOfDesert",
+   "id": 219
+  },
+  {
+   "name": "Cold Spear",
+   "category": "Mod",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Crafted using Jackal's Ivory, which is obtained from defeating Erfor, the Jackal.",
+   "key": "/Items/Mods/ColdSpear",
+   "id": 220
+  },
+  {
+   "name": "Corrosive Aura",
+   "category": "Mod",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted using the Slime Vessel, which is obtained from defeating Canker.",
+   "key": "/Items/Mods/CorrosiveAura",
+   "id": 221
+  },
+  {
+   "name": "Explosive Shot",
+   "category": "Mod",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Crafted using the Shrapnel Shard, which is obtained from defeating Brabus.",
+   "key": "/Items/Mods/ExplosiveShot",
+   "id": 222
+  },
+  {
+   "name": "Fan of Knives",
+   "category": "Mod",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Crafted using the Silver Fragment, which is obtained from defeating Tian, the Assassin.",
+   "key": "/Items/Mods/FanOfKnives",
+   "id": 223
+  },
+  {
+   "name": "Flame Thrower",
+   "category": "Mod",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Comes equipped in the Spitfire, when that weapon is crafted. This mod cannot be removed.",
+   "key": null,
+   "id": 224,
+   "comesWith": 97
+  },
+  {
+   "name": "Flicker Cloak",
+   "category": "Mod",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted using the Displacement Crystal, which is obtained from defeating Splitter.",
+   "key": "/Items/Mods/FlickerCloak",
+   "id": 225
+  },
+  {
+   "name": "Frozen Mist",
+   "category": "Mod",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Crafted using Obryk's Bracelet, which is obtained from defeating Obryk, the Shield Warden.",
+   "key": "/Items/Mods/FrozenMist",
+   "id": 226
+  },
+  {
+   "name": "Fusion Cannon",
+   "category": "Mod",
+   "group": "",
+   "world": "Ward Prime",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Comes equipped in the Fusion Rifle, which is obtained from defeating Haarsgard. This mod cannot be removed.",
+   "key": null,
+   "id": 227,
+   "comesWith": 70
+  },
+  {
+   "name": "Gravity Core",
+   "category": "Mod",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Comes equipped in the Particle Accelerator, when that weapon is crafted. This mod cannot be removed.",
+   "key": null,
+   "id": 228,
+   "comesWith": 79
+  },
+  {
+   "name": "Hive Shot",
+   "category": "Mod",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Comes equipped in the Hive Cannon, when that weapon is crafted. This mod cannot be removed.",
+   "key": null,
+   "id": 229,
+   "comesWith": 73
+  },
+  {
+   "name": "Hot Shot",
+   "category": "Mod",
+   "group": "",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "The Scrapper archtype begins the game with this item. It can also be purchased from McCabe for 750 Scrap.",
+   "key": null,
+   "id": 230
+  },
+  {
+   "name": "Howler's Immunity",
+   "category": "Mod",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted using the Hound Choker, which is obtained from defeating Maul.",
+   "key": "/Items/Mods/HowlersImmunity",
+   "id": 231
+  },
+  {
+   "name": "Hunter's Mark",
+   "category": "Mod",
+   "group": "",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "The Hunter archtype begins the game with this item. It can also be purchased from McCabe for 750 Scrap.",
+   "key": null,
+   "id": 232
+  },
+  {
+   "name": "Incinerator",
+   "category": "Mod",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Comes equipped in the Alternator, when that weapon is crafted. This mod cannot be removed.",
+   "key": null,
+   "id": 233,
+   "comesWith": 56
+  },
+  {
+   "name": "Iron Sentinel",
+   "category": "Mod",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted using the Ancient Core, which is obtained from completing the \"Ancient Construct\" event. You will need to activate the Ancient Construct, which is found in Wud's Workshop, using a Control Rod.",
+   "key": "/Items/Mods/IronSentinel",
+   "id": 234
+  },
+  {
+   "name": "Mantle of Thorns",
+   "category": "Mod",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted using the Flesh Barb, which is obtained from defeating Gorefist.",
+   "key": "/Items/Mods/MantleOfThorns",
+   "id": 235
+  },
+  {
+   "name": "Mender's Aura",
+   "category": "Mod",
+   "group": "",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "The Ex-Cultist archtype begins the game with this item. It can also be purchased from McCabe for 750 Scrap.",
+   "key": null,
+   "id": 236
+  },
+  {
+   "name": "Radioactive Volley",
+   "category": "Mod",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Comes equipped in the Defiler, when that weapon is crafted. This mod cannot be removed.",
+   "key": null,
+   "id": 237,
+   "comesWith": 66
+  },
+  {
+   "name": "Rattle Weed",
+   "category": "Mod",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted using the Shadewood, which is obtained from defeating Shroud.",
+   "key": "/Items/Mods/Rattleweed",
+   "id": 238
+  },
+  {
+   "name": "Rift Walker",
+   "category": "Mod",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "Swamps of Corsus",
+   "how": "Crafted using the Luminous Gland, which is obtained from defeating the Dream Eater.",
+   "key": "/Items/Mods/RiftWalker",
+   "id": 239
+  },
+  {
+   "name": "Seed Caller",
+   "category": "Mod",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted using the Hollow Seed, which is obtained from defeating The Mangler.",
+   "key": "/Items/Mods/SeedCaller",
+   "id": 240
+  },
+  {
+   "name": "Seeker",
+   "category": "Mod",
+   "group": "",
+   "world": "Corsus",
+   "mode": "Adventure",
+   "dlc": "Swamps of Corsus",
+   "how": "Crafted using the Iskal Husk, which is obtained from defeating the Iskal Queen using the alternate kill method (dropping a stalactite on her).",
+   "key": "/Items/Mods/Seeker",
+   "id": 241
+  },
+  {
+   "name": "Skewer",
+   "category": "Mod",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Comes equipped in the Devestator, when that weapon is crafted. This mod cannot be removed.",
+   "key": null,
+   "id": 242,
+   "comesWith": 67
+  },
+  {
+   "name": "Song of Swords",
+   "category": "Mod",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted using the Kin Callers Bell, which is obtained from defeating The Warden.",
+   "key": "/Items/Mods/SongOfSwords",
+   "id": 243
+  },
+  {
+   "name": "Spore Shot",
+   "category": "Mod",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Comes equipped in the Sporebloom, when that weapon is crafted. This mod cannot be removed.",
+   "key": null,
+   "id": 244,
+   "comesWith": 98
+  },
+  {
+   "name": "Static Field Shot",
+   "category": "Mod",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Comes equipped in the Eye of the Storm, when that weapon is crafted. This mod cannot be removed.",
+   "key": null,
+   "id": 245,
+   "comesWith": 68
+  },
+  {
+   "name": "Storm Caller",
+   "category": "Mod",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted using the Storm Crystal, which is obtained from defeating Stormcaller.",
+   "key": "/Items/Mods/StormCaller",
+   "id": 246
+  },
+  {
+   "name": "Swarm",
+   "category": "Mod",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted using the Swarm Tusk, which is obtained from defeating The Thrall.",
+   "key": "/Items/Mods/Swarm",
+   "id": 247
+  },
+  {
+   "name": "Tentacle Shot",
+   "category": "Mod",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Comes equipped in Curse of the Jungle God, when that weapon is crafted. This mod cannot be removed.",
+   "key": null,
+   "id": 248,
+   "comesWith": 65
+  },
+  {
+   "name": "Undying",
+   "category": "Mod",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Comes equipped in Ruin, when that weapon is crafted. This mod cannot be removed.",
+   "key": null,
+   "id": 249,
+   "comesWith": 86
+  },
+  {
+   "name": "Unstable Quills",
+   "category": "Mod",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "Swamps of Corsus",
+   "how": "Crafted using the Barbed Sinew, which is obtained from defeating the Barbed Terror.",
+   "key": "/Items/Mods/UnstableQuills",
+   "id": 250
+  },
+  {
+   "name": "Vampiric",
+   "category": "Mod",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "Swamps of Corsus",
+   "how": "Comes equipped in the Pride of the Iskal, when that weapon is crafted. This mod cannot be removed.",
+   "key": null,
+   "id": 251,
+   "comesWith": 81
+  },
+  {
+   "name": "Veil of the Black Tear",
+   "category": "Mod",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted using the Black Tear, which is obtained from defeating Shade and Shatter.",
+   "key": "/Items/Mods/VeilOfTheBlackTear",
+   "id": 252
+  },
+  {
+   "name": "Very Good Boy",
+   "category": "Mod",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Obtained from petting the friendly Wasteland Hound near Wud.",
+   "key": "/Items/Mods/VeryGoodBoy",
+   "id": 253
+  },
+  {
+   "name": "Wildfire Shot",
+   "category": "Mod",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Crafted using the Zephyr's Conduit, which is obtained from defeating Sear and Scald.",
+   "key": "/Items/Mods/WildfireShot",
+   "id": 254
+  },
+  {
+   "name": "Arcane Strike",
+   "category": "Trait",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Rewarded for defeating The Ravager or the Totem Father.",
+   "key": "/Items/Traits/Trait_ArcaneStrike",
+   "id": 255
+  },
+  {
+   "name": "Armor Piercer",
+   "category": "Trait",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "Obtained after dealing 5000 damage to enemy armor.",
+   "key": "/Items/Traits/Trait_ArmorPiercer",
+   "id": 256
+  },
+  {
+   "name": "Bark Skin",
+   "category": "Trait",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "First, it is required that you obtain the Twisted Mask (see the Armor checklist). Then, find the Wailing Tree encounter, but do not attack the Wailing Tree. Instead, the Twisted Mask allows you to speak with it, and you will be rewarded with this trait if you do. Warning: If you do this event in co-op, only 1 player will be able to obtain this trait from the encounter.",
+   "key": "/Items/Traits/Trait_BarkSkin",
+   "id": 257
+  },
+  {
+   "name": "Blood Bond",
+   "category": "Trait",
+   "group": "",
+   "world": "Corsus",
+   "mode": "Adventure",
+   "dlc": "Swamps of Corsus",
+   "how": "Obtain the Cryptolith Sigil from the Iskal Queen, then use it on the Cryptolith Tower. This must be done 2 separate times (re-rolling the world in between each use). After the second use, you will be rewarded with this trait.",
+   "key": "/Items/Traits/Trait_BloodBond",
+   "id": 258
+  },
+  {
+   "name": "Catalyst",
+   "category": "Trait",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Rewarded for defeating The Thrall or Canker.",
+   "key": "/Items/Traits/Trait_Catalyst",
+   "id": 259
+  },
+  {
+   "name": "Climber",
+   "category": "Trait",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "Obtained after vaulting 50 times.",
+   "key": "/Items/Traits/Trait_Climber",
+   "id": 260
+  },
+  {
+   "name": "Cold As Ice",
+   "category": "Trait",
+   "group": "",
+   "world": "Earth",
+   "mode": "Multiplayer",
+   "dlc": "",
+   "how": "Find Brabus in The Depot dungeon while in a co-op game. He will give you the option of fighting your teammate. The winner of the fight will be rewarded with this trait. Warning: Only 1 player can obtain this trait from the encounter. Also, if the first person to talk to Brabus has the Pocket Watch item, they will not get the option to fight a teammate.",
+   "key": "/Items/Traits/Trait_ColdAsIce",
+   "id": 261
+  },
+  {
+   "name": "Concentration",
+   "category": "Trait",
+   "group": "",
+   "world": "Corsus",
+   "mode": "Adventure",
+   "dlc": "Swamps of Corsus",
+   "how": "Obtain the Cryptolith Sigil from the Iskal Queen, then use it on the Cryptolith Tower. After the first use, you will be rewarded with this trait.",
+   "key": "/Items/Traits/Trait_Concentration",
+   "id": 262
+  },
+  {
+   "name": "Demolitionist",
+   "category": "Trait",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "Obtained after killing 100 enemies with explosive damage.",
+   "key": "/Items/Traits/Trait_Demolitionist",
+   "id": 263
+  },
+  {
+   "name": "Elder Knowledge",
+   "category": "Trait",
+   "group": "",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Retreive the Ward 13 Keycard from the Founder's Hideout (a location on Earth). Open the door on level B2 in Ward 13 using the Keycard. Walk straight down the hallway and enter the second door on the left (labeled \"Dr. Santiago Itsaso\"). Activate the tape recorder on the desk. When it finishes playing, you will obtain this trait.",
+   "key": "/Items/Traits/Trait_ElderKnowledge",
+   "id": 264
+  },
+  {
+   "name": "Endurance",
+   "category": "Trait",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "New characters begin with this trait.",
+   "key": null,
+   "id": 265,
+   "starter": true
+  },
+  {
+   "name": "Evocation",
+   "category": "Trait",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "Swamps of Corsus",
+   "how": "Destroy all of the hives during the \"Circlet Hatchery\" event without getting hit by any of the wisps.",
+   "key": "/Items/Traits/Trait_Evocation",
+   "id": 266
+  },
+  {
+   "name": "Executioner",
+   "category": "Trait",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Rewarded for defeating Ixillis.",
+   "key": "/Items/Traits/Trait_Executioner",
+   "id": 267
+  },
+  {
+   "name": "Exploiter",
+   "category": "Trait",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "Obtained after killing 150 enemies with Weak Spot Damage.",
+   "key": "/Items/Traits/Trait_Exploiter",
+   "id": 268
+  },
+  {
+   "name": "Flash Caster",
+   "category": "Trait",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "Obtained after acquiring 25 weapon mods.",
+   "key": "/Items/Traits/Trait_FlashCaster",
+   "id": 269
+  },
+  {
+   "name": "Footwork",
+   "category": "Trait",
+   "group": "",
+   "world": "Corsus",
+   "mode": "Adventure",
+   "dlc": "Swamps of Corsus",
+   "how": "Rewarded for defeating the Iskal Queen.",
+   "key": "/Items/Traits/Trait_Footwork",
+   "id": 270
+  },
+  {
+   "name": "Fortification",
+   "category": "Trait",
+   "group": "",
+   "world": "Corsus",
+   "mode": "Multiplayer",
+   "dlc": "Swamps of Corsus",
+   "how": "This requires 1 or 2 other players. Find the Fetid Pools dungeon and obtain 3 Acid Cleaned Keys. To obtain an Acid Cleaned Key, you must find and wear a Rusted Amulet, then crouch in one of the acid pools. Once you have 3 keys, open the door that accesses the stairs up. Then open the door to the upstairs room. Use the final key to open the door that leads into the chamber holding the Hero's Ring. Picking up the Hero's Ring will reward this trait.",
+   "key": "/Items/Traits/Trait_Fortification",
+   "id": 271
+  },
+  {
+   "name": "Glutton",
+   "category": "Trait",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Rewarded for defeating The Unclean One.",
+   "key": "/Items/Traits/Trait_Glutton",
+   "id": 272
+  },
+  {
+   "name": "Guardian's Blessing",
+   "category": "Trait",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Find the Stuck Merchant. Get the Strange Curio from the back of her wagon. It can be used to open the door to the Guardian Shrine dungeon. At the end of the dungeon, you may encounter the Root Horror, which will run away after being reduced to 50% health. Return to the Stuck Merchant's wagon, where the Root Horror will reappear. Defeat the Root Horror to be rewarded with this trait.",
+   "key": "/Items/Traits/Trait_GuardiansBlessing",
+   "id": 273
+  },
+  {
+   "name": "Handling",
+   "category": "Trait",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "Acquired upon obtaining 10 ranged weapons.",
+   "key": "/Items/Traits/Trait_Handling",
+   "id": 274
+  },
+  {
+   "name": "Hard Charger",
+   "category": "Trait",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Rewarded for defeating Brudvaak, the Rider and Vargr, the Warg.",
+   "key": "/Items/Traits/Trait_HardCharger",
+   "id": 275
+  },
+  {
+   "name": "Invoker",
+   "category": "Trait",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "Acquired upon killing 100 enemies with summoned creatures.",
+   "key": "/Items/Traits/Trait_Invoker",
+   "id": 276
+  },
+  {
+   "name": "Keeper's Blessing",
+   "category": "Trait",
+   "group": "",
+   "world": "The Labyrinth",
+   "mode": "Campaign",
+   "dlc": "",
+   "how": "Acquired upon entering The Labyrinth for the first time.",
+   "key": "/Items/Traits/Trait_KeepersBlessing",
+   "id": 277
+  },
+  {
+   "name": "Kingslayer",
+   "category": "Trait",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Rewarded for defeating the Undying King.",
+   "key": "/Items/Traits/Trait_Kingslayer",
+   "id": 278
+  },
+  {
+   "name": "Last Resort",
+   "category": "Trait",
+   "group": "",
+   "world": "Ward Prime",
+   "mode": "Campaign",
+   "dlc": "Subject 2923",
+   "how": "Rewarded for defeating Harsgaard, Root Harbinger.",
+   "key": "/Items/Traits/Trait_LastResort",
+   "id": 279
+  },
+  {
+   "name": "Luminescent",
+   "category": "Trait",
+   "group": "",
+   "world": "Corsus",
+   "mode": "Adventure",
+   "dlc": "Swamps of Corsus",
+   "how": "You must be infected with the Parasite effect from an Iskal Infector. This allows you to purchase this trait from Mar'Gosh for 1 Opalescent Shell. The Opalescent Shell can be obtained from the Mudling Queen Beetle during the \"Abandoned Throne\" event. There is a very small percentage chance to spawn this event with each beetle kill (the non-hostile beetles around the throne). It is recommended to focus on the white beetles, as they have smaller health pools.",
+   "key": "/Items/Traits/Trait_Luminescent",
+   "id": 280
+  },
+  {
+   "name": "Mind's Eye",
+   "category": "Trait",
+   "group": "",
+   "world": "Ward 17",
+   "mode": "",
+   "dlc": "",
+   "how": "Rewarded for defeating the Dreamer/Nightmare.",
+   "key": "/Items/Traits/Trait_MindsEye",
+   "id": 281
+  },
+  {
+   "name": "Mother's Blessing",
+   "category": "Trait",
+   "group": "",
+   "world": "Earth",
+   "mode": "Campaign",
+   "dlc": "",
+   "how": "Obtained after successfully defending the Root Mother.",
+   "key": "/Items/Traits/Trait_MothersBlessing",
+   "id": 282
+  },
+  {
+   "name": "Potency",
+   "category": "Trait",
+   "group": "",
+   "world": "Corsus",
+   "mode": "Adventure",
+   "dlc": "Swamps of Corsus",
+   "how": "You must be infected with the Parasite effect from an Iskal Infector. Speak with the Iskal Queen and agree to help her. She will give you an Iskal Vial. Go to the graveyard. Crouch and stealthily approach the Graveyard Elf's cauldron to avoid waking her up. Interact with the cauldron to use the Iskal Vial, which will unlock this trait.",
+   "key": "/Items/Traits/Trait_Potency",
+   "id": 283
+  },
+  {
+   "name": "Quick Hands",
+   "category": "Trait",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Rewarded for defeating The Ent or Singe.",
+   "key": "/Items/Traits/Trait_QuickHands",
+   "id": 284
+  },
+  {
+   "name": "Rapid Strike",
+   "category": "Trait",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "Acquired upon leveling any non-boss melee weapon to level 20.",
+   "key": "/Items/Traits/Trait_RapidStrike",
+   "id": 285
+  },
+  {
+   "name": "Recovery",
+   "category": "Trait",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Rewarded for defeating Claviger or The Harrow.",
+   "key": "/Items/Traits/Trait_Recovery",
+   "id": 286
+  },
+  {
+   "name": "Revivalist",
+   "category": "Trait",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "Acquired upon reviving teammates 10 times.",
+   "key": "/Items/Traits/Trait_Revivalist",
+   "id": 287
+  },
+  {
+   "name": "Scavenger",
+   "category": "Trait",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Find the Tarnished Ring, which spawns randomly. Return it to Reggie and ask him to talk about himself. Exhaust his dialogue until you are given the option to give him the Tarnished Ring. Give him the ring to acquire this trait. Alternatively, you can also obtain this trait by picking up 50,000 Scrap.",
+   "key": "/Items/Traits/Trait_Scavenger",
+   "id": 288
+  },
+  {
+   "name": "Shadow Walker",
+   "category": "Trait",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Given to the Hunter archtype by Ace in Ward 13. Alternatively, it can also be obtained as a reward for completing the event \"Hunter's Hideout\" in the Hidden Grotto dungeon.",
+   "key": "/Items/Traits/Trait_ShadowWalker",
+   "id": 289
+  },
+  {
+   "name": "Siphoner",
+   "category": "Trait",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Acquired after completing the \"Rescue the Krall Baby\" event in Wuthering Keep or The Wild Reach.",
+   "key": "/Items/Traits/Trait_Siphoner",
+   "id": 290
+  },
+  {
+   "name": "Sleight of Hand",
+   "category": "Trait",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "Obtained upon getting 100 kills per weapon for 10 different ranged weapons (for a total of 1000 kills).",
+   "key": "/Items/Traits/Trait_SleightOfHand",
+   "id": 291
+  },
+  {
+   "name": "Spirit",
+   "category": "Trait",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Given to the Ex-Cultist archtype by Ace in Ward 13. It can also be obtained as a reward for completing the event \"Supply Run\" in the Sorrow's Pass dungeon.",
+   "key": "/Items/Traits/Trait_Spirit",
+   "id": 292
+  },
+  {
+   "name": "Suspicion",
+   "category": "Trait",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "Acquired after being downed 10 times by Friendly Fire Damage.",
+   "key": "/Items/Traits/Trait_Suspicion",
+   "id": 293
+  },
+  {
+   "name": "Swiftness",
+   "category": "Trait",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Obtained by playing the \"Song of the Guardian\" on any of the bells in Yaesha. The correct bell sequence is 1-1-3-4-1-1-3-2.",
+   "key": "/Items/Traits/Trait_Swiftness",
+   "id": 294
+  },
+  {
+   "name": "Teamwork",
+   "category": "Trait",
+   "group": "",
+   "world": "",
+   "mode": "Multiplayer",
+   "dlc": "",
+   "how": "Acquired upon joining another player's game or having another player join your game for the first time.",
+   "key": "/Items/Traits/Trait_Teamwork",
+   "id": 295
+  },
+  {
+   "name": "Tormentor",
+   "category": "Trait",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "Acquired upon applying 100 status effects on enemies.",
+   "key": "/Items/Traits/Trait_Tormentor",
+   "id": 296
+  },
+  {
+   "name": "Triage",
+   "category": "Trait",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Acquired after speaking with Navun at the Shrine of the Immortals.",
+   "key": "/Items/Traits/Trait_Triage",
+   "id": 297
+  },
+  {
+   "name": "Trigger Happy",
+   "category": "Trait",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "Acquired upon leveling any ranged weapon to level 20.",
+   "key": "/Items/Traits/Trait_TriggerHappy",
+   "id": 298
+  },
+  {
+   "name": "Vaccine",
+   "category": "Trait",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "Acquired upon curing 25 status effects using consumables.",
+   "key": "/Items/Traits/Trait_Vaccine",
+   "id": 299
+  },
+  {
+   "name": "Vigor",
+   "category": "Trait",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "New characters begin with this trait.",
+   "key": null,
+   "id": 300,
+   "starter": true
+  },
+  {
+   "name": "Warrior",
+   "category": "Trait",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Given to the Scrapper archtype by Ace in Ward 13. It can also be obtained as a reward for completing the event \"A Tale of Two Liz's\" in The Warren dungeon.",
+   "key": "/Items/Traits/Trait_Warrior",
+   "id": 301
+  },
+  {
+   "name": "Will to Live",
+   "category": "Trait",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "Obtained after being revived 10 times by other players.",
+   "key": "/Items/Traits/Trait_WillToLive",
+   "id": 302
+  },
+  {
+   "name": "Wisdom",
+   "category": "Trait",
+   "group": "",
+   "world": "Ward Prime",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Acquired after completing the Ward Prime quest line.",
+   "key": "/Items/Traits/Trait_Wisdom",
+   "id": 303
+  },
+  {
+   "name": "World Walker",
+   "category": "Trait",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Acquired upon entering Rhom for the first time.",
+   "key": "/Items/Traits/Trait_WorldWalker",
+   "id": 304
+  },
+  {
+   "name": "Beckon Emote",
+   "category": "Emote",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Defeat Singe.",
+   "key": "/Player/Emotes/Emote_Beckon",
+   "id": 305
+  },
+  {
+   "name": "Cheer Emote",
+   "category": "Emote",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Defeat The Ent.",
+   "key": "/Player/Emotes/Emote_Cheer",
+   "id": 306
+  },
+  {
+   "name": "Confused Emote",
+   "category": "Emote",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Defeat Ixillis.",
+   "key": "/Player/Emotes/Emote_Confused",
+   "id": 307
+  },
+  {
+   "name": "Exhausted Emote",
+   "category": "Emote",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Defeat The Unclean One.",
+   "key": "/Player/Emotes/Emote_Exhausted",
+   "id": 308
+  },
+  {
+   "name": "Fail Emote",
+   "category": "Emote",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Defeat The Harrow.",
+   "key": "/Player/Emotes/Emote_Fail",
+   "id": 309
+  },
+  {
+   "name": "Freeze Frame Emote",
+   "category": "Emote",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Defeat The Ravager.",
+   "key": "/Player/Emotes/Emote_FreezeFrame",
+   "id": 310
+  },
+  {
+   "name": "Gravedigger Emote",
+   "category": "Emote",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Defeat the Undying King.",
+   "key": "/Player/Emotes/Emote_Gravedigger",
+   "id": 311
+  },
+  {
+   "name": "High Five Emote",
+   "category": "Emote",
+   "group": "",
+   "world": "Ward 17",
+   "mode": "Hardcore",
+   "dlc": "",
+   "how": "Defeat the Dreamer/Nightmare.",
+   "key": "/Player/Emotes/Emote_HighFive",
+   "id": 312
+  },
+  {
+   "name": "Laugh Emote",
+   "category": "Emote",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Defeat Claviger",
+   "key": "/Player/Emotes/Emote_Laugh",
+   "id": 313
+  },
+  {
+   "name": "No Emote",
+   "category": "Emote",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "New characters begin the game with this emote.",
+   "key": null,
+   "id": 314,
+   "starter": true
+  },
+  {
+   "name": "Praise the Gun Emote",
+   "category": "Emote",
+   "group": "",
+   "world": "Ward 17",
+   "mode": "Normal",
+   "dlc": "",
+   "how": "Defeat the Dreamer/Nightmare.",
+   "key": "/Player/Emotes/Emote_PraiseTheGun",
+   "id": 315
+  },
+  {
+   "name": "Tea Time Emote",
+   "category": "Emote",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Defeat the Totem Father.",
+   "key": "/Player/Emotes/Emote_TeaTime",
+   "id": 316
+  },
+  {
+   "name": "This Way Emote",
+   "category": "Emote",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "New characters begin the game with this emote.",
+   "key": null,
+   "id": 317,
+   "starter": true
+  },
+  {
+   "name": "Wave Emote",
+   "category": "Emote",
+   "group": "",
+   "world": "",
+   "mode": "Multiplayer",
+   "dlc": "",
+   "how": "Join another player's game or have another player join your game.",
+   "key": "/Player/Emotes/Emote_Wave",
+   "id": 318
+  },
+  {
+   "name": "Yes Emote",
+   "category": "Emote",
+   "group": "",
+   "world": "",
+   "mode": "",
+   "dlc": "",
+   "how": "New characters begin the game with this emote.",
+   "key": null,
+   "id": 319,
+   "starter": true
+  },
+  {
+   "name": "Adventurer Goggles",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Rigs for 1,000 Scrap and 50 Glowing Fragments.",
+   "key": null,
+   "id": 320
+  },
+  {
+   "name": "Bloodletter Headdress",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 400 Scrap and 10 Glowing Fragments.",
+   "key": null,
+   "id": 321
+  },
+  {
+   "name": "Bloodletter Leggings",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 600 Scrap and 15 Glowing Fragments.",
+   "key": null,
+   "id": 322
+  },
+  {
+   "name": "Bloodletter Raiment",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 1,000 Scrap and 25 Glowing Fragments.",
+   "key": null,
+   "id": 323
+  },
+  {
+   "name": "Brigand Jacket",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 1,000 Scrap and 25 Glowing Fragments.",
+   "key": null,
+   "id": 324
+  },
+  {
+   "name": "Brigand Mask",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 400 Scrap and 10 Glowing Fragments.",
+   "key": null,
+   "id": 325
+  },
+  {
+   "name": "Brigand Trousers",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 600 Scrap and 15 Glowing Fragments.",
+   "key": null,
+   "id": 326
+  },
+  {
+   "name": "Chaos Carapace",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 1,000 Scrap and 25 Glowing Fragments.",
+   "key": null,
+   "id": 327
+  },
+  {
+   "name": "Chaos Greaves",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 600 Scrap and 15 Glowing Fragments.",
+   "key": null,
+   "id": 328
+  },
+  {
+   "name": "Chaos Skull",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 400 Scrap and 10 Glowing Fragments.",
+   "key": null,
+   "id": 329
+  },
+  {
+   "name": "Corrupted Cage",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 1,000 Scrap and 25 Glowing Fragments.",
+   "key": null,
+   "id": 330
+  },
+  {
+   "name": "Corrupted Hood",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 400 Scrap and 10 Glowing Fragments.",
+   "key": null,
+   "id": 331
+  },
+  {
+   "name": "Corrupted Tassets",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 600 Scrap and 15 Glowing Fragments.",
+   "key": null,
+   "id": 332
+  },
+  {
+   "name": "Crusader Greaves",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 600 Scrap and 15 Glowing Fragments.",
+   "key": null,
+   "id": 333
+  },
+  {
+   "name": "Crusader Protector",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 1,000 Scrap and 25 Glowing Fragments.",
+   "key": null,
+   "id": 334
+  },
+  {
+   "name": "Crusader Visage",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 400 Scrap and 10 Glowing Fragments.",
+   "key": null,
+   "id": 335
+  },
+  {
+   "name": "Harbringer Boots",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 600 Scrap and 15 Glowing Fragments.",
+   "key": null,
+   "id": 336
+  },
+  {
+   "name": "Harbringer Mantle",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 1,000 Scrap and 25 Glowing Fragments.",
+   "key": null,
+   "id": 337
+  },
+  {
+   "name": "Harbringer Mask",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 400 Scrap and 10 Glowing Fragments.",
+   "key": null,
+   "id": 338
+  },
+  {
+   "name": "Headhunter Helm",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 400 Scrap and 10 Glowing Fragments.",
+   "key": null,
+   "id": 339
+  },
+  {
+   "name": "Headhunter Husk",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 1,000 Scrap and 25 Glowing Fragments.",
+   "key": null,
+   "id": 340
+  },
+  {
+   "name": "Headhunter Kilt",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 600 Scrap and 15 Glowing Fragments.",
+   "key": null,
+   "id": 341
+  },
+  {
+   "name": "Mystic Armor",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 1,000 Scrap and 25 Glowing Fragments.",
+   "key": null,
+   "id": 342
+  },
+  {
+   "name": "Mystic Greaves",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 600 Scrap and 15 Glowing Fragments.",
+   "key": null,
+   "id": 343
+  },
+  {
+   "name": "Mystic Helm",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 400 Scrap and 10 Glowing Fragments.",
+   "key": null,
+   "id": 344
+  },
+  {
+   "name": "Ritualist Britches",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 600 Scrap and 15 Glowing Fragments.",
+   "key": null,
+   "id": 345
+  },
+  {
+   "name": "Ritualist Duster",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 1,000 Scrap and 25 Glowing Fragments.",
+   "key": null,
+   "id": 346
+  },
+  {
+   "name": "Ritualist Hat",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 400 Scrap and 10 Glowing Fragments.",
+   "key": null,
+   "id": 347
+  },
+  {
+   "name": "Roughneck Bodyplate",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 1,000 Scrap and 25 Glowing Fragments.",
+   "key": null,
+   "id": 348
+  },
+  {
+   "name": "Roughneck Helmet",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 400 Scrap and 10 Glowing Fragments.",
+   "key": null,
+   "id": 349
+  },
+  {
+   "name": "Roughneck Workboots",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 600 Scrap and 15 Glowing Fragments.",
+   "key": null,
+   "id": 350
+  },
+  {
+   "name": "Sentinel Armor",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 1,000 Scrap and 25 Glowing Fragments.",
+   "key": null,
+   "id": 351
+  },
+  {
+   "name": "Sentinel Helmet",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 400 Scrap and 10 Glowing Fragments.",
+   "key": null,
+   "id": 352
+  },
+  {
+   "name": "Sentinel Leggings",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 600 Scrap and 15 Glowing Fragments.",
+   "key": null,
+   "id": 353
+  },
+  {
+   "name": "Shadow Garb",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 1,000 Scrap and 25 Glowing Fragments.",
+   "key": null,
+   "id": 354
+  },
+  {
+   "name": "Shadow Leggings",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 600 Scrap and 15 Glowing Fragments.",
+   "key": null,
+   "id": 355
+  },
+  {
+   "name": "Shadow Mask",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 400 Scrap and 10 Glowing Fragments.",
+   "key": null,
+   "id": 356
+  },
+  {
+   "name": "Survival Goggles",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 400 Scrap and 10 Glowing Fragments.",
+   "key": null,
+   "id": 357
+  },
+  {
+   "name": "Survivor Leggings",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 600 Scrap and 15 Glowing Fragments.",
+   "key": null,
+   "id": 358
+  },
+  {
+   "name": "Survivor Tunic",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 1,000 Scrap and 25 Glowing Fragments.",
+   "key": null,
+   "id": 359
+  },
+  {
+   "name": "Vagrant Mask",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 400 Scrap and 10 Glowing Fragments.",
+   "key": null,
+   "id": 360
+  },
+  {
+   "name": "Vagrant Overcoat",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 1,000 Scrap and 25 Glowing Fragments.",
+   "key": null,
+   "id": 361
+  },
+  {
+   "name": "Vagrant Trousers",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 600 Scrap and 15 Glowing Fragments.",
+   "key": null,
+   "id": 362
+  },
+  {
+   "name": "Vanguard Great Helm",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 400 Scrap and 10 Glowing Fragments.",
+   "key": null,
+   "id": 363
+  },
+  {
+   "name": "Vanguard Greaves",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 600 Scrap and 15 Glowing Fragments.",
+   "key": null,
+   "id": 364
+  },
+  {
+   "name": "Vanguard Shell",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 1,000 Scrap and 25 Glowing Fragments.",
+   "key": null,
+   "id": 365
+  },
+  {
+   "name": "Widowmaker Pants",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 600 Scrap and 15 Glowing Fragments.",
+   "key": null,
+   "id": 366
+  },
+  {
+   "name": "Widowmaker Shroud",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 400 Scrap and 10 Glowing Fragments.",
+   "key": null,
+   "id": 367
+  },
+  {
+   "name": "Widowmaker Trenchcoat",
+   "category": "Skin",
+   "group": "",
+   "world": "",
+   "mode": "Survival",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from Whispers for 1,000 Scrap and 25 Glowing Fragments.",
+   "key": null,
+   "id": 368
+  },
+  {
+   "name": "Adrenaline",
+   "category": "Consumível",
+   "group": "",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from Reggie for 50 Scrap.",
+   "key": null,
+   "id": 369
+  },
+  {
+   "name": "Ammo Box",
+   "category": "Consumível",
+   "group": "",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from Reggie, Mudtooth, or Wud for 200 Scrap.",
+   "key": null,
+   "id": 370
+  },
+  {
+   "name": "Antiserum",
+   "category": "Consumível",
+   "group": "",
+   "world": "Corsus",
+   "mode": "Adventure",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from the Graveyard Elf for 50 Scrap.",
+   "key": null,
+   "id": 371
+  },
+  {
+   "name": "Bandage",
+   "category": "Consumível",
+   "group": "",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from Reggie for 50 Scrap.",
+   "key": null,
+   "id": 372
+  },
+  {
+   "name": "Beetle Extract",
+   "category": "Consumível",
+   "group": "",
+   "world": "Corsus",
+   "mode": "Adventure",
+   "dlc": "Swamps of Corsus",
+   "how": "Purchased from the Graveyard Elf for 500 Scrap.",
+   "key": null,
+   "id": 373
+  },
+  {
+   "name": "Bloodwort",
+   "category": "Consumível",
+   "group": "",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from Reggie, Wud, the Stuck Merchant, or the Iskal Queen for 100 Scrap.",
+   "key": null,
+   "id": 374
+  },
+  {
+   "name": "Divine Nectar",
+   "category": "Consumível",
+   "group": "",
+   "world": "Corsus",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from the Iskal Queen for 500 Scrap.",
+   "key": null,
+   "id": 375
+  },
+  {
+   "name": "Elixir of Enlightenment",
+   "category": "Consumível",
+   "group": "",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "New characters begin the game with 3 of these consumables.",
+   "key": null,
+   "id": 376,
+   "starter": true
+  },
+  {
+   "name": "Ethereal Orb",
+   "category": "Consumível",
+   "group": "",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from Reggie or the Stuck Merchant for 50 Scrap.",
+   "key": null,
+   "id": 377
+  },
+  {
+   "name": "Frenzy Dust",
+   "category": "Consumível",
+   "group": "",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from Reggie for 100 Scrap.",
+   "key": null,
+   "id": 378
+  },
+  {
+   "name": "Golden Plum",
+   "category": "Consumível",
+   "group": "",
+   "world": "Yaesha",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from the Stuck Merchant for 500 Scrap.",
+   "key": null,
+   "id": 379
+  },
+  {
+   "name": "Greenleaf",
+   "category": "Consumível",
+   "group": "",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from Reggie or the Iskal Queen for 50 Scrap.",
+   "key": null,
+   "id": 380
+  },
+  {
+   "name": "Heavy Water Elixir",
+   "category": "Consumível",
+   "group": "",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from Reggie or Wud for 50 Scrap.",
+   "key": null,
+   "id": 381
+  },
+  {
+   "name": "Houndmaster's Jerky",
+   "category": "Consumível",
+   "group": "",
+   "world": "Rhom",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from the Houndmaster for 500 Scrap.",
+   "key": null,
+   "id": 382
+  },
+  {
+   "name": "Hydro Coolant",
+   "category": "Consumível",
+   "group": "",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from Reggie or the Stuck Merchant for 50 Scrap.",
+   "key": null,
+   "id": 383
+  },
+  {
+   "name": "Icefruit",
+   "category": "Consumível",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Purchased from Sebum for 500 Scrap.",
+   "key": null,
+   "id": 384
+  },
+  {
+   "name": "Liquid Escape",
+   "category": "Consumível",
+   "group": "",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "New characters begin the game with this item.",
+   "key": null,
+   "id": 385,
+   "starter": true
+  },
+  {
+   "name": "Mudtooth's Stew",
+   "category": "Consumível",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from Mudtooth for 500 Scrap.",
+   "key": null,
+   "id": 386
+  },
+  {
+   "name": "Mudtooth's Tonic",
+   "category": "Consumível",
+   "group": "",
+   "world": "Earth",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from Mudtooth for 500 Scrap.",
+   "key": null,
+   "id": 387
+  },
+  {
+   "name": "Oilskin Tonic",
+   "category": "Consumível",
+   "group": "",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from Reggie for 50 Scrap.",
+   "key": null,
+   "id": 388
+  },
+  {
+   "name": "Orb of Undoing",
+   "category": "Consumível",
+   "group": "",
+   "world": "Ward 13",
+   "mode": "",
+   "dlc": "",
+   "how": "Purchased from Reggie for 2,500 Scrap after defeating the Dreamer/Nightmare.",
+   "key": null,
+   "id": 389
+  },
+  {
+   "name": "Pristine Essence",
+   "category": "Consumível",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Purchased from Krall Mother or Sebum for 200 Scrap.",
+   "key": null,
+   "id": 390
+  },
+  {
+   "name": "Spiceroot",
+   "category": "Consumível",
+   "group": "",
+   "world": "Reisum",
+   "mode": "",
+   "dlc": "Subject 2923",
+   "how": "Purchased from Krall Mother, Sebum, or Reggie for 50 Scrap.",
+   "key": null,
+   "id": 391
+  }
+ ],
+ "events": {
+  "AbandonedThrone": {
+   "altName": null,
+   "items": [
+    "/Items/Traits/Trait_Luminescent"
+   ]
+  },
+  "AbrasiveAmulet": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_AbrasiveAmulet"
+   ]
+  },
+  "AcesCoin": {
+   "altName": null,
+   "items": [
+    "/Items/Weapons/Basic/HandGuns/Revolver/Weapon_Revolver"
+   ]
+  },
+  "Afterbirth": {
+   "altName": "ChillwindHovel",
+   "items": [
+    "/Items/Trinkets/ScavengersRing",
+    "/Items/Trinkets/BlessedNecklace"
+   ]
+  },
+  "AggressorsBane": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/AggressorsBane"
+   ]
+  },
+  "AlchemistsJewel": {
+   "altName": "Alchemist'sJewel",
+   "items": [
+    "/Items/Trinkets/Trinket_AlchemistsJewel"
+   ]
+  },
+  "ArmorVault": {
+   "altName": null,
+   "items": [
+    "/Items/Armor/Akari/Armor_Head_Akari",
+    "/Items/Armor/Akari/Armor_Body_Akari",
+    "/Items/Armor/Akari/Armor_Legs_Akari"
+   ]
+  },
+  "BackbreakerRing": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/BackbreakerRing"
+   ]
+  },
+  "BandOfCastor": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/BandsOfCastorAndPollux/Trinket_BandOfCastor"
+   ]
+  },
+  "BandOfPollux": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/BandsOfCastorAndPollux/Trinket_BandOfPollux"
+   ]
+  },
+  "BandOfStrength": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/BandOfStrength"
+   ]
+  },
+  "BarbTerror": {
+   "altName": "BarbedTerror",
+   "items": [
+    "/Items/Mods/UnstableQuills"
+   ]
+  },
+  "BarnSiege": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/HangmansMemento"
+   ]
+  },
+  "BlinkFiend": {
+   "altName": "Onslaught",
+   "items": [
+    "/Items/Mods/BlinkToken"
+   ]
+  },
+  "BlinkThief": {
+   "altName": null,
+   "items": [
+    "/Items/Weapons/Basic/RicochetRifle/Weapon_Pan_RicochetRifle",
+    "/Items/Trinkets/Trinket_CelerityStone"
+   ]
+  },
+  "BlizzardMage": {
+   "altName": "IkroTheIceConjurer",
+   "items": [
+    "/Items/Mods/Blizzard"
+   ]
+  },
+  "BloodFont": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_BloodFont"
+   ]
+  },
+  "Brabus": {
+   "altName": null,
+   "items": [
+    "/Items/Mods/ExplosiveShot",
+    "/Items/Armor/Bandit/Armor_Head_Bandit",
+    "/Items/Armor/Bandit/Armor_Body_Bandit",
+    "/Items/Armor/Bandit/Armor_Legs_Bandit",
+    "/Items/Traits/Trait_ColdAsIce"
+   ]
+  },
+  "BrainBug": {
+   "altName": "Mar'gosh",
+   "items": [
+    "/Items/Trinkets/GIftOfTheIskal",
+    "/Items/Armor/Carapace/Armor_Head_Carapace",
+    "/Items/Armor/Carapace/Armor_Body_Carapace",
+    "/Items/Armor/Carapace/Armor_Legs_Carapace",
+    "/Items/Traits/Trait_Luminescent"
+   ]
+  },
+  "BrutalMark": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/BrutalMark"
+   ]
+  },
+  "BurdenOfTheReckless": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/BurdenOfTheReckless"
+   ]
+  },
+  "BurdenOfTheGambler": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/BurdenOfTheGambler"
+   ]
+  },
+  "BurdenOfTheDevoted": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/BurdenOfTheDevoted"
+   ]
+  },
+  "BurdenOfTheFollower": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_BurdenOfTheFollower"
+   ]
+  },
+  "BurdenOfTheWarlord": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_BurdenOfTheWarlord"
+   ]
+  },
+  "ButchersFetish": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/ButchersFetish"
+   ]
+  },
+  "CharcoalNecklace": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/CharcoalNecklace"
+   ]
+  },
+  "CleansingJewel": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/CleansingJewel"
+   ]
+  },
+  "CompulsionLoop": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/CompulsionLoop"
+   ]
+  },
+  "CreepersPeeper": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/SwashbucklersSignet",
+    "/Items/Weapons/Basic/MiniCrossbow/Weapon_MiniCrossbow"
+   ]
+  },
+  "Cryptolith": {
+   "altName": null,
+   "items": [
+    "/Items/Traits/Trait_Concentration",
+    "/Items/Traits/Trait_BloodBond",
+    "/Items/Armor/Armor_Head_Labyrinth",
+    "/Items/Armor/Armor_Body_Labyrinth",
+    "/Items/Armor/Armor_Legs_Labyrinth"
+   ]
+  },
+  "DeceiversBand": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/DeceiversBand"
+   ]
+  },
+  "DevouringLoop": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/DevouringLoop"
+   ]
+  },
+  "DoeShrine": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_ScavengersBauble",
+    "/Items/Traits/Trait_Swiftness"
+   ]
+  },
+  "DrifterMask": {
+   "altName": null,
+   "items": [
+    "/Items/Armor/Drifter/Armor_Head_Drifter"
+   ]
+  },
+  "Driftstone": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/DriftStone"
+   ]
+  },
+  "EzlansBand": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_EzlansBand"
+   ]
+  },
+  "Fatty": {
+   "altName": "TheUncleanOne",
+   "items": [
+    "/Items/Weapons/Boss/Devastator/Weapon_Swamp_Devastator",
+    "/Items/Weapons/Boss/ButchersFlail/Weapon_Swamp_ButchersFlail",
+    "/Items/Traits/Trait_Glutton",
+    "/Player/Emotes/Emote_Exhausted"
+   ]
+  },
+  "FetidPool": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_RustedAmulet",
+    "/Items/Trinkets/HeartOfDarkness",
+    "/Items/Trinkets/HerosRing",
+    "/Items/Traits/Trait_Fortification"
+   ]
+  },
+  "FiveFingeredRing": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/FiveFingeredRing"
+   ]
+  },
+  "Flautist": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_HeartOfTheWolf",
+    "/Items/Traits/Trait_Swiftness"
+   ]
+  },
+  "FlickeringHorror": {
+   "altName": "DreamEater",
+   "items": [
+    "/Items/Mods/RiftWalker"
+   ]
+  },
+  "FoundersHideout": {
+   "altName": null,
+   "items": [
+    "/Items/Armor/Drifter/Armor_Body_Drifter",
+    "/Items/Armor/Drifter/Armor_Legs_Drifter"
+   ]
+  },
+  "FrozenLords": {
+   "altName": null,
+   "items": [
+    "/Items/Armor/Scavenger/Armor_Head_Scavenger",
+    "/Items/Armor/Scavenger/Armor_Body_Scavenger",
+    "/Items/Armor/Scavenger/Armor_Legs_Scavenger"
+   ]
+  },
+  "GalenicCharm": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_GalenicCharm"
+   ]
+  },
+  "GraveyardElf": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/GrimCoil",
+    "/Items/Trinkets/Trinket_RingOfTheUnclean",
+    "/Items/Traits/Trait_Potency"
+   ]
+  },
+  "GravityStone": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/GravityStone"
+   ]
+  },
+  "Guardian": {
+   "altName": null,
+   "items": []
+  },
+  "GunslingersCharm": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_GunslingersCharm"
+   ]
+  },
+  "GunslignersRing": {
+   "altName": "Gunslinger'sRing",
+   "items": [
+    "/Items/Trinkets/Trinket_GunslingersRing"
+   ]
+  },
+  "HeartSeeker": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/HeartSeeker"
+   ]
+  },
+  "Homestead": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/VanguardRing"
+   ]
+  },
+  "HoundMaster": {
+   "altName": null,
+   "items": [
+    "/Items/Mods/HowlersImmunity"
+   ]
+  },
+  "HuntersBand": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/HuntersBand"
+   ]
+  },
+  "HuntersHalo": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_HuntersHalo"
+   ]
+  },
+  "HuntersHideout": {
+   "altName": null,
+   "items": [
+    "/Items/Weapons/Basic/HandGuns/HuntingPistol/Weapon_HuntingPistol",
+    "/Items/Traits/Trait_ShadowWalker"
+   ]
+  },
+  "IceSkimmer": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/BandOfDiscord",
+    "/Items/Trinkets/RingOfSynergy",
+    "/Items/Weapons/Basic/SawedOffShotgun/Weapon_SawedOffShotgun",
+    "/Items/Armor/Warlord/Armor_Head_Warlord",
+    "/Items/Armor/Warlord/Armor_Body_Warlord",
+    "/Items/Armor/Warlord/Armor_Legs_Warlord"
+   ]
+  },
+  "ImmolatorAndZephyr": {
+   "altName": "ScaldAndSear",
+   "items": [
+    "/Items/Mods/WildfireShot"
+   ]
+  },
+  "IskalQueen": {
+   "altName": null,
+   "items": [
+    "/Items/Weapons/Basic/Melee/Weapon_Swamp_Scythe",
+    "/Items/Weapons/Basic/LongGuns/Crossbow/Weapon_Swamp_Crossbow",
+    "/Items/Armor/Slayer/Armor_Head_Slayer",
+    "/Items/Armor/Slayer/Armor_Body_Slayer",
+    "/Items/Armor/Slayer/Armor_Legs_Slayer"
+   ]
+  },
+  "JanitorsWatch": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/AmberMoonstone"
+   ]
+  },
+  "KeepersRing": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_KeepersRing"
+   ]
+  },
+  "KinCaller": {
+   "altName": "Warden",
+   "items": [
+    "/Items/Mods/SongOfSwords"
+   ]
+  },
+  "KrallBaby": {
+   "altName": null,
+   "items": [
+    "/Items/Traits/Trait_Siphoner",
+    "/Items/Trinkets/BlessedNecklace"
+   ]
+  },
+  "LastWill": {
+   "altName": "SupplyRun",
+   "items": [
+    "/Items/Weapons/Basic/LongGuns/AssaultRifle/Weapon_AssaultRifle",
+    "/Items/Traits/Trait_Spirit"
+   ]
+  },
+  "LeechEmber": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_LeechEmber"
+   ]
+  },
+  "LizAndLiz": {
+   "altName": "TaleOfTwoLiz's",
+   "items": [
+    "/Items/Weapons/Basic/LongGuns/MachineGun/Weapon_Machinegun",
+    "/Items/Traits/Trait_Warrior"
+   ]
+  },
+  "MadMerchant": {
+   "altName": null,
+   "items": [
+    "/Items/QuestItems/TwistedMask/Quest_TwistedMask"
+   ]
+  },
+  "Monolith": {
+   "altName": null,
+   "items": [
+    "/Items/Armor/Void/Armor_Head_Void",
+    "/Items/Armor/Void/Armor_Body_Void",
+    "/Items/Armor/Void/Armor_Legs_Void"
+   ]
+  },
+  "MothersRing": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_MothersRing"
+   ]
+  },
+  "MudTooth": {
+   "altName": null,
+   "items": [
+    "/Quests/Quest_OverworldPOI_MudTooth/Quest_BrabusPocketWatch"
+   ]
+  },
+  "Nexus": {
+   "altName": "RootNexus",
+   "items": []
+  },
+  "OldManAndConstruct": {
+   "altName": "WudAndAncientConstruct",
+   "items": [
+    "/Items/Trinkets/JewelOfTheBlackSun",
+    "/Items/Trinkets/MendersCharm",
+    "/Items/Armor/Osseous/Armor_Head_Osseous",
+    "/Items/Armor/Osseous/Armor_Body_Osseous",
+    "/Items/Armor/Osseous/Armor_Legs_Osseous",
+    "/Items/Mods/IronSentinel",
+    "/Items/Mods/VeryGoodBoy"
+   ]
+  },
+  "PearlOfLuminescence": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_PearlOfLuminescence"
+   ]
+  },
+  "Penitent": {
+   "altName": "Leto'sAmulet",
+   "items": [
+    "/Items/Trinkets/Trinket_LetosAmulet"
+   ]
+  },
+  "PillarOfStone": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_PillarOfStone"
+   ]
+  },
+  "PolishedWhetstone": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/PolishedWhetstone"
+   ]
+  },
+  "QueensTemple": {
+   "altName": null,
+   "items": [
+    "/Items/Weapons/Boss/PrideOfTheIskal/Weapon_Swamp_PrideOfTheIskal",
+    "/Items/Traits/Trait_Footwork",
+    "/Items/Mods/Seeker"
+   ]
+  },
+  "RadioactiveEmber": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/RadioactiveEmber"
+   ]
+  },
+  "RatRider": {
+   "altName": "RargrAndBrudvaak",
+   "items": [
+    "/Items/Traits/Trait_HardCharger",
+    "/Items/Weapons/Boss/Alternator/Weapon_Snow_Alternator",
+    "/Items/Weapons/Boss/ChainBlade/Weapon_Snow_ChainBlade"
+   ]
+  },
+  "RazorStone": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Razorstone"
+   ]
+  },
+  "RazorwireNecklace": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/RazorwireNecklace"
+   ]
+  },
+  "ReggiesRing": {
+   "altName": null,
+   "items": [
+    "/Items/Traits/Trait_Scavenger"
+   ]
+  },
+  "RestrictionCord": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/RestrictionCord"
+   ]
+  },
+  "RingOfElusion": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/RingOfElusion"
+   ]
+  },
+  "RingOfEvasion": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_RingOfEvasion"
+   ]
+  },
+  "RockOfAnguish": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/RockOfAnguish"
+   ]
+  },
+  "RingOfShadows": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_RingOfShadows"
+   ]
+  },
+  "RootBrute": {
+   "altName": "Gorefist",
+   "items": [
+    "/Items/Mods/MantleOfThorns"
+   ]
+  },
+  "RootCultist": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/BraidedThorns",
+    "/Items/Trinkets/Trinket_RootCirclet"
+   ]
+  },
+  "RootDragon": {
+   "altName": "Singe",
+   "items": [
+    "/Items/Weapons/Boss/Root_Spitfire/Weapon_Root_Spitfire",
+    "/Items/Weapons/Boss/Root_Smolder/Weapon_Root_Smolder",
+    "/Player/Emotes/Emote_Beckon"
+   ]
+  },
+  "RootMother": {
+   "altName": null,
+   "items": [
+    "/Items/Traits/Trait_MothersBlessing",
+    "/Items/Weapons/Basic/LongGuns/SniperRifle/Weapon_SniperRifle"
+   ]
+  },
+  "RootTumbleweed": {
+   "altName": "TheMangler",
+   "items": [
+    "/Items/Mods/SeedCaller"
+   ]
+  },
+  "RootWraith": {
+   "altName": "Shroud",
+   "items": [
+    "/Items/Mods/Rattleweed"
+   ]
+  },
+  "RootEnt": {
+   "altName": "TheEnt",
+   "items": [
+    "/Items/Weapons/Boss/Root_SporeLauncher/Weapon_Root_SporeLauncher",
+    "/Items/Weapons/Boss/Root_PetrifiedMaul/Weapon_Root_PetrifiedMaul",
+    "/Items/Traits/Trait_QuickHands",
+    "/Player/Emotes/Emote_Cheer"
+   ]
+  },
+  "RootShrine": {
+   "altName": null,
+   "items": [
+    "/Items/Armor/Twisted/Armor_Head_Twisted",
+    "/Items/Armor/Twisted/Armor_Body_Twisted",
+    "/Items/Armor/Twisted/Armor_Legs_Twisted"
+   ]
+  },
+  "Ruins": {
+   "altName": null,
+   "items": []
+  },
+  "SageStone": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_Sagestone"
+   ]
+  },
+  "Sentinel": {
+   "altName": "Raze",
+   "items": [
+    "/Items/Mods/Beckon"
+   ]
+  },
+  "SerpentsFang": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/SerpentsFang"
+   ]
+  },
+  "Settlement": {
+   "altName": null,
+   "items": []
+  },
+  "ShamanFlames": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_PrismaticDiamondRing"
+   ]
+  },
+  "ShieldWarden": {
+   "altName": "ObrykTheShieldWarden",
+   "items": [
+    "/Items/Mods/FrozenMist"
+   ]
+  },
+  "Sketterling": {
+   "altName": null,
+   "items": [
+    "/Items/Armor/Carapace/Armor_Head_Carapace",
+    "/Items/Armor/Carapace/Armor_Body_Carapace",
+    "/Items/Armor/Carapace/Armor_Legs_Carapace",
+    "/Items/Trinkets/Trinket_IskalHunterBand",
+    "/Items/Trinkets/AmuletOfEpicaricacy",
+    "/Items/Trinkets/RingOfTheMantis"
+   ]
+  },
+  "SlaveRevolt": {
+   "altName": null,
+   "items": [
+    "/Items/Traits/Trait_Triage"
+   ]
+  },
+  "SlimeHulk": {
+   "altName": "Canker",
+   "items": [
+    "/Items/Mods/CorrosiveAura",
+    "/Items/Traits/Trait_Catalyst"
+   ]
+  },
+  "SnowRuins": {
+   "altName": "TheSilentSnow",
+   "items": []
+  },
+  "SoulLink": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/SoulLink"
+   ]
+  },
+  "SpiritStone": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_SpiritStone"
+   ]
+  },
+  "Splitter": {
+   "altName": "Riphide",
+   "items": [
+    "/Items/Armor/Leto/Armor_Head_Leto",
+    "/Items/Armor/Leto/Armor_Body_Leto",
+    "/Items/Armor/Leto/Armor_Legs_Leto",
+    "/Items/Mods/FlickerCloak"
+   ]
+  },
+  "StalkersBrand": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_StalkersBrand"
+   ]
+  },
+  "StockpileCirclet": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_StockpileCirclet"
+   ]
+  },
+  "StoneOfBalance": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_StoneOfBalance"
+   ]
+  },
+  "StormAmulet": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_StormAmulet"
+   ]
+  },
+  "StormCaller": {
+   "altName": "Stormcaller",
+   "items": [
+    "/Items/Mods/StormCaller"
+   ]
+  },
+  "StuckMerchant": {
+   "altName": null,
+   "items": [
+    "/Items/Weapons/Basic/Spear/Weapon_Pan_Spear",
+    "/Items/Armor/Radiant/Armor_Legs_Radiant",
+    "/Items/Armor/Radiant/Armor_Body_Radiant",
+    "/Items/Armor/Radiant/Armor_Head_Radiant",
+    "/Items/Trinkets/Trinket_GuardiansRing",
+    "/Items/Traits/Trait_GuardiansBlessing"
+   ]
+  },
+  "SwampGuardian": {
+   "altName": "Ixillis",
+   "items": [
+    "/Items/Weapons/Boss/HiveCannon/Weapon_Swamp_HiveCannon",
+    "/Items/Weapons/Boss/GuardianAxe/Weapon_Swamp_GuardianAxe",
+    "/Items/Traits/Trait_Executioner",
+    "/Player/Emotes/Emote_Confused"
+   ]
+  },
+  "SwarmMaster": {
+   "altName": "Scourge",
+   "items": [
+    "/Items/Mods/BreathOfDesert"
+   ]
+  },
+  "TalismanOfAnimosity": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/TalismanOfAnimosity"
+   ]
+  },
+  "TalismanOfPerseverance": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/TalismanOfPerseverance"
+   ]
+  },
+  "TerrorMargin": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/TerrorMargin"
+   ]
+  },
+  "TheCleanRoom": {
+   "altName": null,
+   "items": [
+    "/Items/Weapons/Basic/Wasteland_Flail/Weapon_Wasteland_Flail"
+   ]
+  },
+  "TheHarrow": {
+   "altName": null,
+   "items": [
+    "/Items/Weapons/Boss/Defiler/Weapon_Wasteland_Defiler",
+    "/Items/Weapons/Boss/LostHarpoon/Weapon_Wasteland_LostHarpoon",
+    "/Player/Emotes/Emote_Fail"
+   ]
+  },
+  "TheJackal": {
+   "altName": "ErforTheJackal",
+   "items": [
+    "/Items/Mods/ColdSpear"
+   ]
+  },
+  "TheLostGantry": {
+   "altName": null,
+   "items": [
+    "/Items/Weapons/Basic/Wasteland_BeamRifle/Weapon_Wasteland_BeamRifle"
+   ]
+  },
+  "TheRisen": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/SoulAnchor"
+   ]
+  },
+  "TotemFather": {
+   "altName": null,
+   "items": [
+    "/Items/Traits/Trait_ArcaneStrike",
+    "/Items/Weapons/Boss/Pan_EyeOfTheStorm/Weapon_Pan_EyeOfTheStorm",
+    "/Items/Weapons/Boss/Pan_VoiceOfTheTempest/Weapon_Pan_VoiceOfTheTempest",
+    "/Player/Emotes/Emote_TeaTime"
+   ]
+  },
+  "Tyrant": {
+   "altName": "TheThrall",
+   "items": [
+    "/Items/Mods/Swarm",
+    "/Items/Traits/Trait_Catalyst"
+   ]
+  },
+  "UndyingKing": {
+   "altName": null,
+   "items": [
+    "/Items/Weapons/Boss/Ruin/Weapon_Wasteland_Ruin",
+    "/Items/Traits/Trait_Kingslayer",
+    "/Items/Weapons/Boss/Riven/Weapon_Wasteland_Riven",
+    "/Player/Emotes/Emote_Gravedigger"
+   ]
+  },
+  "UrikkiBlademasters": {
+   "altName": "TianTheAssassin\n           ",
+   "items": [
+    "/Items/Mods/FanOfKnives"
+   ]
+  },
+  "VargylBones": {
+   "altName": null,
+   "items": [
+    "/Items/Weapons/Boss/Frostborne/Weapon_Frostborne"
+   ]
+  },
+  "VengeanceIdol": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/VengeanceIdol"
+   ]
+  },
+  "Uncategorized": {
+   "altName": null,
+   "items": [
+    "/Items/Traits/Trait_Exploiter",
+    "/Items/Traits/Trait_Handling",
+    "/Items/Traits/Trait_KeepersBlessing",
+    "/Items/Traits/Trait_RapidStrike",
+    "/Items/Traits/Trait_Revivalist",
+    "/Items/Traits/Trait_SleightOfHand",
+    "/Items/Traits/Trait_Suspicion",
+    "/Items/Traits/Trait_Teamwork",
+    "/Items/Traits/Trait_TriggerHappy",
+    "/Items/Traits/Trait_WillToLive",
+    "/Items/Traits/Trait_WorldWalker",
+    "/Items/Traits/Trait_Invoker",
+    "/Items/Traits/Trait_FlashCaster",
+    "/Items/Traits/Trait_Climber",
+    "/Items/Traits/Trait_ArmorPiercer",
+    "/Items/Traits/Trait_Demolitionist",
+    "/Items/Traits/Trait_Tormentor",
+    "/Items/Traits/Trait_Vaccine",
+    "/Player/Emotes/Emote_Wave",
+    "/Items/Armor/Adventurer/Armor_Head_Adventurer",
+    "/Items/Weapons/Human/Melee/Sword/Weapon_HerosSword",
+    "/Items/Trinkets/Trinket_LoopOfProsperity",
+    "/Items/Trinkets/TalismanOfPerseverance",
+    "/Items/Trinkets/DaredevilsCharm",
+    "/Items/Trinkets/BlackRose",
+    "/Items/Trinkets/BlackCatBand",
+    "/Items/Trinkets/BrightSteelRing",
+    "/Items/Trinkets/WhiteRose",
+    "/Items/Trinkets/RingOfFlawlessBeauty",
+    "/Items/Trinkets/AkariWarBand",
+    "/Items/Trinkets/Trinket_EmpoweringLoop",
+    "/Items/Trinkets/Trinket_ProvisionerRing",
+    "/Items/Trinkets/RingOfSumpremacy",
+    "/Items/Trinkets/Trinket_NightmareSpiral",
+    "/Player/Emotes/Emote_HighFive",
+    "/Items/Trinkets/Trinket_BandOfAccord",
+    "/Items/Trinkets/RingOfThePunisher",
+    "/Items/Trinkets/ShatteredVertebrae",
+    "/Items/Trinkets/OnyxPendulum"
+   ]
+  },
+  "VolatileGem": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/VolatileGem"
+   ]
+  },
+  "Vyr": {
+   "altName": "ShadeAndShatter",
+   "items": [
+    "/Items/Mods/VeilOfTheBlackTear"
+   ]
+  },
+  "WailingWood": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/Trinket_TwistedIdol",
+    "/Items/Traits/Trait_BarkSkin"
+   ]
+  },
+  "Ward13": {
+   "altName": null,
+   "items": [
+    "/Items/Weapons/Basic/LongGuns/Coachgun/Weapon_Coachgun",
+    "/Items/Weapons/Human/Melee/Hatchet/Weapon_Hatchet",
+    "/Items/Armor/Cultist/Armor_Body_Cultist",
+    "/Items/Armor/Cultist/Armor_Head_Cultist",
+    "/Items/Armor/Cultist/Armor_Legs_Cultist",
+    "/Items/Weapons/Basic/LongGuns/HuntingRifle/Weapon_HuntingRifle",
+    "/Items/Weapons/Human/Melee/Sword/Weapon_Sword",
+    "/Items/Armor/Hunter/Armor_Body_Hunter",
+    "/Items/Armor/Hunter/Armor_Head_Hunter",
+    "/Items/Armor/Hunter/Armor_Legs_Hunter",
+    "/Items/Weapons/Basic/LongGuns/Shotgun/Weapon_Shotgun",
+    "/Items/Armor/Scrapper/Armor_Body_Scrapper",
+    "/Items/Armor/Scrapper/Armor_Head_Scrapper",
+    "/Items/Armor/Scrapper/Armor_Legs_Scrapper",
+    "/Items/Weapons/Human/Melee/Hammer/Weapon_Hammer",
+    "/Items/Traits/Trait_ElderKnowledge",
+    "/Items/Weapons/Basic/HandGuns/SubMachineGun/Weapon_Submachinegun",
+    "/Items/Trinkets/RingOfTheAdmiral"
+   ]
+  },
+  "Ward17": {
+   "altName": null,
+   "items": [
+    "/Items/Weapons/Boss/Guns/LongGuns/Repulsor/Weapon_Atoll_Repulsor",
+    "/Items/Traits/Trait_MindsEye",
+    "/Player/Emotes/Emote_PraiseTheGun"
+   ]
+  },
+  "Ward17Root": {
+   "altName": null,
+   "items": [
+    "/Items/Weapons/Boss/FusionRifle/Weapon_Rural_FusionRifle",
+    "/Items/Weapons/Boss/WorldsEdge/Weapon_Rural_WorldsEdge",
+    "/Items/Traits/Trait_LastResort"
+   ]
+  },
+  "WardPrime": {
+   "altName": null,
+   "items": [
+    "/Items/Weapons/Basic/MachinePistol/Weapon_MachinePistol",
+    "/Items/Trinkets/Trinket_RingOfHonor",
+    "/Items/Traits/Trait_Wisdom"
+   ]
+  },
+  "WarningTotems": {
+   "altName": null,
+   "items": [
+    "/Items/Trinkets/BloodlettersInsignia",
+    "/Items/Trinkets/JuggernautBand",
+    "/Items/Trinkets/Trinket_EvokersSeal",
+    "/Items/Trinkets/VulcansDetonator"
+   ]
+  },
+  "Wisp": {
+   "altName": "CircletHatchery",
+   "items": [
+    "/Items/Trinkets/SoulEmber",
+    "/Items/Traits/Trait_Evocation"
+   ]
+  },
+  "WastelandGuardian": {
+   "altName": "Claviger",
+   "items": [
+    "/Items/Weapons/Boss/WorldBreaker/Weapon_Wasteland_WorldBreaker",
+    "/Items/Weapons/Boss/ParticleAccelerator/Weapon_Wasteland_ParticleAccelerator",
+    "/Items/Traits/Trait_Recovery",
+    "/Player/Emotes/Emote_Laugh"
+   ]
+  },
+  "Wolf": {
+   "altName": "TheRavager",
+   "items": [
+    "/Items/Weapons/Boss/Pan_CurseOfTheJungleGod/Weapon_Pan_CurseOfTheJungleGod",
+    "/Items/Weapons/Boss/Pan_ScarOfTheJungleGod/Weapon_Pan_ScarOfTheJungleGod",
+    "/Items/Traits/Trait_ArcaneStrike",
+    "/Items/Traits/Trait_Swiftness",
+    "/Player/Emotes/Emote_FreezeFrame"
+   ]
+  },
+  "WolfShrine": {
+   "altName": null,
+   "items": [
+    "/Items/Armor/Elder/Armor_Head_Elder",
+    "/Items/Armor/Elder/Armor_Body_Elder",
+    "/Items/Armor/Elder/Armor_Legs_Elder"
+   ]
+  }
+ },
+ "subLocations": {
+  "ArmorVault": "VaultOfTheHeralds",
+  "BarbTerror": "NeedleLair",
+  "BlinkFiend": "Widow'sPass",
+  "BlinkThief": "ForgottenUndercroft",
+  "BlizzardMage": "WutheringKeep",
+  "Brabus": "CutthroatChannel",
+  "BrainBug": "StrangePass",
+  "CreepersPeeper": "Watcher'sHollow",
+  "DoeShrine": "Widow'sVestry",
+  "Fatty": "TheFetidGlade",
+  "FlickeringHorror": "HallOfWhispers",
+  "FrozenLords": "Judgment'sSpear",
+  "Guardian": "TheGuardian'sSanctum",
+  "HoundMaster": "TheBurrows",
+  "HuntersHideout": "HiddenGrotto",
+  "ImmolatorAndZephyr": "WitheringVillage",
+  "IceSkimmer": "TheFrieranSea",
+  "KinCaller": "TheHallOfJudgement",
+  "LastWill": "Sorrow'sField",
+  "LizAndLiz": "TheWarren",
+  "MadMerchant": "Junktown",
+  "RatRider": "TheCrimsonHold",
+  "RootBrute": "SunkenPassage",
+  "RootCultist": "MarrowPass",
+  "RootDragon": "TheAshYard",
+  "RootEnt": "TheChokingHollow",
+  "RootMother": "ChurchOfTheHarbinger",
+  "RootShrine": "TheGallows",
+  "RootTumbleweed": "TheTangledPass",
+  "RootWraith": "TheHiddenSanctum",
+  "Sentinel": "ShackledCanyon",
+  "ShamanFlames": "GraveOfTheElders",
+  "ShieldWarden": "Exile'sTrench",
+  "SlimeHulk": "TheDrownedTrench",
+  "Splitter": "ResearchStationAlpha",
+  "StormCaller": "Heretic'sNest",
+  "StuckMerchant": "MerchantDungeon",
+  "SwampGuardian": "TheGrotto",
+  "SwarmMaster": "TheIronRift",
+  "TheCleanRoom": "ThePurgeHall",
+  "TheHarrow": "TheBunker",
+  "TheJackal": "TheWildReach",
+  "TheLostGantry": "ConcourseOfTheSun",
+  "TheRisen": "Ahanae'sLament",
+  "TotemFather": "TheTempestCourt",
+  "Tyrant": "TheCapillary",
+  "UndyingKing": "UndyingThrone",
+  "UrikkiBlademasters": "ValenhaagMines",
+  "Vyr": "TheArdentTemple",
+  "WarningTotems": "Magir'sDirge",
+  "WastelandGuardian": "LoomOfTheBlackSun",
+  "Wisp": "CircletHatchery",
+  "Wolf": "TheRavager'sHaunt",
+  "WolfShrine": "TempleOfTheRavager"
+ },
+ "mainLocations": {
+  "City Overworld Zone1": "Fairview",
+  "City Overworld Zone2": "Westcourt",
+  "Wasteland Overworld Zone1": "TheEasternWind",
+  "Wasteland Overworld Zone2": "TheScouringWaste",
+  "Swamp Overworld Zone1": "TheFetidGlade",
+  "Swamp Overworld Zone2": "TheMistFen",
+  "Jungle Overworld Zone1": "TheVerdantStrand",
+  "Jungle Overworld Zone2": "TheScaldingGlade",
+  "Rural Overworld 01": "Rural",
+  "Rural Overworld 02": "Rural",
+  "Snow Overworld Zone1": "DrolniirWoods",
+  "Snow Overworld Zone2": "DeepfrostExpanse"
+ }
+};
+if (typeof module !== 'undefined') module.exports = RWA_DATA;
