@@ -231,6 +231,7 @@ details.raw > summary { cursor: pointer; }
 .credits li { margin: 4px 0; }
 .credits a { color: var(--accent); }
 .credits .repo { margin: 18px 0 0; }
+.credits .version { margin: 18px 0 0; font-size: 15px; font-weight: 600; color: var(--text); }
 .drop-hint.download { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
 
 @media (max-width: 720px) {

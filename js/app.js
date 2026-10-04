@@ -1031,6 +1031,15 @@
     ['missing-search', 'missing-only-now', 'missing-show-owned'].forEach(function (id) { $(id).addEventListener('input', renderMissing); });
   }
 
+  // Footer: "Version 2.0 · Updated on October 4, 2026" from js/version.js (the HTML already has it for crawlers).
+  function showVersion() {
+    if (typeof RWA_VERSION === 'undefined') return;
+    var d = new Date(RWA_VERSION.date + 'T12:00:00');
+    var when = d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    $('version').innerHTML = 'Version ' + esc(RWA_VERSION.version) + ' · Updated on <time datetime="' + esc(RWA_VERSION.date) + '">' + esc(when) + '</time>';
+  }
+
+  showVersion();
   wire();
   tryAuto();
 })();

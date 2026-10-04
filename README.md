@@ -60,6 +60,8 @@ js/dps.js                             DPS model; ring/amulet/set/mod effects are
 tools/fetch-stats.ps1                 downloads the wiki pages into tools/source/wiki/ (not committed)
 tools/build-stats.mjs                 generates js/stats.js from those pages
 js/data.js                            GENERATED — items, events, locations
+js/version.js                         version and date shown in the footer — bump with every release
+                                      (also softwareVersion/dateModified in index.html)
 tools/build-data.mjs                  generates js/data.js from tools/source/
 tools/overrides.mjs                   manual name → game path fixes
 js/wiki.js                            GENERATED — Fextralife wiki page of each item
