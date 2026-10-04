@@ -270,7 +270,12 @@
         var set = norm((item.group || '').replace(/ Set$/, '').replace(/'s$/, ''));
         var slot = /legging|trousers|greaves|pants|boots|kilt|britches|tassets/i.test(item.name) ? 'Legs'
           : /mask|hood|helm|goggles|visage|headdress|hat|skull|shroud/i.test(item.name) ? 'Head' : 'Body';
-        return !!names['armor|' + set + '|' + slot];
+        if (names['armor|' + set + '|' + slot]) return true;
+        // Single pieces have their own group ("Bomber Hat" is Armor_Head_Bomber in the game).
+        return Object.keys(names).some(function (k) {
+          var p = k.split('|');
+          return p[0] === 'armor' && p[2] === slot && p[1] && set.indexOf(p[1]) === 0;
+        });
       }
       return !!names[norm(item.name.replace(/ Emote$/, ''))];
     }

@@ -1,4 +1,4 @@
-/* global RWA_DATA, RWA_PARSER, RWA_WIKI, RWA_CHARACTER, RWA_DPS, RWA_WORLDSTATE */
+/* global RWA_DATA, RWA_PARSER, RWA_WIKI, RWA_CHARACTER, RWA_DPS, RWA_WORLDSTATE, RWA_GVAS */
 (function () {
   'use strict';
 
@@ -7,7 +7,7 @@
 
   var WORLD_LABEL = { Earth: 'Earth', 'Subject 2923': 'Subject 2923', Rhom: 'Rhom', Corsus: 'Corsus', Yaesha: 'Yaesha', Reisum: 'Reisum',
     'Ward 13': 'Ward 13', 'Ward 17': 'Ward 17', 'Ward Prime': 'Ward Prime', 'The Labyrinth': 'The Labyrinth', '': 'General / achievements' };
-  var WORLD_ORDER = ['Earth', 'Rhom', 'Corsus', 'Yaesha', 'Reisum', 'Ward 13', 'Ward 17', 'Ward Prime', 'The Labyrinth', ''];
+  var WORLD_ORDER = ['Earth', 'Subject 2923', 'Rhom', 'Corsus', 'Yaesha', 'Reisum', 'Ward 13', 'Ward 17', 'Ward Prime', 'The Labyrinth', ''];
   var TYPE_LABEL = { 'World Boss': 'Boss', 'Miniboss': 'Miniboss', 'Side Dungeon': 'Dungeon', 'Siege': 'Siege',
     'Point of Interest': 'Point of interest', 'Item Drop': 'Item', 'Loot Beetle': 'Beetle', 'Home': 'Home', 'Quest Event': 'Event' };
   var CATEGORIES = ['Weapon', 'Armor', 'Amulet', 'Ring', 'Mod', 'Trait', 'Emote', 'Skin', 'Consumable'];
@@ -191,9 +191,13 @@
     $('tab-character').hidden = state.tab !== 'character';
     $('tab-build').hidden = state.tab !== 'build';
     $('tab-state').hidden = state.tab !== 'state';
+    $('tab-map').hidden = state.tab !== 'map';
+    $('tab-raw').hidden = state.tab !== 'raw';
     renderWorld();
     renderMissing();
     renderStateTab();
+    renderMapTab();
+    renderRawTab();
     renderCharacterTab();
     renderBuildTab();
   }
@@ -364,7 +368,11 @@
     var c = list.filter(function (x) { return x[0] === label; })[0];
     return c ? c[1] : null;
   }
-  function worldOf(it) { return WORLD_LABEL[it.world] !== undefined ? it.world : ''; }
+  // The Subject 2923 DLC's rural Earth gets its own group, apart from the base game's Earth.
+  function worldOf(it) {
+    if (it.world === 'Earth' && it.dlc === 'Subject 2923') return 'Subject 2923';
+    return WORLD_LABEL[it.world] !== undefined ? it.world : '';
+  }
 
   // World, type and mode selections filter each other: each group's numbers apply the other two.
   function passes(it, skip) {
@@ -506,7 +514,8 @@
 
     var tiles = function (rows) {
       return '<div class="tiles">' + rows.map(function (r) {
-        return '<div class="tile"><span class="tq">' + num(r.quantity || 1) + '</span><span class="tn">' + esc(r.name) + rowGlobe(r) + '</span></div>';
+        var q = r.quantity != null ? r.quantity : 1;
+        return '<div class="tile' + (q ? '' : ' zero') + '"><span class="tq">' + num(q) + '</span><span class="tn">' + esc(r.name) + rowGlobe(r) + '</span></div>';
       }).join('') + '</div>';
     };
     var resources = ch.resources.filter(function (r) { return r.name !== 'Dragon Heart upgrades'; });
@@ -571,8 +580,16 @@
       }).join('') + '</table>';
     };
     var chips = function (list) { return list && list.length ? '<div class="chips">' + list.map(function (t) { return '<span class="chip on">' + esc(t) + '</span>'; }).join('') + '</div>' : '<p class="cat">None.</p>'; };
+    var prof = state.profile || {};
     var general = kv([
+      ['Name stored in the save', x.characterName], ['Archetype', ch.archetype], ['Trait rank', x.traitRank],
       ['Power level', x.powerLevel], ['Stamina', x.stamina], ['Character level', ch.level], ['Experience', num(ch.experience)],
+      ['Weapon in hand', x.inHand || '—'], ['Hidden inventory entries', x.hiddenItems],
+      ['Hand gun ammo pool', x.ammoPools && x.ammoPools.handGun != null ? fmt(x.ammoPools.handGun, 2) : null],
+      ['Long gun ammo pool', x.ammoPools && x.ammoPools.longGun != null ? fmt(x.ammoPools.longGun, 2) : null],
+      ['Special ammo pool', x.ammoPools && x.ammoPools.special != null ? fmt(x.ammoPools.special, 2) : null],
+      ['Last host type', x.hostType], ['Skipped the intro', x.skipIntro ? 'yes' : 'no'], ['Appearance seed', x.visualSeed],
+      ['Loading screen tip', prof.settings && prof.settings.loadscreenTip], ['Auto visibility setting', prof.settings ? (prof.settings.autoVisibility ? 'on' : 'off') : null],
       ['Audio logs (recorders) stored', x.recorders], ['Cryptolith phase', x.cryptolithPhase],
       ['Equipped the Harsgaard root gun', x.usedHarsgaardRootGun ? 'yes' : 'no'], ['Finished the intro', x.finishedIntro ? 'yes' : 'no'],
       world ? ['World has a campaign', world.hasCampaign ? 'yes' : 'no'] : null,
@@ -591,6 +608,10 @@
       panel('Quick-use shortcuts', chips(shortcuts)) +
       panel('Emotes unlocked (' + (x.emotes || []).length + ')', chips(x.emotes)) +
       panel('Account rewards received', chips(x.awards)) +
+      panel('Account rewards available', chips(prof.accountAwards)) +
+      panel('Account currencies', kv((prof.accountCurrencies || []).map(function (c) { return [c.name, c.quantity]; }))) +
+      panel('Items marked new', chips(x.newItems)) +
+      panel('Equipped look (weapon and armor skins)', kv((x.skins || []).map(function (s) { return [s.item + ' +' + s.level, s.skin || 'default look']; }))) +
       panel('Counters', counters) +
       panel('Tutorials seen (' + (x.tutorials || []).length + ')', chips(x.tutorials)) +
       panel('Appearance', visuals) +
@@ -671,7 +692,180 @@
       panel('Areas', areas, true) +
       panel('Left on the ground', lootTable) +
       panel('Story progress flags', ws.flags.length ? '<div class="chips">' + ws.flags.map(function (f) { return '<span class="chip on">' + esc(f) + '</span>'; }).join('') + '</div>' : '<p class="cat">None.</p>') +
+      panel('Merchants and NPCs in this world', ws.npcs.length ? '<table class="kv">' + ws.npcs.map(function (n) {
+        return '<tr><th>' + esc(n.name) + '<div class="cat">' + esc(n.where.replace(/^Zone_\d+_\d+\./, '').replace(/_POI$/, '').replace(/_/g, ' ')) + '</div></th><td>' +
+          (n.items.length ? n.items.map(function (i) { return '<span class="evitem">' + esc(i) + globe(RWA_WIKI.items[i], i) + '</span>'; }).join('') : '<span class="cat">nothing</span>') + '</td></tr>';
+      }).join('') + '</table><p class="cat">What each NPC carries — for merchants, what they sell.</p>' : '<p class="cat">None recorded.</p>') +
+      panel('Key items', ws.keyItems.length ? '<table class="kv">' + ws.keyItems.map(function (k) { return '<tr><th>' + esc(k.name) + '</th><td class="cat">' + esc(k.quest) + '</td></tr>'; }).join('') + '</table>' : '<p class="cat">None.</p>') +
+      panel('Checkpoints and generated quests', ws.modes.map(function (m) {
+        return '<p><b>' + esc(m.name) + '</b>' + (m.playTime ? ' <span class="cat">' + duration(m.playTime) + ' played</span>' : '') + (m.checkpoint ? '<br><span class="cat">Last checkpoint: ' + esc(m.checkpoint.replace(/_/g, ' ')) + '</span>' : '') + '</p>' +
+          (m.generated.length ? '<details><summary class="cat">' + m.generated.length + ' quests generated</summary><table class="kv">' + m.generated.map(function (g) { return '<tr><th>' + esc(g.template) + '</th><td>×' + g.count + '</td></tr>'; }).join('') + '</table></details>' : '');
+      }).join('') || '<p class="cat">None.</p>') +
+      panel('NPC conversations (' + ws.conversations.length + ')', ws.conversations.length ? '<div class="chips">' + ws.conversations.map(function (c) { return '<span class="chip on" title="' + esc(c.quest) + '">' + esc(c.text) + '</span>'; }).join('') + '</div>' : '<p class="cat">None.</p>', true) +
+      panel('World save', '<table class="kv">' + [
+        ['Shown location', ws.header.location], ['New game', ws.header.newGame ? 'yes' : 'no'], ['Has a campaign', ws.header.hasCampaign ? 'yes' : 'no'],
+        ['Requires the full game', ws.header.requiresFullGame ? 'yes' : 'no'], ['Last active slot', ws.header.lastRootSlot], ['Unique ID counter', ws.header.uniqueIds],
+        ['Map objects remembered without a known effect', num(ws.objects.other)],
+      ].map(function (r) { return '<tr><th>' + esc(r[0]) + '</th><td>' + esc(String(r[1])) + '</td></tr>'; }).join('') + '</table>') +
       '</div>';
+  }
+
+  // ---- map -------------------------------------------------------------------
+  var TILE_CELL = 80;
+  function short(s, n) { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
+
+  // Tile layout of one zone as SVG: rooms, corridors (edge bits), events, chests, loot and waypoints.
+  function zoneLayoutSvg(z) {
+    var core = z.tiles.filter(function (t) { return t.kind !== 'blank' && t.kind !== 'vista'; });
+    if (!core.length) return '<p class="cat">No tile layout stored for this area (fixed map).</p>';
+    var xs = core.map(function (t) { return t.x; }), ys = core.map(function (t) { return t.y; });
+    var minX = Math.min.apply(null, xs), minY = Math.min.apply(null, ys), maxX = Math.max.apply(null, xs), maxY = Math.max.apply(null, ys);
+    var C = TILE_CELL, w = (maxX - minX + 1) * C, h = (maxY - minY + 1) * C;
+    var px = function (t) { return (t.x - minX) * C; }, py = function (t) { return (t.y - minY) * C; };
+    var out = [];
+    z.tiles.forEach(function (t) {
+      if (t.kind !== 'vista' || t.x < minX || t.x > maxX || t.y < minY || t.y > maxY) return;
+      out.push('<rect class="t-vista" x="' + (px(t) + 6) + '" y="' + (py(t) + 6) + '" width="' + (C - 12) + '" height="' + (C - 12) + '" rx="6"/>');
+    });
+    // Corridors first so rooms sit on top of them.
+    core.forEach(function (t) {
+      var cx = px(t) + C / 2, cy = py(t) + C / 2;
+      WS.EDGES.forEach(function (e) { if (t.edges & e[0]) out.push('<line class="t-path" x1="' + cx + '" y1="' + cy + '" x2="' + (cx + e[1] * C / 2) + '" y2="' + (cy + e[2] * C / 2) + '"/>'); });
+    });
+    core.forEach(function (t) {
+      var x = px(t), y = py(t);
+      var precious = t.loot.some(function (l) { return l.item && /Ring|Amulet|Weapon|Armor|Mod|Trait/.test(l.item.category) || l.name === 'Trait Book'; });
+      var tip = [z.name + ' — tile ' + t.id + ' (' + t.level + ')', t.role !== 'None' ? 'Role: ' + t.role : '', t.tag && t.tag !== 'None' ? 'Tag: ' + t.tag : '']
+        .concat(t.events.map(function (e) { return e.type + ': ' + e.name + (e.done ? ' (completed)' : ''); }))
+        .concat(t.links.map(function (l) { return ({ Waypoint: 'Waypoint', Checkpoint: 'Respawn checkpoint', Link: 'Passage' }[l.type] || l.type) + (l.label ? ': ' + l.label : '') + (l.used ? ' (used)' : '') + (l.active ? '' : ' (inactive)'); }))
+        .concat(t.chests ? ['Chests: ' + t.chestsOpen + ' of ' + t.chests + ' opened'] : [])
+        .concat(t.loot.map(function (l) { return 'On the ground: ' + l.name + (l.quantity > 1 ? ' ×' + l.quantity : ''); }))
+        .filter(Boolean).join('\n');
+      out.push('<g class="tile t-' + t.kind + '"><title>' + esc(tip) + '</title><rect x="' + (x + 8) + '" y="' + (y + 8) + '" width="' + (C - 16) + '" height="' + (C - 16) + '" rx="7"/>');
+      var lines = [];
+      if (t.kind === 'start') lines.push(['Start', '']);
+      if (t.kind === 'exit') lines.push([short(t.tag && t.tag !== 'None' ? t.tag.replace(/^To/, '→ ') : 'Exit', 12), '']);
+      t.events.forEach(function (e) { lines.push([(e.done ? '✔ ' : '') + short(e.name, 13), e.done ? 'ok' : e.type === 'Item drop' ? 'acc' : 'miss']); });
+      if (t.links.some(function (l) { return l.type === 'Waypoint'; })) lines.push(['⚑ waypoint', 'now']);
+      if (t.links.some(function (l) { return l.type === 'Checkpoint'; })) lines.push(['✚ checkpoint', 'now']);
+      var icons = (t.chests ? '▣' + t.chestsOpen + '/' + t.chests + ' ' : '') + (t.loot.length ? (precious ? '★' : '•') + t.loot.length : '');
+      if (icons) lines.push([icons, precious ? 'acc' : '']);
+      lines.slice(0, 5).forEach(function (l, i) { out.push('<text class="tl ' + l[1] + '" x="' + (x + 12) + '" y="' + (y + 22 + i * 11) + '">' + esc(l[0]) + '</text>'); });
+      out.push('</g>');
+    });
+    return '<svg class="zmap" viewBox="-2 -2 ' + (w + 4) + ' ' + (h + 4) + '" width="' + (w + 4) + '" height="' + (h + 4) + '" role="img" aria-label="Map of ' + esc(z.name) + '">' + out.join('') + '</svg>';
+  }
+
+  // Map cells you walked through (the trail the in-game map reveals).
+  function zoneFogSvg(z) {
+    if (!z.fow.length) return '<p class="cat">You have not walked here yet.</p>';
+    var xs = z.fow.map(function (c) { return c[0]; }), ys = z.fow.map(function (c) { return c[1]; });
+    var minX = Math.min.apply(null, xs), minY = Math.min.apply(null, ys), w = Math.max.apply(null, xs) - minX + 1, h = Math.max.apply(null, ys) - minY + 1;
+    var d = z.fow.map(function (c) { return 'M' + (c[0] - minX) + ' ' + (c[1] - minY) + 'h1v1h-1z'; }).join('');
+    var scale = Math.min(3, 300 / Math.max(w, h));
+    return '<svg class="zfog" viewBox="0 0 ' + w + ' ' + h + '" width="' + Math.round(w * scale) + '" height="' + Math.round(h * scale) + '" shape-rendering="crispEdges" role="img" aria-label="Explored part of ' + esc(z.name) + '"><path d="' + d + '"/></svg>';
+  }
+
+  // Re-render the expensive tabs only when they're shown.
+  function renderMapTab() {
+    var el = $('map-view');
+    if (state.tab !== 'map') return;
+    var ws = state.worldStates && state.worldStates[state.charIndex];
+    if (!ws) { el.innerHTML = '<div class="empty">Load a world save (save_N.sav) to see the map.</div>'; return; }
+    if (ws.error) { el.innerHTML = '<div class="empty">Could not read the world: ' + esc(ws.error) + '</div>'; return; }
+    var depthOf = function (z) { var d = 0, p = z; while (p && p.parent != null && d < 5) { p = ws.zones.filter(function (x) { return x.id === p.parent; })[0]; d++; } return d; };
+    var index = ws.zones.map(function (z) { return '<a class="chip on" href="#zone-' + z.id + '">' + '·'.repeat(depthOf(z)) + esc(z.name) + '</a>'; }).join('');
+    var legend = '<div class="legend"><span class="lg t-start">Start</span><span class="lg t-exit">Exit / way to another area</span><span class="lg t-poi">Event / point of interest</span>' +
+      '<span class="lg t-straight">Path</span><span class="lg t-vista">Scenery</span> <span class="cat">✔ completed · ⚑ waypoint · ✚ respawn checkpoint · ▣ chests opened/total · • loot on the ground · ★ gear or trait book on the ground · hover a tile for everything in it</span></div>';
+    el.innerHTML = '<div class="chips map-index">' + index + '</div>' + legend + ws.zones.map(function (z) {
+      var parent = z.parent != null ? ws.zones.filter(function (x) { return x.id === z.parent; })[0] : null;
+      // Travel points (waypoints) by name; respawn checkpoints and passages to other areas as counts.
+      var waypoints = z.links.filter(function (l) { return l.type === 'Waypoint'; }), checkpoints = z.links.filter(function (l) { return l.type === 'Checkpoint'; });
+      var passages = z.links.filter(function (l) { return l.type === 'Link'; });
+      var links = waypoints.map(function (l) {
+        return '<span class="chip' + (l.active ? ' on' : '') + '">⚑ ' + esc(l.label || l.name) + (l.active ? '' : ' (inactive)') + '</span>';
+      }).join('') +
+        (checkpoints.length ? '<span class="chip">✚ ' + checkpoints.length + ' respawn checkpoint' + (checkpoints.length > 1 ? 's' : '') + '</span>' : '') +
+        (passages.length ? '<span class="chip">↔ ' + passages.length + ' passage' + (passages.length > 1 ? 's' : '') + ' to other areas · ' + passages.filter(function (l) { return l.used; }).length + ' used</span>' : '');
+      var facts = [
+        'Level ' + (z.level || '—') + (z.itemLevel ? ' · item level ' + z.itemLevel : ''),
+        parent ? 'inside ' + parent.name : '',
+        z.chests ? z.chestsOpen + '/' + z.chests + ' chests opened' : '',
+        z.loot ? z.loot + ' piles on the ground' : '',
+        z.explored ? num(z.explored) + ' map cells walked' : '',
+        z.tileSet ? 'tile set ' + z.tileSet.replace(/^TileSet_/, '') : '',
+      ].filter(Boolean).join(' · ');
+      return '<section class="panel zone" id="zone-' + z.id + '"><h3>' + esc(z.name) + wikiLink(z.name) + '</h3><p class="cat">' + esc(facts) + '</p>' +
+        (links ? '<div class="chips">' + links + '</div>' : '') +
+        '<div class="zviews"><div><div class="section-title">Layout</div>' + zoneLayoutSvg(z) + '</div><div><div class="section-title">Your path</div>' + zoneFogSvg(z) + '</div></div>' +
+        (z.spawns.length ? '<details class="spawns"><summary class="cat">Spawn tables (' + z.spawns.length + ')</summary><p class="cat">' + esc(z.spawns.join(', ')) + '</p></details>' : '') +
+        '</section>';
+    }).join('');
+  }
+
+  // ---- raw data --------------------------------------------------------------
+  var rawNodes = [];
+  // Objects read by js/gvas.js reference each other; show those links as "→ path" instead of expanding them.
+  function isRef(v) { return v && typeof v === 'object' && !Array.isArray(v) && 'path' in v && 'props' in v && 'comps' in v; }
+  function rawLabel(v) { return Array.isArray(v) ? '[' + v.length + ']' : '{' + Object.keys(v).length + '}'; }
+  function rawNode(label, value) {
+    var id = rawNodes.push(value) - 1;
+    return '<details class="raw" data-raw="' + id + '"><summary>' + label + '</summary></details>';
+  }
+  function rawValue(v) {
+    if (v === null || v === undefined) return '<span class="rv">null</span>';
+    if (isRef(v)) return '<span class="rv ref">→ ' + esc(String(v.path).split('/').pop()) + '</span>';
+    if (typeof v !== 'object') return '<span class="rv">' + esc(JSON.stringify(v)) + '</span>';
+    if (Array.isArray(v) && !v.length) return '<span class="rv">[]</span>';
+    if (!Array.isArray(v) && !Object.keys(v).length) return '<span class="rv">{}</span>';
+    return rawNode('<span class="cat">' + rawLabel(v) + '</span>', v);
+  }
+  function rawChildren(v) {
+    var keys = Array.isArray(v) ? v.map(function (_, i) { return i; }) : Object.keys(v);
+    return keys.map(function (k) { return '<div class="rrow"><span class="rk">' + esc(String(k)) + '</span> ' + rawValue(v[k]) + '</div>'; }).join('');
+  }
+  // A gvas object as a plain, expandable node.
+  function objNode(o, i) { return { index: i, path: o.path, properties: o.props, components: o.comps }; }
+
+  function renderRawTab() {
+    var el = $('raw-view');
+    if (state.tab !== 'raw') return;
+    rawNodes = [];
+    var parts = [];
+    var pf = state.files['profile.sav'];
+    if (pf) {
+      try {
+        var prof = RWA_GVAS.readFile(pf);
+        var root = prof.root.props, chars = (root.Characters || []);
+        var top = {}; Object.keys(root).forEach(function (k) { if (k !== 'Characters') top[k] = root[k]; });
+        var charNodes = chars.map(function (c, i) {
+          if (!c || !c.props) return '<div class="rrow"><span class="rk">Slot ' + i + '</span> <span class="rv">empty</span></div>';
+          var inner = RWA_GVAS.readBlob(pf, c.props.CharacterData);
+          var props = {}; Object.keys(c.props).forEach(function (k) { props[k] = c.props[k]; });
+          return '<div class="rrow"><span class="rk">Character ' + (i + 1) + '</span> ' + rawNode('<span class="cat">character properties</span>', props) +
+            rawNode('<span class="cat">character data: ' + inner.objects.length + ' objects</span>', inner.objects.map(objNode)) + '</div>';
+        }).join('');
+        parts.push('<section class="panel"><h3>profile.sav</h3>' + rawNode('<b>Account</b> <span class="cat">' + Object.keys(top).length + ' properties</span>', top) +
+          '<div class="rrow"><span class="rk">Objects</span> ' + rawNode('<span class="cat">' + prof.objects.length + ' objects</span>', prof.objects.map(objNode)) + '</div>' + charNodes + '</section>');
+      } catch (e) { parts.push('<p class="error">profile.sav: ' + esc(String(e)) + '</p>'); }
+    }
+    var saveName = Object.keys(state.files).filter(function (n) { return saveIndexOf(n) === state.charIndex && /\.sav$/i.test(n); })[0];
+    var ws = state.worldStates && state.worldStates[state.charIndex];
+    if (saveName) {
+      try {
+        var save = RWA_GVAS.readFile(state.files[saveName]);
+        var wtop = {}; Object.keys(save.root.props).forEach(function (k) { if (k !== 'Containers') wtop[k] = save.root.props[k]; });
+        var conts = ws && ws.raw ? ws.raw.map(function (c) {
+          return rawNode(esc(c.key.split('/').pop().split(':')[0]) + ' <span class="cat">' + c.actors.length + ' actors</span>', c.actors.map(function (a) {
+            return { id: a.id, class: a.classPath || '(placed in the level)', location: a.location, properties: a.props, components: a.comps, objects: a.objects.map(objNode) };
+          }));
+        }).join('') : '';
+        parts.push('<section class="panel"><h3>' + esc(saveName) + '</h3>' + rawNode('<b>World</b> <span class="cat">' + Object.keys(wtop).length + ' properties</span>', wtop) +
+          '<div class="rrow"><span class="rk">Containers</span> <span class="cat">' + (ws && ws.raw ? ws.raw.length : 0) + ' maps — each holds the actors whose state the game remembers</span></div>' + conts + '</section>');
+      } catch (e) { parts.push('<p class="error">' + esc(saveName) + ': ' + esc(String(e)) + '</p>'); }
+    }
+    el.innerHTML = parts.length ? '<p class="cat">Everything stored in your save files, as read. Click to expand. "→" points to another object.</p>' + parts.join('')
+      : '<div class="empty">Load your save files to browse them.</div>';
   }
 
   // ---- build & DPS -----------------------------------------------------------
@@ -816,6 +1010,13 @@
         state[p[1]] = state[p[1]] === v ? null : v; renderMissing();
       });
     });
+    // Raw data: fill a node the first time it is opened ('toggle' doesn't bubble, so listen while capturing).
+    $('raw-view').addEventListener('toggle', function (e) {
+      var d = e.target;
+      if (!d.open || d.dataset.filled || d.dataset.raw == null) return;
+      d.dataset.filled = '1';
+      d.insertAdjacentHTML('beforeend', '<div class="rkids">' + rawChildren(rawNodes[+d.dataset.raw]) + '</div>');
+    }, true);
     $('build-view').addEventListener('change', function (e) {
       var k = e.target.dataset && e.target.dataset.bonus; if (!k) return;
       dpsOn[k] = e.target.checked; renderBuildTab();

@@ -113,6 +113,12 @@
     switch (type) {
       case 'IntProperty': r.u8(); return r.i32();
       case 'FloatProperty': r.u8(); return r.f32();
+      case 'Int8Property': r.u8(); return r.i8();
+      case 'Int16Property': r.u8(); v = r.view.getInt16(r.pos, true); r.pos += 2; return v;
+      case 'UInt16Property': r.u8(); return r.u16();
+      case 'UInt32Property': r.u8(); return r.u32();
+      case 'Int64Property': case 'UInt64Property': r.u8(); return r.u64();
+      case 'DoubleProperty': r.u8(); v = r.view.getFloat64(r.pos, true); r.pos += 8; return v;
       case 'BoolProperty': v = r.u8(); r.u8(); return !!v;
       case 'ByteProperty': v = N(); r.u8(); return v === 'None' ? r.u8() : N();
       case 'EnumProperty': N(); r.u8(); return N();
@@ -121,7 +127,9 @@
       case 'ObjectProperty': r.u8(); return objRef(ctx, r.i32());
       case 'TextProperty': {
         r.u8(); start = r.pos; r.u32(); var h = r.i8(), t = null;
-        if (h === 0) { r.str(); r.str(); t = r.str(); } else if (h === -1 && r.u32()) t = r.str();
+        if (h === 0) { r.str(); r.str(); t = r.str(); }
+        // "No history": an optional culture-invariant string. Empty texts stop here; never read past the value.
+        else if (h === -1 && start + size - r.pos >= 9 && r.u32() === 1) t = r.str();
         r.pos = start + size; return t;
       }
       case 'StructProperty': {
@@ -157,6 +165,10 @@
       case 'IntProperty': return r.i32();
       case 'FloatProperty': return r.f32();
       case 'BoolProperty': case 'ByteProperty': return r.u8();
+      case 'Int8Property': return r.i8();
+      case 'UInt16Property': return r.u16();
+      case 'UInt32Property': return r.u32();
+      case 'Int64Property': case 'UInt64Property': return r.u64();
       case 'NameProperty': case 'EnumProperty': return readName(ctx, r);
       case 'StrProperty': case 'SoftObjectProperty': return r.str();
       case 'ObjectProperty': return objRef(ctx, r.i32());

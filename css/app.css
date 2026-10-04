@@ -167,11 +167,52 @@ table.kv { width: 100%; border-collapse: collapse; font-size: 14px; }
 .tile { background: var(--panel-2); border-radius: 6px; padding: 6px 9px; display: flex; flex-direction: column; }
 .tile .tq { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
 .tile .tn { font-size: 13px; color: var(--muted); }
+.tile.zero { opacity: .55; }
 .section-title.more { margin-top: 22px; }
 .panel .chips .chip { cursor: default; }
 
 /* World state */
 .evitem { display: inline-block; margin: 1px 12px 1px 0; font-size: 14px; }
+
+/* Map */
+.map-index { margin-bottom: 8px; }
+.map-index a { text-decoration: none; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; margin-bottom: 12px; font-size: 13px; }
+.lg { display: inline-flex; align-items: center; gap: 5px; }
+.lg::before { content: ""; width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--line); background: var(--panel-2); }
+.lg.t-start::before { background: color-mix(in srgb, var(--ok) 35%, var(--panel)); }
+.lg.t-exit::before { background: color-mix(in srgb, var(--now) 35%, var(--panel)); }
+.lg.t-poi::before { background: color-mix(in srgb, var(--accent) 35%, var(--panel)); }
+.lg.t-vista::before { background: transparent; border-style: dashed; }
+.panel.zone { margin-bottom: 12px; }
+.zviews { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; margin-top: 8px; }
+.zviews > div { max-width: 100%; overflow-x: auto; }
+svg.zmap { display: block; }
+.zmap .tile rect { fill: var(--panel-2); stroke: var(--line); stroke-width: 1.5; }
+.zmap .t-start rect { fill: color-mix(in srgb, var(--ok) 30%, var(--panel)); }
+.zmap .t-exit rect { fill: color-mix(in srgb, var(--now) 30%, var(--panel)); }
+.zmap .t-poi rect { fill: color-mix(in srgb, var(--accent) 30%, var(--panel)); }
+.zmap .tile:hover rect { stroke: var(--accent); stroke-width: 2.5; }
+.zmap .t-vista { fill: none; stroke: var(--line); stroke-dasharray: 3 3; }
+.zmap .t-path { stroke: var(--muted); stroke-width: 6; stroke-linecap: round; opacity: .55; }
+.zmap .tl { font-size: 9.5px; fill: var(--text); }
+.zmap .tl.ok { fill: var(--ok); }
+.zmap .tl.miss { fill: var(--miss); }
+.zmap .tl.acc { fill: var(--accent); }
+.zmap .tl.now { fill: var(--now); }
+svg.zfog { display: block; background: var(--panel-2); border-radius: 6px; }
+.zfog path { fill: var(--accent); stroke: var(--accent); stroke-width: 1.4; stroke-linejoin: round; }
+.spawns { margin-top: 6px; }
+
+/* Raw data */
+details.raw > summary { cursor: pointer; }
+.rkids { margin-left: 14px; padding-left: 8px; border-left: 1px solid var(--line); }
+.rrow { font-size: 13px; line-height: 1.6; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+.rrow > details.raw { display: inline-block; vertical-align: top; }
+.rrow > details.raw[open] { display: block; margin-left: 4px; }
+.rk { color: var(--muted); }
+.rv { color: var(--text); word-break: break-all; }
+.rv.ref { color: var(--now); }
 
 /* Build & DPS */
 .toggles { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 6px 16px; }

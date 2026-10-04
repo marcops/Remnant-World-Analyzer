@@ -48,6 +48,8 @@
           "Items obtainable in your current world",
           "Character sheet: level, loadout, upgrade levels, traits, resources, kill stats, deaths per quest, achievement progress",
           "World state: completed events, chests opened, map explored and loot left on the ground per area",
+          "World map drawn from the save: tiles, events, waypoints, chests and loot per tile, and the path you walked",
+          "Raw data browser for everything stored in the save files",
           "DPS and build calculator: weapon DPS with traits, rings, amulets and armor sets; mod combinations and summon count",
           "Links to the Fextralife wiki for every location and item",
           "Supports Swamps of Corsus and Subject 2923 DLC",
@@ -124,8 +126,10 @@
         <button class="tab active" data-tab="world" role="tab">Current world</button>
         <button class="tab" data-tab="missing" role="tab">Missing items</button>
         <button class="tab" data-tab="state" role="tab">World state</button>
+        <button class="tab" data-tab="map" role="tab">Map</button>
         <button class="tab" data-tab="character" role="tab">My character</button>
         <button class="tab" data-tab="build" role="tab">Build &amp; DPS</button>
+        <button class="tab" data-tab="raw" role="tab">Raw data</button>
       </nav>
 
       <div id="tab-world" class="tab-panel">
@@ -162,6 +166,14 @@
 
       <div id="tab-state" class="tab-panel" hidden>
         <div id="state-view"></div>
+      </div>
+
+      <div id="tab-map" class="tab-panel" hidden>
+        <div id="map-view"></div>
+      </div>
+
+      <div id="tab-raw" class="tab-panel" hidden>
+        <div id="raw-view"></div>
       </div>
 
       <div id="tab-character" class="tab-panel" hidden>

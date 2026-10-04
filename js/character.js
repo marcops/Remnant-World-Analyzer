@@ -43,7 +43,8 @@
     }
     if (!found) {
       var stripped = cls.replace(/^(Weapon|Trinket|Trait|Mod|Emote|Quest|Consumable|Resource|Item)_/, '').replace(/^(Root|Wasteland|Swamp|Pan|Atoll|Rural|Snow|Jungle|City|Rare|Special)_/, '');
-      var cands = byName[norm(stripped)] || byName[norm(parts[parts.length - 1])] || [];
+      // Boss weapon mods are named after their shot in the game files (GravityCoreShot is "Gravity Core").
+      var cands = byName[norm(stripped)] || byName[norm(parts[parts.length - 1])] || byName[norm(stripped.replace(/Shot$/, ''))] || [];
       var want = PREFIX_CATEGORY[parts[0]];
       found = cands.filter(function (it) { return !want || it.category === want; })[0] || cands[0];
       if (!found) {
@@ -59,8 +60,11 @@
     Resource_Scraps: 'Scrap', Resource_Rare_Iron: 'Simple Iron', Resource_Rare_ForgedIron: 'Forged Iron',
     Resource_Rare_GalvanizedIron: 'Galvanized Iron', Resource_Rare_HardenedIron: 'Hardened Iron',
     Resource_Special_LumeniteCrystal: 'Lumenite Crystal', Resource_Special_GlowingFragment: 'Glowing Fragment',
+    Resource_Special_Simulacrum: 'Simulacrum', Resource_Simulacrum: 'Simulacrum',
     Item_DragonHeartUpgrade: 'Dragon Heart upgrades',
   };
+  // Always listed, with 0 when the character has none.
+  var RESOURCE_ORDER = ['Scrap', 'Simple Iron', 'Forged Iron', 'Galvanized Iron', 'Hardened Iron', 'Lumenite Crystal', 'Simulacrum', 'Glowing Fragment', 'Dragon Heart upgrades'];
 
   function levelOf(entry) {
     var data = entry.InstanceData && entry.InstanceData.props;
@@ -92,6 +96,10 @@
       else if ((info.category === 'Weapon' || info.category === 'Armor') && row.level != null && !/_PreOrder$|_Nude$|Weapon_Fist/.test(cls)) arsenal.push(row);
     });
     loadout.sort(function (a, b) { return SLOT_ORDER.indexOf(a.slot) - SLOT_ORDER.indexOf(b.slot); });
+    // Every upgrade material, 0 when missing (the save only keeps what you have); anything unexpected goes last.
+    var have = {}; resources.forEach(function (r) { have[r.name] = r; });
+    resources = RESOURCE_ORDER.map(function (n) { return have[n] || { name: n, category: 'Resource', item: null, level: null, mods: [], quantity: 0 }; })
+      .concat(resources.filter(function (r) { return RESOURCE_ORDER.indexOf(r.name) < 0; }));
 
     var traitComp = comps.Traits || {};
     var traits = (traitComp.Traits || []).filter(function (t) { return t && t.TraitBP; }).map(function (t) {
@@ -124,6 +132,22 @@
       cryptolithPhase: stats.CryptolithPhase || 0,
       usedHarsgaardRootGun: !!stats.HasEquippedHarsgaardRootGun,
       finishedIntro: !!p.bFinishedIntro,
+      inHand: (function () {
+        var h = comps.Inventory && comps.Inventory.EquipmentInHand;
+        var e = items.filter(function (i) { return i.ID === h; })[0];
+        return e && e.ItemBP ? itemFromPath(e.ItemBP.path).name : (h != null ? 'item #' + h : null);
+      })(),
+      newItems: items.filter(function (e) { return e.New && !e.Hidden && e.ItemBP; }).map(function (e) { return RESOURCE_NAMES[className(e.ItemBP.path)] || itemFromPath(e.ItemBP.path).name; }),
+      hiddenItems: items.filter(function (e) { return e.Hidden; }).length,
+      ammoPools: { handGun: comps.HandGunAmmo && comps.HandGunAmmo.Value, longGun: comps.LongGunAmmo && comps.LongGunAmmo.Value, special: comps.SpecialAmmo && comps.SpecialAmmo.Value },
+      skins: (p.EquipmentVisuals || []).map(function (v) {
+        return { item: itemFromPath(v.EquipmentPath).name, skin: v.SkinEquipmentPath ? itemFromPath(v.SkinEquipmentPath).name : '', level: v.EquipmentLevel };
+      }),
+      hostType: String(p.HostType || '').replace(/^.*::/, ''),
+      characterName: p.Name,
+      skipIntro: !!p.bSkipIntro,
+      visualSeed: comps.VisualComp && comps.VisualComp.Seed,
+      traitRank: p.TraitRank,
       // Pre-order skins, emotes and other account rewards handed to this character.
       awards: (p.ReceivedAwards || []).filter(function (a) { return a && a.AccountAward && a.bHasBeenAwarded; })
         .map(function (a) { return splitWords(className(a.AccountAward.path).replace(/^Award_/, '').replace(/_Skin_PreOrder$|_PreOrder$/, ' (pre-order)')); }),
@@ -182,7 +206,12 @@
       if (!c || !c.props) return null;
       try { return characterDetails(file, c); } catch (e) { return { error: String(e) }; }
     });
-    return { characters: characters, achievements: achievements, activeCharacter: rootProps.ActiveCharacterIndex || 0 };
+    return {
+      characters: characters, achievements: achievements, activeCharacter: rootProps.ActiveCharacterIndex || 0,
+      settings: { loadscreenTip: rootProps.LoadscreenTipIndex, autoVisibility: !!rootProps.RunAutoVisSetting },
+      accountAwards: (rootProps.AccountAwards || []).filter(Boolean).map(function (a) { return splitWords(className(a.path).replace(/^Award_/, '')); }),
+      accountCurrencies: (rootProps.AccountCurrencies || []).map(function (c) { return { name: c.CurrencyType ? splitWords(className(c.CurrencyType.path).replace(/^Resource_Special_/, '')) : '?', quantity: c.Quantity || 0 }; }),
+    };
   }
 
   var QUEST_TYPES = { Boss: 'Boss', MiniBoss: 'Miniboss', SmallD: 'Dungeon', Siege: 'Siege', Event: 'Item drop', OverworldPOI: 'Point of interest', AdventureMode: 'Adventure' };
