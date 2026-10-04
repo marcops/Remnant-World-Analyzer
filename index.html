@@ -3,7 +3,77 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Remnant World Analyzer</title>
+  <title>Remnant World Analyzer — Remnant: From the Ashes Save Checker</title>
+  <meta name="description" content="Free Remnant: From the Ashes save checker: see which bosses and events rolled in your world, what they drop, and every item you're still missing.">
+  <meta name="keywords" content="Remnant From the Ashes, Remnant 1, save analyzer, save checker, world analyzer, world roll, reroll checker, adventure mode, campaign reroll, missing items, item tracker, completionist checklist, 100% completion, rings, amulets, traits, weapon mods, armor sets, emotes, Survival mode, Hardcore mode, Swamps of Corsus, Subject 2923, Reisum, Ward Prime, save file location">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="theme-color" content="#15161a">
+  <link rel="canonical" href="https://marcops.github.io/Remnant-World-Analyzer/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2315161a'/%3E%3Ccircle cx='32' cy='32' r='18' fill='none' stroke='%23d9813f' stroke-width='6'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%23d9813f'/%3E%3C/svg%3E">
+  <link rel="sitemap" type="application/xml" href="sitemap.xml">
+  <link rel="alternate" type="text/plain" title="LLM summary" href="llms.txt">
+
+  <!-- Link previews (Discord, Reddit, WhatsApp, X, …) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Remnant World Analyzer">
+  <meta property="og:title" content="Remnant World Analyzer — what rolled in your world and what you're missing">
+  <meta property="og:description" content="Load your Remnant: From the Ashes save and see every event in your world, what it drops, and which items you still need — by world, item type and game mode.">
+  <meta property="og:url" content="https://marcops.github.io/Remnant-World-Analyzer/">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Remnant World Analyzer">
+  <meta name="twitter:description" content="Remnant: From the Ashes save checker: world events, drops and missing items.">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "Remnant World Analyzer",
+        "url": "https://marcops.github.io/Remnant-World-Analyzer/",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Any (web browser); automatic mode on Windows",
+        "browserRequirements": "Requires JavaScript",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+        "codeRepository": "https://github.com/marcops/Remnant-World-Analyzer",
+        "about": { "@type": "VideoGame", "name": "Remnant: From the Ashes", "sameAs": "https://en.wikipedia.org/wiki/Remnant:_From_the_Ashes" },
+        "description": "Reads Remnant: From the Ashes save files (save_N.sav and profile.sav) in the browser and shows the campaign or adventure world roll — bosses, minibosses, side dungeons, sieges, points of interest and item drops — plus every item you own or are still missing, grouped by world (Earth, Rhom, Corsus, Yaesha, Reisum, Ward 13, Ward 17, Ward Prime), item type and game mode (Normal, Survival, Hardcore).",
+        "featureList": [
+          "World roll viewer for campaign and adventure mode",
+          "Owned and missing items from profile.sav",
+          "Missing items by world, item type and game mode",
+          "Items obtainable in your current world",
+          "Links to the Fextralife wiki for every location and item",
+          "Supports Swamps of Corsus and Subject 2923 DLC",
+          "Runs locally: save files are never uploaded"
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Where are the Remnant: From the Ashes save files?",
+            "acceptedAnswer": { "@type": "Answer", "text": "On PC (Steam and Epic) they are in %LOCALAPPDATA%\\Remnant\\Saved\\SaveGames. save_0.sav is character 1, save_1.sav is character 2, and profile.sav holds the items every character owns." }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I see what is missing in my Remnant world?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Open Remnant World Analyzer and drop your save_N.sav and profile.sav on the page. The Current world tab lists every event in your campaign or adventure with its items; the Missing items tab counts what you still need by world, item type and mode." }
+          },
+          {
+            "@type": "Question",
+            "name": "Are my save files uploaded?",
+            "acceptedAnswer": { "@type": "Answer", "text": "No. The files are read by your own browser; nothing is sent to any server." }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
   <link rel="stylesheet" href="css/app.css">
   <script src="js/data.js"></script>
   <script src="js/wiki.js"></script>
@@ -28,7 +98,7 @@
           <code id="save-path">%LOCALAPPDATA%\Remnant\Saved\SaveGames</code>
           <button id="copy-path" class="btn small" type="button">Copy</button>
         </p>
-        <p class="drop-hint">Want it to open by itself and refresh whenever the game saves? Use <b>Start.bat</b> (see the README).</p>
+        <p class="drop-hint download">Want to run it locally, fully automatic? <a class="link" href="https://github.com/marcops/Remnant-World-Analyzer/archive/refs/heads/master.zip">Download it here</a>, extract and double-click <b>Start.bat</b> (Windows): it finds your saves by itself and refreshes whenever the game saves. Source on <a class="link" href="https://github.com/marcops/Remnant-World-Analyzer" target="_blank" rel="noopener">GitHub</a>.</p>
       </div>
       <p id="load-error" class="error" hidden></p>
     </section>
@@ -81,7 +151,20 @@
     </section>
   </main>
 
+  <section class="about">
+    <h2>About Remnant World Analyzer</h2>
+    <p>A free save checker for <b>Remnant: From the Ashes</b>. Load your save and it shows which bosses, minibosses, side dungeons, sieges, points of interest and item drops rolled in your <b>campaign</b> or <b>adventure</b>, what each event drops, and every weapon, armor piece, ring, amulet, mod, trait and emote you already have or are still missing — by world (Earth, Rhom, Corsus, Yaesha, Reisum, Ward 13, Ward 17, Ward Prime), by item type and by game mode (Normal, Survival, Hardcore). Includes the Swamps of Corsus and Subject 2923 DLC.</p>
+    <p>Use it as a <b>world roll checker</b> before deciding to reroll your campaign or adventure mode, as a <b>completionist checklist</b> to track your way to 100%, or to find out <b>where to farm</b> a specific ring, amulet, trait or weapon. It is free, needs no install or account, and works in any browser. (For Remnant: From the Ashes only — Remnant II uses a different save format.)</p>
+    <h3>Where are the Remnant: From the Ashes save files?</h3>
+    <p>On PC (Steam and Epic) they are in <code>%LOCALAPPDATA%\Remnant\Saved\SaveGames</code>. <code>save_0.sav</code> is character 1, <code>save_1.sav</code> is character 2, and <code>profile.sav</code> holds the items every character owns.</p>
+    <h3>How do I see what is missing in my Remnant world?</h3>
+    <p>Drop your <code>save_N.sav</code> and <code>profile.sav</code> on this page. The <b>Current world</b> tab lists every event in your campaign or adventure with its items; the <b>Missing items</b> tab counts what you still need by world, item type and mode, and highlights what you can get in your current world right now.</p>
+    <h3>Are my save files uploaded?</h3>
+    <p>No. The files are read by your own browser; nothing is sent to any server.</p>
+  </section>
+
   <footer class="credits">
+    <p class="repo">Open source (GPL-3.0) — <a href="https://github.com/marcops/Remnant-World-Analyzer" target="_blank" rel="noopener">github.com/marcops/Remnant-World-Analyzer</a> · <a href="https://github.com/marcops/Remnant-World-Analyzer/archive/refs/heads/master.zip">download to run locally (automatic mode)</a></p>
     <h2>Credits</h2>
     <ul>
       <li><a href="https://github.com/hzla/Remnant-World-Analyzer" target="_blank" rel="noopener">hzla/Remnant-World-Analyzer</a> — the original project this is a fork of.</li>
