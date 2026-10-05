@@ -229,6 +229,8 @@ details.raw > summary { cursor: pointer; }
 .about h2 { font-size: 18px; color: var(--text); margin: 20px 0 10px; }
 .about h3 { font-size: 15px; color: var(--text); margin: 16px 0 4px; }
 .about p { margin: 0 0 10px; }
+.about-list { margin: 0 0 10px; padding-left: 20px; }
+.about-list li { margin: 4px 0; }
 .about code { background: var(--panel-2); padding: 1px 5px; border-radius: 4px; word-break: break-all; }
 .credits { margin-top: 24px; padding-bottom: 40px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
 .credits h2 { font-size: 16px; color: var(--text); margin: 18px 0 8px; }

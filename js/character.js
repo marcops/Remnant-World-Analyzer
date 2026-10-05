@@ -29,6 +29,11 @@
   function itemFromPath(path) {
     var cls = className(path);
     if (itemCache[cls]) return itemCache[cls];
+    // Armor skins (Armor_Head_Carapace_Skin) only change the look: name them after the piece, never count them as it.
+    if (/_Skin$/.test(cls) && !/_PreOrder/.test(cls)) {
+      var base = itemFromPath(path.replace(/_Skin(?=\.|_C$|$)/g, ''));
+      return (itemCache[cls] = { name: (base.item ? base.name : splitWords(cls.replace(/_Skin$/, '').replace(/^Armor_/, ''))) + ' (skin)', category: 'Skin', cls: cls, item: null });
+    }
     var parts = cls.split('_'), found = byKeyName[cls.toLowerCase()];
     if (!found && parts[0] === 'Armor' && parts.length >= 3) {
       var set = norm(parts.slice(2).join('')), slot = parts[1];
