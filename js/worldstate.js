@@ -158,8 +158,13 @@
     // Unlabelled zones are the overworld of a campaign or adventure: name them after its world.
     Object.keys(zones).forEach(function (k) {
       var z = zones[k], r = rootOf(byId[z.questId]);
+      // Which part of the save the area belongs to: the campaign, the adventure, or Ward 13 (the hub).
+      z.mode = !r ? '' : /AdventureMode/.test(r.cls) ? 'Adventure' : /Campaign/.test(r.cls) ? 'Campaign' : /Ward13/.test(r.cls) ? 'Ward 13' : '';
       var w = r && /_(City|Rural|Wasteland|Swamp|Jungle|Snow)(_|$)/.exec(r.cls + '_');
-      if (!z.label && w) z.label = WORLD_OF[w[1]] + (/AdventureMode/.test(r.cls) ? ' (adventure)' : '');
+      // Unlabelled inner areas take their quest's name (Quest_Cryptolith_Labyrinth -> "Cryptolith Labyrinth").
+      var own = byId[z.questId];
+      if (!z.label && z.parent != null && own) z.label = splitWords(own.cls.replace(/^Quest_(OverworldPOI_|Event_|SmallD_|MiniBoss_|Boss_|Siege_)?/, ''));
+      if (!z.label && w && z.parent == null) z.label = WORLD_OF[w[1]] + (/AdventureMode/.test(r.cls) ? ' (adventure)' : '');
       z.name = zoneName(z);
     });
 

@@ -19,7 +19,7 @@
     files: {},          // name -> ArrayBuffer
     characters: [],     // from profile.sav
     charIndex: null,
-    tab: 'world', mode: 'campaign',
+    tab: 'world', mode: 'adventure', mapMode: 'Adventure',
     worldZones: {}, worldTypes: {}, worldCats: {}, missingWorld: null, missingType: null, missingMode: null,
   };
   P.ZONES.forEach(function (z) { state.worldZones[z] = true; });
@@ -28,7 +28,7 @@
   function store(k, v) { try { localStorage.setItem('rwa.' + k, JSON.stringify(v)); } catch (e) { /* private mode */ } }
   function recall(k, d) { try { var v = localStorage.getItem('rwa.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }
   state.tab = recall('tab', 'world');
-  state.mode = recall('mode', 'campaign');
+  // Every tab opens on the adventure (falls back to the campaign when the save has none).
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -747,7 +747,7 @@
       : '<p class="cat">Nothing left behind.</p>';
 
     el.innerHTML = '<div class="summary">' + cards + '</div><div class="panels">' +
-      eventTable('Campaign') + eventTable('Adventure') +
+      eventTable('Adventure') + eventTable('Campaign') +
       panel('Areas', areas, true) +
       panel('Left on the ground', lootTable) +
       panel('Story progress flags', ws.flags.length ? '<div class="chips">' + ws.flags.map(function (f) { return '<span class="chip on">' + esc(f) + '</span>'; }).join('') + '</div>' : '<p class="cat">None.</p>') +
@@ -977,10 +977,17 @@
     if (!ws) { el.innerHTML = '<div class="empty">Load a world save (save_N.sav) to see the map.</div>'; return; }
     if (ws.error) { el.innerHTML = '<div class="empty">Could not read the world: ' + esc(ws.error) + '</div>'; return; }
     var depthOf = function (z) { var d = 0, p = z; while (p && p.parent != null && d < 5) { p = ws.zones.filter(function (x) { return x.id === p.parent; })[0]; d++; } return d; };
-    var index = ws.zones.map(function (z) { return '<a class="chip on" href="#zone-' + z.id + '">' + '·'.repeat(depthOf(z)) + esc(z.name) + '</a>'; }).join('');
+    // Campaign and adventure are separate maps: show one at a time, adventure first.
+    var modes = ['Adventure', 'Campaign', 'Ward 13'].filter(function (m) { return ws.zones.some(function (z) { return z.mode === m; }); });
+    if (modes.indexOf(state.mapMode) < 0) state.mapMode = modes[0];
+    var zones = ws.zones.filter(function (z) { return !modes.length || z.mode === state.mapMode || (!z.mode && state.mapMode === modes[0]); });
+    var switcher = modes.length > 1 ? '<div class="seg" id="map-mode">' + modes.map(function (m) {
+      return '<button type="button" data-map-mode="' + esc(m) + '" class="' + (m === state.mapMode ? 'active' : '') + '">' + esc(m) + ' <span class="cat">' + ws.zones.filter(function (z) { return z.mode === m; }).length + '</span></button>';
+    }).join('') + '</div>' : '';
+    var index = zones.map(function (z) { return '<a class="chip on" href="#zone-' + z.id + '">' + '·'.repeat(depthOf(z)) + esc(z.name) + '</a>'; }).join('');
     var legend = '<div class="legend"><span class="lg t-start">Start</span><span class="lg t-exit">Exit / way to another area</span><span class="lg t-poi">Event / point of interest</span>' +
       '<span class="lg t-straight">Path</span><span class="lg t-vista">Scenery</span> <span class="cat">✔ completed · ⚑ waypoint · ✚ respawn checkpoint · ▣ chests opened/total · • loot on the ground · ★ gear or trait book on the ground · hover a tile for everything in it</span></div>';
-    el.innerHTML = '<div class="chips map-index">' + index + '</div>' + legend + ws.zones.map(function (z) {
+    el.innerHTML = switcher + '<div class="chips map-index">' + index + '</div>' + legend + zones.map(function (z) {
       var parent = z.parent != null ? ws.zones.filter(function (x) { return x.id === z.parent; })[0] : null;
       // Travel points (waypoints) by name; respawn checkpoints and passages to other areas as counts.
       var waypoints = z.links.filter(function (l) { return l.type === 'Waypoint'; }), checkpoints = z.links.filter(function (l) { return l.type === 'Checkpoint'; });
@@ -1197,7 +1204,7 @@
     });
     $('mode-switch').addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b) return;
-      state.mode = b.dataset.mode; store('mode', state.mode); renderWorld();
+      state.mode = b.dataset.mode; renderWorld();
     });
     $('world-zones').addEventListener('click', function (e) { var c = e.target.closest('.chip'); if (c) { state.worldZones[c.dataset.zone] = !state.worldZones[c.dataset.zone]; renderWorld(); } });
     $('world-types').addEventListener('click', function (e) { var c = e.target.closest('.chip'); if (c) { state.worldTypes[c.dataset.type] = !state.worldTypes[c.dataset.type]; renderWorld(); } });
@@ -1220,10 +1227,19 @@
         state[p[1]] = state[p[1]] === v ? null : v; renderMissing();
       });
     });
+    // Map: Adventure / Campaign / Ward 13 switch.
+    $('map-view').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-map-mode]'); if (!b) return;
+      state.mapMode = b.dataset.mapMode; renderMapTab();
+    });
     // Links from tips to the map: switch to the Map tab, then jump to the area.
     $('tips-view').addEventListener('click', function (e) {
       var a = e.target.closest('[data-goto-map]'); if (!a) return;
       e.preventDefault();
+      // Show the map (campaign or adventure) the area belongs to.
+      var ws = state.worldStates && state.worldStates[state.charIndex];
+      var zone = ws && ws.zones ? ws.zones.filter(function (z) { return String(z.id) === a.dataset.gotoMap; })[0] : null;
+      if (zone && zone.mode) state.mapMode = zone.mode;
       state.tab = 'map'; store('tab', state.tab); render();
       var z = $('zone-' + a.dataset.gotoMap); if (z && z.scrollIntoView) z.scrollIntoView({ behavior: 'smooth' });
     });
