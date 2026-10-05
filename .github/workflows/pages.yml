@@ -1,0 +1,33 @@
+# Publishes the site to GitHub Pages in a single job (the default Pages build uses three).
+# Pushes that only touch tools, tests or docs don't publish.
+name: Publish site
+
+on:
+  push:
+    branches: [master]
+    paths-ignore: ['tools/**', 'test/**', '**.md', '*.ps1', '*.bat', '.gitignore']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: .
+      - id: deploy
+        uses: actions/deploy-pages@v5
