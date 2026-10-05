@@ -929,14 +929,44 @@
     return '<svg class="zmap" viewBox="-2 -2 ' + (w + 4) + ' ' + (h + 4) + '" width="' + (w + 4) + '" height="' + (h + 4) + '" role="img" aria-label="Map of ' + esc(z.name) + '">' + out.join('') + '</svg>';
   }
 
-  // Map cells you walked through (the trail the in-game map reveals).
-  function zoneFogSvg(z) {
+  // Map cells you walked through (the trail the in-game map reveals). `size` is the longest side in pixels.
+  function zoneFogSvg(z, size) {
     if (!z.fow.length) return '<p class="cat">You have not walked here yet.</p>';
-    var xs = z.fow.map(function (c) { return c[0]; }), ys = z.fow.map(function (c) { return c[1]; });
+    // Frame the trail on where most of it is: a few stray cells (teleports, falls) would leave the drawing mostly empty.
+    var pick = function (axis) {
+      var v = z.fow.map(function (c) { return c[axis]; }).sort(function (a, b) { return a - b; });
+      var lo = v[Math.floor(v.length * 0.005)], hi = v[Math.ceil(v.length * 0.995) - 1];
+      return [lo - 6, hi + 6];
+    };
+    var bx = pick(0), by = pick(1);
+    var cells = z.fow.filter(function (c) { return c[0] >= bx[0] && c[0] <= bx[1] && c[1] >= by[0] && c[1] <= by[1]; });
+    var xs = cells.map(function (c) { return c[0]; }), ys = cells.map(function (c) { return c[1]; });
     var minX = Math.min.apply(null, xs), minY = Math.min.apply(null, ys), w = Math.max.apply(null, xs) - minX + 1, h = Math.max.apply(null, ys) - minY + 1;
-    var d = z.fow.map(function (c) { return 'M' + (c[0] - minX) + ' ' + (c[1] - minY) + 'h1v1h-1z'; }).join('');
-    var scale = Math.min(3, 300 / Math.max(w, h));
+    var d = cells.map(function (c) { return 'M' + (c[0] - minX) + ' ' + (c[1] - minY) + 'h1v1h-1z'; }).join('');
+    var scale = Math.min(size ? 4 : 3, (size || 300) / Math.max(w, h));
     return '<svg class="zfog" viewBox="0 0 ' + w + ' ' + h + '" width="' + Math.round(w * scale) + '" height="' + Math.round(h * scale) + '" shape-rendering="crispEdges" role="img" aria-label="Explored part of ' + esc(z.name) + '"><path d="' + d + '"/></svg>';
+  }
+
+  // Everything an area holds, as a list: events, waypoints, chests and loot on the ground.
+  function zoneContents(z, ws) {
+    var rows = [];
+    ws.events.filter(function (e) { return e.zoneId === z.id || e.ownZone === z.id; }).forEach(function (e) {
+      // Item drops don't record completion: they count as done when you own the item; trait books can't be told.
+      var sheet = e.items.filter(function (i) { return i.item; });
+      var done = e.done ? true : e.type !== 'Item drop' ? false : sheet.length ? sheet.every(function (i) { return itemOwned(i.item) === true; }) : null;
+      rows.push(statusIcon(done) + ' ' + esc(e.name) + ' <span class="cat">' + esc(e.type) + '</span>' +
+        (e.items.length ? '<div class="cat">' + e.items.map(function (i) { return (i.item ? statusIcon(itemOwned(i.item)) : '') + esc(i.name); }).join(', ') + '</div>' : ''));
+    });
+    z.links.filter(function (l) { return l.type !== 'Link'; }).forEach(function (l) {
+      rows.push((l.type === 'Waypoint' ? '⚑ ' : '✚ ') + esc(l.label || (l.type === 'Waypoint' ? 'Waypoint' : 'Respawn checkpoint')) + (l.active ? '' : ' <span class="cat">inactive</span>'));
+    });
+    if (z.chests) rows.push('▣ ' + z.chestsOpen + ' of ' + z.chests + ' chests opened');
+    var loot = {};
+    ws.loot.filter(function (l) { return l.zone === z.id; }).forEach(function (l) { loot[l.name] = (loot[l.name] || 0) + l.quantity; });
+    Object.keys(loot).forEach(function (n) { rows.push('• ' + esc(n) + (loot[n] > 1 ? ' ×' + num(loot[n]) : '') + ' <span class="cat">on the ground</span>'); });
+    var npcs = ws.npcs.filter(function (n) { return /Zone_(\d+)_/.exec(n.where) && +/Zone_(\d+)_/.exec(n.where)[1] === z.id; });
+    npcs.forEach(function (n) { rows.push('☺ ' + esc(n.name) + (n.items.length ? ' <span class="cat">carries ' + esc(n.items.join(', ')) + '</span>' : '')); });
+    return rows.length ? '<ul class="tips">' + rows.map(function (r) { return '<li>' + r + '</li>'; }).join('') + '</ul>' : '<p class="cat">Nothing recorded here.</p>';
   }
 
   // Re-render the expensive tabs only when they're shown.
@@ -968,9 +998,16 @@
         z.explored ? num(z.explored) + ' map cells walked' : '',
         z.tileSet ? 'tile set ' + z.tileSet.replace(/^TileSet_/, '') : '',
       ].filter(Boolean).join(' · ');
+      // Fixed maps (Ward 13, Ward Prime, boss arenas…) keep no tile layout: the path you walked is their map,
+      // drawn large, with what the area holds listed next to it (the save has no usable positions for them).
+      var core = z.tiles.filter(function (t) { return t.kind !== 'blank' && t.kind !== 'vista'; });
+      var here = '<div class="zhere"><div class="section-title">What\'s here</div>' + zoneContents(z, ws) + '</div>';
+      var views = (core.length > 2
+        ? '<div><div class="section-title">Layout</div>' + zoneLayoutSvg(z) + '</div><div><div class="section-title">Your path</div>' + zoneFogSvg(z) + '</div>'
+        : '<div><div class="section-title">Your path <span class="cat">(fixed map: no tile layout in the save)</span></div>' + zoneFogSvg(z, 560) + '</div>') + here;
       return '<section class="panel zone" id="zone-' + z.id + '"><h3>' + esc(z.name) + wikiLink(z.name) + '</h3><p class="cat">' + esc(facts) + '</p>' +
         (links ? '<div class="chips">' + links + '</div>' : '') +
-        '<div class="zviews"><div><div class="section-title">Layout</div>' + zoneLayoutSvg(z) + '</div><div><div class="section-title">Your path</div>' + zoneFogSvg(z) + '</div></div>' +
+        '<div class="zviews">' + views + '</div>' +
         (z.spawns.length ? '<details class="spawns"><summary class="cat">Spawn tables (' + z.spawns.length + ')</summary><p class="cat">' + esc(z.spawns.join(', ')) + '</p></details>' : '') +
         '</section>';
     }).join('');

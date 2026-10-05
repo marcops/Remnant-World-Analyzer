@@ -191,6 +191,7 @@ ul.tips li { margin: 5px 0; font-size: 14px; }
 .panel.zone { margin-bottom: 12px; }
 .zviews { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; margin-top: 8px; }
 .zviews > div { max-width: 100%; overflow-x: auto; }
+.zviews .zhere { flex: 1 1 260px; min-width: 240px; }
 svg.zmap { display: block; }
 .zmap .tile rect { fill: var(--panel-2); stroke: var(--line); stroke-width: 1.5; }
 .zmap .t-start rect { fill: color-mix(in srgb, var(--ok) 30%, var(--panel)); }
