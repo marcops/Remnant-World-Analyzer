@@ -1076,7 +1076,7 @@
       var sheet = e.items.filter(function (i) { return i.item; });
       var done = e.done ? true : e.type !== 'Item drop' ? false : sheet.length ? sheet.every(function (i) { return itemOwned(i.item) === true; }) : null;
       rows.push(statusIcon(done) + ' ' + esc(e.name) + ' <span class="cat">' + esc(e.type) + '</span>' +
-        (e.items.length ? '<div class="cat">' + e.items.map(function (i) { return (i.item ? statusIcon(itemOwned(i.item)) : '') + ico(i.name) + esc(i.name); }).join(', ') + '</div>' : ''));
+        e.items.map(function (i) { return '<div class="evitem">' + (i.item ? statusIcon(itemOwned(i.item)) : '') + ico(i.name) + esc(i.name) + '</div>'; }).join(''));
     });
     z.links.filter(function (l) { return l.type !== 'Link'; }).forEach(function (l) {
       rows.push((l.type === 'Waypoint' ? '⚑ ' : '✚ ') + esc(l.label || (l.type === 'Waypoint' ? 'Waypoint' : 'Respawn checkpoint')) + (l.active ? '' : ' <span class="cat">inactive</span>'));
@@ -1087,7 +1087,7 @@
     Object.keys(loot).forEach(function (n) { rows.push('• ' + esc(n) + (loot[n] > 1 ? ' ×' + num(loot[n]) : '') + ' <span class="cat">on the ground</span>'); });
     var npcs = ws.npcs.filter(function (n) { return /Zone_(\d+)_/.exec(n.where) && +/Zone_(\d+)_/.exec(n.where)[1] === z.id; });
     npcs.forEach(function (n) { rows.push('☺ ' + esc(n.name) + (n.items.length ? ' <span class="cat">carries ' + esc(n.items.join(', ')) + '</span>' : '')); });
-    return rows.length ? '<ul class="tips">' + rows.map(function (r) { return '<li>' + r + '</li>'; }).join('') + '</ul>' : '<p class="cat">Nothing recorded here.</p>';
+    return rows.length ? '<ul class="here">' + rows.map(function (r) { return '<li>' + r + '</li>'; }).join('') + '</ul>' : '<p class="cat">Nothing recorded here.</p>';
   }
 
   // Re-render the expensive tabs only when they're shown.
