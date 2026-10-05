@@ -217,24 +217,118 @@
     }).join('');
   }
 
-  // ---- Cryptolith -----------------------------------------------------------
-  // What you get in Corsus is the Cryptolith Sigil (from the Iskal Queen), not the rewards: those come from
-  // using the Sigil on a Cryptolith tower (Earth, Rhom or Corsus), once per world — 1st Concentration,
-  // 2nd Blood Bond, 3rd the Labyrinth set. The Sigil is shown in their place.
+  // ---- quest items ------------------------------------------------------------
+  // Key items you get in one place and hand over in another. They're tracked like items ("Quest items"):
+  // done when you carry one or already own everything they unlock.
+  //   from:    event that drops it, so the current world can list it
+  //   usedAt:  events that only give these rewards for the item (not "available now" unless you carry it)
+  //   hide:    the rewards are listed as this item instead (the Labyrinth set isn't something you pick up in Corsus)
+  function byName(names) { return names.map(function (n) { return DATA.items.filter(function (i) { return i.name === n; })[0]; }).filter(Boolean); }
   var CRYPTOLITH_REWARDS = ((DATA.events.Cryptolith || {}).items || []).map(function (p) { return itemsByKey[p]; }).filter(Boolean);
-  var SIGIL_KEY = '__cryptolith_sigil';
-  var SIGIL = {
-    name: 'Cryptolith Sigil', category: 'Quest item', sigil: true, key: SIGIL_KEY, world: 'Corsus', dlc: 'Swamps of Corsus', mode: '', group: '',
-    how: 'Drops from the Iskal Queen (Corsus, The Mist Fen). Use it on a Cryptolith tower — it can be in Earth, Rhom or Corsus — once per world, rerolling in between: ' +
-      '1st use gives the Concentration trait, 2nd the Blood Bond trait, 3rd opens the Labyrinth room with the Labyrinth armor set (Labyrinth Helm, Armor and Greaves).',
-  };
-  // Everything the Missing items tab counts: the sheet's items plus the Sigil (a "Quest item").
-  var TRACKED_ITEMS = DATA.items.concat([SIGIL]);
-  function isCryptolithReward(it) { return CRYPTOLITH_REWARDS.indexOf(it) >= 0; }
-  function hasSigil() {
-    var ch = state.profile && state.profile.characters && state.profile.characters[state.charIndex];
-    return !!(ch && ch.extra && (ch.extra.questItems || []).some(function (q) { return /Sigil|Cryptolith/i.test(q.cls); }));
+  var HEART_IKSAL = byName(['Crossbow', 'Slayer Mask', 'Slayer Mantle', 'Slayer Boots']), HEART_UNDYING = byName(['Riven']);
+  // Every key item of the game (Fextralife wiki, "Key Items"). `rewards` are the sheet items it leads to;
+  // story keys have none and are recognised from your progress instead (`seen`: achievements, profile
+  // milestones, world flags or key items the world save records).
+  var QUEST_ITEMS = [
+    {
+      id: 'sigil', name: 'Cryptolith Sigil', carried: /Sigil|Cryptolith/i, from: 'IskalQueen', hide: true,
+      world: 'Corsus', dlc: 'Swamps of Corsus', rewards: CRYPTOLITH_REWARDS, usedAt: { Cryptolith: CRYPTOLITH_REWARDS },
+      how: 'Drops from the Iskal Queen (Corsus, The Mist Fen). Use it on a Cryptolith tower — it can be in Earth, Rhom or Corsus — once per world, rerolling in between: ' +
+        '1st use gives the Concentration trait, 2nd the Blood Bond trait, 3rd opens the Labyrinth room with the Labyrinth armor set (Labyrinth Helm, Armor and Greaves).',
+    },
+    {
+      id: 'heart', name: "Guardian's Heart", carried: /GuardiansHeart|Guardian_?Heart/i, from: 'SwampGuardian',
+      world: 'Corsus', rewards: HEART_IKSAL.concat(HEART_UNDYING), usedAt: { IskalQueen: HEART_IKSAL, UndyingKing: HEART_UNDYING },
+      how: 'Drops from Ixillis (Corsus). Give it to the Iskal Queen (Corsus) for the Crossbow and the Slayer set (Mask, Mantle, Boots), or take it to the Undying King on Rhom for the Riven. ' +
+        'There is one heart per world and giving it to one locks the other out, so you need two worlds to get all of them.',
+    },
+    { id: 'acidkey', name: 'Acid Cleaned Key', carried: /AcidCleaned|AcidKey/i, from: 'FetidPool', world: 'Corsus', dlc: 'Swamps of Corsus', rewards: byName(['Heart of Darkness', "Hero's Ring", 'Fortification']),
+      how: 'Wear the Rusted Amulet (Fetid Pools, Corsus) and crouch in one of the acid pools: the amulet turns into this key. Opens the doors in the Fetid Pools: Heart of Darkness behind the second; with 3 keys and other players, Hero\'s Ring and the Fortification trait.' },
+    { id: 'controlrod', name: 'Control Rod', carried: /ControlRod/i, from: 'HoundMaster', world: 'Rhom', rewards: byName(['Iron Sentinel']),
+      how: 'Dropped by Maul (break the Houndmaster\'s horn first). Activates the Ancient Construct outside Wud\'s workshop on Rhom; completing that event gives the Ancient Core, crafted into the Iron Sentinel mod.' },
+    { id: 'cagekey', name: 'Servant Cage Key', carried: /ServantCage|CageKey/i, from: 'CreepersPeeper', world: 'Reisum', dlc: 'Subject 2923', rewards: byName(['Twin Shot', "Swashbuckler's Signet"]),
+      how: 'Found at the end of Watcher\'s Hollow (Reisum). Opens the cage of the Emin servants: kill the one with the false green eye for the Creeper\'s Peeper.' },
+    { id: 'peeper', name: "Creeper's Peeper", carried: /CreepersPeeper|Peeper/i, from: 'CreepersPeeper', world: 'Reisum', dlc: 'Subject 2923', rewards: byName(['Twin Shot', "Swashbuckler's Signet"]),
+      how: 'Dropped by the Emin servant with the false green eye in the Watcher\'s Hollow cage (needs the Servant Cage Key); killing only that one also gives Swashbuckler\'s Signet. Put the Peeper in the statue with a missing eye outside for the Twin Shot.' },
+    { id: 'w13keycard', name: 'Ward 13 Keycard', carried: /Quest_Keycard$|Ward13Keycard/i, from: 'FoundersHideout', world: 'Ward 13', rewards: byName(['Submachine Gun', 'Elder Knowledge']), seen: { keyItems: /^Keycard$/ },
+      how: 'On a table in the Founder\'s Hideout (Earth). Opens the doors on level B2 of Ward 13: the tape recorder in Dr. Itsaso\'s office gives Elder Knowledge, and it leads to the Fuse and the Master Key for the Submachine Gun.' },
+    { id: 'w13fuse', name: 'Fuse', carried: /Quest_Fuse$|Ward13Fuse/i, from: 'Ward13', world: 'Ward 13', rewards: byName(['Submachine Gun']), seen: { fuse: /Zone_1_0\./ },
+      how: 'In a room in the basement of Ward 13 (behind the keycard doors). Goes in the empty fuse box on level B3 to turn on the fans, part of the way to the Submachine Gun.' },
+    { id: 'w13master', name: 'Ward 13 Master Key', carried: /Ward13Master/i, from: 'Ward13', world: 'Ward 13', rewards: byName(['Submachine Gun']), seen: { keyItems: /Ward13\s?Master/i },
+      how: 'Behind the giant fan in the Ward 13 basement (after the keycard and the fuse). Opens the door at the end of level B2, where the Submachine Gun lies on a table.' },
+    { id: 'glowingrod', name: 'Glowing Rod', carried: /GlowingRod/i, from: 'ArmorVault', world: 'Rhom', rewards: byName(['Akari Mask', 'Akari Garb', 'Akari Leggings']),
+      how: 'Found in dungeons on Rhom when the Vault of the Heralds (Armor Vault) is in the world. Each of the three doors at the end of the vault needs one rod: Akari Mask, Garb and Leggings.' },
+    { id: 'homestead', name: 'Homestead Basement Key', carried: /Homestead_?Key/i, from: 'WardPrime', world: 'Ward Prime', dlc: 'Subject 2923', rewards: byName(['Vanguard Ring']),
+      how: 'In Dr. Enji Sato and Dr. Sebastian Weisskoof\'s office in Ward Prime, when the Homestead is in your Rural Earth. Destroy the shelves in the Homestead house, go down and unlock the basement for the Vanguard Ring.' },
+    { id: 'hunterskey', name: "Hunter's Key", carried: /HuntersKey|HunterKey/i, from: 'HuntersHideout', world: 'Earth', rewards: byName(['Hunting Pistol']),
+      how: 'Given by the dying Hunter at the start of the Hunter\'s Hideout dungeon (Hidden Grotto, Earth). Opens the Safehouse at the end, with the Hunting Pistol in a locker.' },
+    { id: 'iskalvial', name: 'Iskal Vial', carried: /IskalVial/i, from: 'IskalQueen', world: 'Corsus', dlc: 'Swamps of Corsus', rewards: byName(['Ring of the Unclean', 'Potency']), usedAt: { GraveyardElf: byName(['Ring of the Unclean', 'Potency']) },
+      how: 'With the Parasite effect (from an Iskal Infector), tell the Iskal Queen you want to help the Iskal. Needs the Graveyard Elf in the same Corsus map: sneak up to her cauldron with the vial for the Ring of the Unclean and the Potency trait.' },
+    { id: 'janitorswatch', name: "Janitor's Watch", carried: /JanitorsWatch/i, from: 'JanitorsWatch', world: 'Reisum', dlc: 'Subject 2923', rewards: byName(['Amber Moonstone']),
+      how: 'Random drop in Drolniir Woods (Reisum). Give it to Clementine for the Amber Moonstone ring.' },
+    { id: 'lizkey', name: "Liz's Key", carried: /LizKey|LizsKey/i, from: 'LizAndLiz', world: 'Earth', rewards: byName(['Chicago Typewriter']),
+      how: 'Reward for the "A Tale of Two Liz\'s" event (Earth). Opens the locked door with the Chicago Typewriter.' },
+    { id: 'monkeykey', name: 'Monkey Key', carried: /MonkeyKey/i, from: 'LastWill', world: 'Earth', rewards: byName(['Assault Rifle']),
+      how: 'Found during the "Supply Run" event in the Sorrow\'s Field dungeon (Earth). Opens the room with the Assault Rifle.' },
+    { id: 'opalshell', name: 'Opalescent Shell', carried: /Opalescent/i, from: 'AbandonedThrone', world: 'Corsus', dlc: 'Swamps of Corsus', rewards: byName(['Luminescent']),
+      how: 'Dropped by the Mudling Queen Beetle, who sometimes appears when you kill the beetles around the Abandoned Throne (Corsus). With the Parasite effect, buy the Luminescent trait from Mar\'Gosh for it.' },
+    { id: 'tusk', name: "Packmaster's Tusk", carried: /Tusk/i, from: 'IceSkimmer', world: 'Reisum', dlc: 'Subject 2923', rewards: byName(['Warlord Skull', 'Warlord Armor', 'Warlord Boots']), seen: { talk: ['GaveTusk_Sebum'] },
+      how: 'Dropped by the Pack Master (only when Sebum is in the map). Bring it to Sebum, after finding the hole in his ship\'s hull, and ask him about the armor for the Warlord set.' },
+    { id: 'letoskeycard', name: 'Research Station Alpha Keycard', carried: /ResearchStation|LetoKeycard/i, world: 'Earth', rewards: byName(["Leto's Helmet", "Leto's Armor", "Leto's Leggings"]),
+      how: 'Unlocks the doors of Research Station Alpha (Leto\'s Lab, Earth). Leto\'s set is in the room with the burning corpses, after the teleporter.' },
+    { id: 'strangecoin', name: 'Strange Coin', carried: /StrangeCoin|AcesCoin/i, from: 'AcesCoin', world: 'Earth', rewards: byName(['Magnum Revolver']), seen: { achievements: ['Return_Ace_Coin'], talk: ['GaveCoinAlready'] },
+      how: 'Spawns randomly anywhere on Earth. Give it to Ace in Ward 13 for the Magnum Revolver.' },
+    { id: 'curio', name: 'Strange Curio', carried: /Curio/i, from: 'StuckMerchant', world: 'Yaesha', rewards: byName(['Radiant Visage', "Guardian's Blessing"]),
+      how: 'In the back of the Stuck Merchant\'s wagon (Yaesha) — buy her Radiant Protector and Greaves first. Opens the Guardian Shrine: the Radiant Visage is on a statue at the end, and beating the Root Horror back at the wagon gives Guardian\'s Blessing.' },
+    { id: 'tarnishedring', name: 'Tarnished Ring', carried: /TarnishedRing/i, from: 'ReggiesRing', world: 'Earth', rewards: byName(['Scavenger']),
+      how: 'Spawns at a random place on Earth. Give it to Reggie in Ward 13 (exhaust his dialogue) for the Scavenger trait — also earned by picking up 50,000 scrap.' },
+    // Story and door keys: no collection item, recognised from your progress.
+    { id: 'datla', name: 'D.A.T.L.A. Key', carried: /DATLA/i, world: 'Ward 13', rewards: [], seen: { socket: /DATLA/, achievements: ['Kill_Dreamer'], flags: ['Finished Game'] },
+      how: 'Given by Commander Ford after you turn on the reactor in Ward 13. Powers the crystal terminal on the way to Ward 17 (main story).' },
+    { id: 'founderskey', name: "Founder's Key", carried: /FoundersKey/i, world: 'Ward 13', rewards: [], seen: { achievements: ['Kill_Dreamer'], flags: ['Finished Game'] },
+      how: 'Given after you free the Founder in the Founder\'s Prison (Yaesha). Unlocks the computer connected to the mirror on the lower levels of Ward 13 (main story).' },
+    { id: 'howlingkey', name: 'Howling Key', carried: /HowlingKey/i, world: 'Rhom', rewards: [], seen: { achievements: ['Meet_Undying_King', 'Kill_Undying_King'] },
+      how: 'Dropped by Claviger or The Harrow (Rhom). Opens the altar of the Sun Gate that leads to the Undying King.' },
+    { id: 'labyrinthkey', name: 'Labyrinth Key', carried: /LabyrinthKey/i, world: 'The Labyrinth', rewards: [], seen: { achievements: ['Meet_Labyrinth_Keeper'], milestones: ['Traveled To Labyrinth'] },
+      how: 'Given by the Undying King for the Guardian\'s Heart, or as the reward for killing him. Opens the way to the Labyrinth.' },
+    { id: 'wpfuse', name: 'Ward Prime Fuse', carried: /WardPrime_?Fuse/i, world: 'Ward Prime', dlc: 'Subject 2923', rewards: [], seen: { fuse: /Zone_204_|WardPrime/, flags: ['Fuse Used'], achievements: ['Kill_Harsgaard'] },
+      how: 'Behind the obstructed door on the left of the Laboratory in Ward Prime. Restores power to the main level of Ward Prime (DLC story).' },
+    { id: 'wpkeycard', name: 'Ward Prime Keycard', carried: /Keycard_?WardPrime/i, world: 'Ward Prime', dlc: 'Subject 2923', rewards: [], seen: { keyItems: /Keycard Ward Prime/i, achievements: ['Kill_Harsgaard'] },
+      how: 'In the Medical Storage of Ward Prime: restore power from the reactor room and use the computer to unlock its door (DLC story).' },
+    { id: 'wpmaintkey', name: 'Ward Prime Maintenance Key', carried: /Maintenance/i, world: 'Ward Prime', dlc: 'Subject 2923', rewards: [],
+      how: 'In the Medical Area of Ward Prime: vault over a broken window and destroy a bookshelf.' },
+  ];
+  QUEST_ITEMS.forEach(function (q) {
+    q.key = '__quest_' + q.id; q.category = 'Quest item'; q.quest = true; q.mode = ''; q.group = ''; q.dlc = q.dlc || '';
+    q.hide = !!q.hide; q.usedAt = q.usedAt || {};
+  });
+  // Story keys: true when your saves show you already went past them.
+  function questSeen(q) {
+    var s = q.seen; if (!s) return false;
+    var prof = state.profile || {}, ch = prof.characters && prof.characters[state.charIndex];
+    var ws = state.worldStates && state.worldStates[state.charIndex];
+    if ((s.achievements || []).some(function (id) { return (prof.achievements || []).some(function (a) { return a.id === id && a.value >= a.target; }); })) return true;
+    if ((s.milestones || []).some(function (m) { return ch && ch.milestones && ch.milestones.indexOf(m) >= 0; })) return true;
+    if ((s.flags || []).some(function (f) { return ws && ws.flags && ws.flags.indexOf(f) >= 0; })) return true;
+    if (s.keyItems && ws && ws.keyItems && ws.keyItems.some(function (k) { return s.keyItems.test(k.name); })) return true;
+    // NPC conversation flags (GaveTusk_Sebum, GaveCoinAlready), filled sockets and fuse boxes.
+    if ((s.talk || []).some(function (t) { return ws && ws.conversations && ws.conversations.some(function (c) { return c.key === t; }); })) return true;
+    if (s.socket && ws && ws.sockets && ws.sockets.some(function (x) { return x.full && s.socket.test(x.cls); })) return true;
+    if (s.fuse && ws && ws.fuses && ws.fuses.some(function (f) { return s.fuse.test(f.where); })) return true;
+    return false;
   }
+  var SIGIL = QUEST_ITEMS[0], SIGIL_KEY = SIGIL.key;
+  // Everything the Missing items tab counts: the sheet's items plus the quest items.
+  var TRACKED_ITEMS = DATA.items.concat(QUEST_ITEMS);
+  // Rewards listed as their quest item instead of on their own.
+  function isCryptolithReward(it) { return QUEST_ITEMS.some(function (q) { return q.hide && q.rewards.indexOf(it) >= 0; }); }
+  function carries(q) {
+    var ch = state.profile && state.profile.characters && state.profile.characters[state.charIndex];
+    return !!(ch && ch.extra && (ch.extra.questItems || []).some(function (x) { return q.carried.test(x.cls); }));
+  }
+  function hasSigil() { return carries(SIGIL); }
+  // Quest items handed over at this event, and the rewards that need them.
+  function gatedAt(ev) { return QUEST_ITEMS.filter(function (q) { return q.usedAt[ev.key]; }); }
 
   // Events that only hand out some items in exchange for another one: Brabus gives the Bandit set
   // for the Pocket Watch you get from Mudtooth.
@@ -249,18 +343,21 @@
 
   // key -> where it can drop in the currently loaded world
   function availability() {
-    var map = {}, save = current(), sigil = hasSigil();
+    var map = {}, save = current();
     if (!save) return map;
     [['campaign', save.campaign], ['adventure', save.adventure]].forEach(function (pair) {
       var block = pair[1];
       if (!block) return;
       block.events.forEach(function (ev) {
         var at = { block: block.label + (block.world ? ' (' + block.world + ')' : ''), event: ev.name, location: ev.location };
-        // The tower's rewards only count as available when you carry a Sigil.
-        if (ev.key === 'Cryptolith' && !sigil) return;
-        if (ev.key === 'IskalQueen') (map[SIGIL_KEY] = map[SIGIL_KEY] || []).push(at);
+        // Quest items this event drops (the Iskal Queen's Sigil, Ixillis' heart).
+        QUEST_ITEMS.forEach(function (q) { if (q.from === ev.key) (map[q.key] = map[q.key] || []).push(at); });
+        // Rewards handed out for a quest item or another item only count when you hold it.
+        var locked = [];
+        gatedAt(ev).forEach(function (q) { if (!carries(q)) locked = locked.concat(q.usedAt[ev.key].map(function (i) { return i.key; })); });
         var x = EXCHANGES[ev.key], ready = exchangeReady(ev);
         ev.items.forEach(function (p) {
+          if (locked.indexOf(p) >= 0) return;
           if (x && !ready && x.items.test(p)) return;
           (map[p] = map[p] || []).push(at);
         });
@@ -275,11 +372,14 @@
     return '<span class="st unk" title="Unknown">?</span>';
   }
 
-  // The Sigil counts as done when you carry one or already have every tower reward.
+  // A quest item counts as done when you carry one, already own everything it unlocks, or (story keys)
+  // your progress shows you used it; story keys with no trace are unknown.
   function itemOwned(it) {
-    if (it.sigil) {
+    if (it.quest) {
       if (!character()) return null;
-      return hasSigil() || CRYPTOLITH_REWARDS.every(function (r) { return state.owns(r) === true; });
+      if (carries(it) || questSeen(it)) return true;
+      if (!it.rewards.length) return null;
+      return it.rewards.every(function (r) { return state.owns(r) === true; });
     }
     return UNTRACKED[it.category] ? null : state.owns(it);
   }
@@ -368,12 +468,11 @@
     block.events.forEach(function (ev) {
       if (!state.worldZones[ev.zone] || !state.worldTypes[ev.type]) return;
       var items = ev.items.map(itemForPath);
-      // The Iskal Queen also gives the Cryptolith Sigil; it matters while a tower reward is still missing.
-      var sigilWanted = ev.key === 'IskalQueen' && CRYPTOLITH_REWARDS.some(function (it) { return itemOwned(it) !== true; });
-      if (sigilWanted) items.push(SIGIL);
-      var wanted = function (it) { return itemOwned(it) === false || (it.sigil && sigilWanted); };
+      // Quest items this event drops (Sigil from the Iskal Queen, heart from Ixillis), while something they unlock is missing.
+      QUEST_ITEMS.forEach(function (qi) { if (qi.from === ev.key && itemOwned(qi) !== true) items.push(qi); });
+      var wanted = function (it) { return itemOwned(it) === false; };
       if (!allCats) {
-        items = items.filter(function (it) { return it.sigil || state.worldCats[it.category]; });
+        items = items.filter(function (it) { return it.quest || state.worldCats[it.category]; });
         if (!items.length) return;
       }
       if (hideOwned) {
@@ -386,7 +485,11 @@
       shown++;
       rows.push('<tr><td class="loc">' + esc(ev.location) + wikiLink(ev.location) + '</td><td class="type"><span class="type-badge">' + esc(TYPE_LABEL[ev.type] || ev.type) +
         '</span></td><td class="name">' + esc(ev.name) +
-        (ev.key === 'Cryptolith' ? '<div class="cat">' + (hasSigil() ? 'You carry a Cryptolith Sigil — use it here.' : 'Needs a Cryptolith Sigil (Iskal Queen, Corsus).') + '</div>' : '') +
+        // Events that want a quest item: say which rewards need it and whether you carry it.
+        gatedAt(ev).map(function (qi) {
+          return '<div class="cat">' + esc(qi.usedAt[ev.key].length === qi.rewards.length ? 'Needs the ' + qi.name + '.' : qi.usedAt[ev.key].map(function (i) { return i.name; }).join(', ') + ' need the ' + qi.name + '.') +
+            (carries(qi) ? ' You carry it.' : '') + '</div>';
+        }).join('') +
         (EXCHANGES[ev.key] ? '<div class="cat">' + esc(EXCHANGES[ev.key].note) + (exchangeReady(ev) ? ' You have it.' : '') + '</div>' : '') + '</td><td>' +
         (items.length ? items.map(function (it) { return itemDetails(it); }).join('') : '<span class="cat">—</span>') + '</td></tr>');
     });
@@ -857,6 +960,12 @@
     });
     // Quest items that aren't regular gear (the Pocket Watch is also an amulet in the sheet).
     (x.questItems || []).filter(function (q) { return !q.item; }).forEach(function (q) { me.push('You carry <b>' + esc(q.name) + '</b>' + (q.item ? itemWikiLink(q.item) : '') + (/Sigil|Cryptolith/i.test(q.cls) ? ' — use it on a Cryptolith tower' : '')); });
+    // Quest items whose rewards aren't all yours yet (the Sigil has its own panel above).
+    QUEST_ITEMS.filter(function (qi) { return !qi.hide && itemOwned(qi) === false; }).forEach(function (qi) {
+      var miss = qi.rewards.filter(function (r) { return itemOwned(r) === false; });
+      me.push('<b>' + esc(qi.name) + '</b>' + (carries(qi) ? ' (you carry one)' : '') + ': still missing ' + miss.map(function (r) { return esc(r.name) + itemWikiLink(r); }).join(', ') +
+        '<div class="cat">' + esc(qi.how) + '</div>');
+    });
     if ((x.newItems || []).length) me.push('New items you haven\'t looked at: ' + x.newItems.map(esc).join(', '));
     prof.achievements.filter(function (a) { return a.target > 1 && a.value < a.target && a.value / a.target >= 0.5; }).forEach(function (a) {
       me.push('Almost there: <b>' + esc(a.name) + '</b> ' + num(a.value) + ' / ' + num(a.target));

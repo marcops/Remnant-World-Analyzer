@@ -87,7 +87,7 @@
     var containers = (file.root.props.Containers || []).filter(function (c) { return c && c.props && c.props.Blob; });
 
     var zones = {}, quests = [], loot = [], chests = [], objects = { broken: 0, opened: 0, unlocked: 0, switchedOn: 0, other: 0 }, flags = {};
-    var modes = [], conversations = [], keyItems = [], npcs = [], raw = [];
+    var modes = [], conversations = [], keyItems = [], npcs = [], raw = [], sockets = [], fuses = [];
 
     containers.forEach(function (c) {
       var key = String(c.props.Key), m = /Zone_(\d+)_(\d+)/.exec(key);
@@ -143,6 +143,10 @@
           var items = ((a.comps.Inventory || {}).Items || []).filter(function (it) { return it.ItemBP; }).map(function (it) { return LOOT_NAMES[className(it.ItemBP.path)] || CHAR.itemFromPath(it.ItemBP.path).name; });
           npcs.push({ name: splitWords(cls.replace(/^Character_/, '')), items: items, where: key.split('/').pop().split(':')[0] });
         } else if (!cls) {
+          // Key items placed in the world: sockets (D.A.T.L.A. Key, Founder's Key) and fuse boxes.
+          var socket = a.comps.ItemSocket && a.comps.ItemSocket.Slot;
+          if (socket && socket.SlottedType) sockets.push({ cls: className(socket.SlottedType.path), full: !!socket.bFull, where: key });
+          if (p.HasFuse === true) fuses.push({ where: key });
           var counted = false;
           if (p.Health === 0) { objects.broken++; counted = true; }
           if (p.Open === true) { objects.opened++; counted = true; }
@@ -230,6 +234,7 @@
       zones: zoneList, events: events, loot: loot, objects: objects,
       chests: { total: chests.length, open: chests.filter(function (c) { return c.open; }).length },
       modes: modes, flags: Object.keys(flags).sort(), conversations: conversations, keyItems: keyItems, npcs: npcs, cryptolith: cryptolith,
+      sockets: sockets, fuses: fuses,
       header: {
         newGame: !!top.NewGame, hasCampaign: !!top.HasMainCampaign, requiresFullGame: !!top.RequiresFullGame, lastRootSlot: top.LastActiveRootSlot,
         location: splitWords(className(top.LocationImage).replace(/^T_UI_Waypoint_|_A$/g, '')), uniqueIds: top.UniqueIDGenerator,
