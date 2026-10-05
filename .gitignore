@@ -3,5 +3,5 @@
 *.bak
 .DS_Store
 node_modules/
-# Wiki pages downloaded by tools/fetch-stats.ps1; only the generated js/stats.js is kept
+# Wiki pages cached by tools/update.ps1; only the generated js/wiki.js, js/stats.js and img/items are kept
 tools/source/wiki/

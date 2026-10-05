@@ -6,7 +6,7 @@
 //
 // Usage:
 //   node tools/build-data.mjs              rebuild js/data.js from the cached sources
-//   node tools/build-data.mjs --download   refresh the sheet CSVs first
+//   node tools/build-data.mjs --download   refresh the sheet CSVs first (tools/update.ps1 does this and everything else)
 //   node tools/build-data.mjs --report     also print items that could not be linked to a game path
 
 import fs from 'node:fs';

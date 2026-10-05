@@ -1,5 +1,5 @@
 // Generates js/stats.js from the Fextralife wiki pages cached in tools/source/wiki/
-// (download them first with tools/fetch-stats.ps1).
+// (tools/update.ps1 downloads them and runs this script).
 //
 //   weapons  base damage, RPS, magazine, range, crit chance, weak spot bonus (from the
 //            Hand Guns / Long Guns / Melee Weapons tables)

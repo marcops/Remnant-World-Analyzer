@@ -56,31 +56,33 @@ js/parser.js                          save and profile parsing (runs in the brow
 js/gvas.js                            reader for the game's property format (objects, nested character blobs)
 js/character.js                       character details and world stats built on js/gvas.js
 js/worldstate.js                      per-area state from the world save (quests, zones, chests, loot left behind)
-js/stats.js                           GENERATED — weapon, trait, ring, amulet, mod and armor set stats from the wiki
 js/dps.js                             DPS model; ring/amulet/set/mod effects are written out by hand in it
-tools/fetch-stats.ps1                 downloads the wiki pages into tools/source/wiki/ (not committed)
-tools/build-stats.mjs                 generates js/stats.js from those pages
 js/data.js                            GENERATED — items, events, locations
+js/wiki.js                            GENERATED — Fextralife wiki page and icon of each item
+js/stats.js                           GENERATED — weapon, trait, ring, amulet, mod and armor set stats from the wiki
+img/items/                            GENERATED — 64×64 item icons (from the wiki pages)
 js/version.js                         version and date shown in the footer — bump with every release
                                       (also softwareVersion/dateModified in index.html)
-tools/build-data.mjs                  generates js/data.js from tools/source/
+tools/update.ps1                      rebuilds all generated files in one run (see below)
+tools/build-data.mjs                  js/data.js from tools/source/ (sheet CSVs + GameInfo.xml)
+tools/build-stats.mjs                 js/stats.js from the cached wiki pages
 tools/overrides.mjs                   manual name → game path fixes
-js/wiki.js                            GENERATED — Fextralife wiki page of each item
-tools/build-wiki.ps1                  generates js/wiki.js, keeping only pages that exist
+tools/source/wiki/                    cached wiki pages (not committed)
 server.ps1, Start.bat                 local server for automatic mode
 test/parser.test.mjs                  tests
 ```
 
+All generated data comes from **one command** (Windows PowerShell; uses Node from PATH, or VS Code's bundled Node):
+
 ```sh
-node tools/build-data.mjs --download --report   # re-download the sheet and regenerate js/data.js
-powershell -ExecutionPolicy Bypass -File tools/build-wiki.ps1   # re-check item wiki pages (after build-data)
-powershell -ExecutionPolicy Bypass -File tools/fetch-stats.ps1  # download weapon/trait/ring/mod pages
-node tools/build-stats.mjs                     # …and regenerate js/stats.js from them
-node --test test/                              # data and parser tests
+powershell -ExecutionPolicy Bypass -File tools/update.ps1            # update: sheet, items, wiki pages, icons, stats
+powershell -ExecutionPolicy Bypass -File tools/update.ps1 -Refresh   # download everything again
+powershell -ExecutionPolicy Bypass -File tools/update.ps1 -Offline   # rebuild from the cache only
+node --test test/                                                    # data and parser tests
 RWA_SAVE=path/save_0.sav RWA_PROFILE=path/profile.sav node --test test/   # + with your own save
 ```
 
-`--report` lists sheet items that couldn't be linked to a game path, and game paths with no item; fix them in `tools/overrides.mjs`.
+It downloads only what isn't cached yet, so a normal run takes seconds. `node tools/build-data.mjs --report` lists sheet items that couldn't be linked to a game path, and game paths with no item; fix them in `tools/overrides.mjs`.
 
 ## Credits
 

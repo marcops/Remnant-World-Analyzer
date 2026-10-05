@@ -394,7 +394,7 @@
   function itemDetails(it, extra) {
     var meta = [it.category, it.world && WORLD_LABEL[it.world] !== undefined ? WORLD_LABEL[it.world] : it.world, it.mode && 'Mode: ' + it.mode, it.dlc && 'DLC: ' + it.dlc]
       .filter(Boolean).join(' · ');
-    return '<details class="item"><summary>' + statusIcon(itemOwned(it)) + ' ' + esc(it.name) + itemWikiLink(it) +
+    return '<details class="item"><summary>' + statusIcon(itemOwned(it)) + ' ' + ico(it.name) + esc(it.name) + itemWikiLink(it) +
       (it.category ? '<span class="cat">' + esc(it.category) + '</span>' : '') + (extra || '') + '</summary>' +
       '<div class="how">' + (it.how ? esc(it.how) : '<i>No description in the sheet.</i>') +
       (meta ? '<div class="meta">' + esc(meta) + '</div>' : '') + '</div></details>';
@@ -438,8 +438,13 @@
     return globe(WIKI[page.toLowerCase().replace(/[^a-z0-9]/g, '')], page);
   }
 
-  // Item pages come from js/wiki.js (tools/build-wiki.ps1), which only lists pages that exist.
+  // Item pages come from js/wiki.js (tools/update.ps1), which only lists pages that exist.
   function itemWikiLink(it) { return globe(RWA_WIKI.items[it.name], it.name); }
+  // Small picture of an item (img/items, from its wiki page); empty when there is none.
+  function ico(name) {
+    var src = RWA_WIKI.icons && RWA_WIKI.icons[name];
+    return src ? '<img class="ico" src="' + esc(src) + '" alt="" width="22" height="22" loading="lazy">' : '';
+  }
 
   function chip(label, on, attrs) { return '<span class="chip' + (on ? ' on' : '') + '" ' + attrs + '>' + esc(label) + '</span>'; }
 
@@ -676,15 +681,15 @@
       var e = l.entry;
       var mods = e.mods.map(function (m) { return '<span class="tag mode">' + esc(m.name) + (m.level ? ' +' + m.level : '') + '</span>'; }).join('');
       var qty = e.quantity != null && l.slot !== 6 ? ' <span class="cat">×' + e.quantity + '</span>' : '';
-      return '<tr><th>' + esc(l.label) + '</th><td>' + esc(e.name) + rowGlobe(e) + levelTag(e) + qty + mods + '</td></tr>';
+      return '<tr><th>' + esc(l.label) + '</th><td>' + ico(e.name) + esc(e.name) + rowGlobe(e) + levelTag(e) + qty + mods + '</td></tr>';
     }).join('') + '</table>';
 
-    var traits = leveled.length ? leveled.map(function (t) { return meter(esc(t.name) + rowGlobe(t), t.level, t.level / 20, t.level >= 20); }).join('') : '<p class="cat">No trait points spent yet.</p>';
+    var traits = leveled.length ? leveled.map(function (t) { return meter(ico(t.name) + esc(t.name) + rowGlobe(t), t.level, t.level / 20, t.level >= 20); }).join('') : '<p class="cat">No trait points spent yet.</p>';
 
     var tiles = function (rows) {
       return '<div class="tiles">' + rows.map(function (r) {
         var q = r.quantity != null ? r.quantity : 1;
-        return '<div class="tile' + (q ? '' : ' zero') + '"><span class="tq">' + num(q) + '</span><span class="tn">' + esc(r.name) + rowGlobe(r) + '</span></div>';
+        return '<div class="tile' + (q ? '' : ' zero') + '"><span class="tq">' + num(q) + '</span><span class="tn">' + ico(r.name) + esc(r.name) + rowGlobe(r) + '</span></div>';
       }).join('') + '</div>';
     };
     var resources = ch.resources.filter(function (r) { return r.name !== 'Dragon Heart upgrades'; });
@@ -693,12 +698,12 @@
     var arsenalList = function (cat) {
       var rows = ch.arsenal.filter(function (a) { return a.category === cat; });
       var up = rows.filter(function (a) { return a.level > 0; }), rest = rows.length - up.length;
-      return (up.length ? up.map(function (a) { return meter(esc(a.name) + rowGlobe(a), '+' + a.level, a.level / 20, a.level >= 20); }).join('') : '<p class="cat">None upgraded yet.</p>') +
+      return (up.length ? up.map(function (a) { return meter(ico(a.name) + esc(a.name) + rowGlobe(a), '+' + a.level, a.level / 20, a.level >= 20); }).join('') : '<p class="cat">None upgraded yet.</p>') +
         (rest ? '<p class="cat">' + rest + ' more owned at +0.</p>' : '');
     };
 
     var topKills = ch.kills.length ? ch.kills[0].kills : 0;
-    var kills = ch.kills.map(function (k) { return meter(esc(k.name) + rowGlobe(k), num(k.kills), topKills ? k.kills / topKills : 0); }).join('');
+    var kills = ch.kills.map(function (k) { return meter(ico(k.name) + esc(k.name) + rowGlobe(k), num(k.kills), topKills ? k.kills / topKills : 0); }).join('');
     var s = ch.stats;
     var statRows = [
       ['Weak spot kills', s.weakspotKills], ['Allies revived', s.revives], ['Times revived', s.timesRevived],
@@ -834,7 +839,7 @@
       if (!list.length) return '';
       return panel(mode + ' events', '<table class="kv">' + list.map(function (e) {
         var st = status(e);
-        var items = e.items.map(function (i) { return '<span class="evitem">' + (i.item ? statusIcon(itemOwned(i.item)) : '') + esc(i.name) + (i.item ? itemWikiLink(i.item) : '') + '</span>'; }).join('');
+        var items = e.items.map(function (i) { return '<span class="evitem">' + (i.item ? statusIcon(itemOwned(i.item)) : '') + ico(i.name) + esc(i.name) + (i.item ? itemWikiLink(i.item) : '') + '</span>'; }).join('');
         return '<tr><th><span class="st ' + st.cls + '">' + (st.cls === 'ok' ? '✔' : st.cls === 'miss' ? '✘' : '?') + '</span> ' + esc(e.name) +
           ' <span class="cat">' + esc(e.type) + (e.area ? ' · ' + esc(e.area) : '') + '</span>' + (e.area ? wikiLink(e.area) : '') + '</th><td>' +
           '<div class="cat">' + esc(st.text) + '</div>' + items + '</td></tr>';
@@ -1071,7 +1076,7 @@
       var sheet = e.items.filter(function (i) { return i.item; });
       var done = e.done ? true : e.type !== 'Item drop' ? false : sheet.length ? sheet.every(function (i) { return itemOwned(i.item) === true; }) : null;
       rows.push(statusIcon(done) + ' ' + esc(e.name) + ' <span class="cat">' + esc(e.type) + '</span>' +
-        (e.items.length ? '<div class="cat">' + e.items.map(function (i) { return (i.item ? statusIcon(itemOwned(i.item)) : '') + esc(i.name); }).join(', ') + '</div>' : ''));
+        (e.items.length ? '<div class="cat">' + e.items.map(function (i) { return (i.item ? statusIcon(itemOwned(i.item)) : '') + ico(i.name) + esc(i.name); }).join(', ') + '</div>' : ''));
     });
     z.links.filter(function (l) { return l.type !== 'Link'; }).forEach(function (l) {
       rows.push((l.type === 'Waypoint' ? '⚑ ' : '✚ ') + esc(l.label || (l.type === 'Waypoint' ? 'Waypoint' : 'Respawn checkpoint')) + (l.active ? '' : ' <span class="cat">inactive</span>'));
@@ -1283,7 +1288,7 @@
       var max = DPS.weaponDps(w.name, w.maxLevel, a.bonuses, on);
       var now = w.dps ? fmt(w.dps, 0) + ' DPS' : fmt(w.expectedHit, 0) + ' per hit';
       var top = max.dps ? fmt(max.dps, 0) + ' DPS' : fmt(max.expectedHit, 0) + ' per hit';
-      return '<tr><th>' + esc(w.name) + ' <span class="lvl">+' + w.level + '</span>' + (w.reloadBound ? ' <span class="cat">reload-bound</span>' : '') + '</th><td>' + now + '</td><td>' + top + '</td></tr>';
+      return '<tr><th>' + ico(w.name) + esc(w.name) + ' <span class="lvl">+' + w.level + '</span>' + (w.reloadBound ? ' <span class="cat">reload-bound</span>' : '') + '</th><td>' + now + '</td><td>' + top + '</td></tr>';
     }).join('') + '</table>';
 
     el.innerHTML = '<div class="summary">' + cards + '</div><div class="panels">' +

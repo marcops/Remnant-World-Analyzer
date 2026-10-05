@@ -88,6 +88,7 @@ table.events { width: 100%; border-collapse: collapse; background: var(--panel);
 .events td { border-top: 1px solid var(--line); padding: 8px 10px; vertical-align: top; }
 .events td.loc { color: var(--muted); font-size: 13px; width: 26%; }
 .wiki { text-decoration: none; font-size: 13px; opacity: .7; }
+.ico { width: 22px; height: 22px; object-fit: contain; vertical-align: middle; margin: -3px 5px -3px 0; }
 .wiki:hover { opacity: 1; }
 .events td.type { white-space: nowrap; font-size: 13px; width: 1%; }
 .events td.name { font-weight: 600; width: 18%; }
