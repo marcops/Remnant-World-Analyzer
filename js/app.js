@@ -231,7 +231,7 @@
   // milestones, world flags or key items the world save records).
   var QUEST_ITEMS = [
     {
-      id: 'sigil', name: 'Cryptolith Sigil', carried: /Sigil|Cryptolith/i, from: 'IskalQueen', hide: true,
+      id: 'sigil', name: 'Cryptolith Sigil', carried: /Sigil|Cryptolith/i, from: 'IskalQueen', hide: true, repeat: true,
       world: 'Corsus', dlc: 'Swamps of Corsus', rewards: CRYPTOLITH_REWARDS, usedAt: { Cryptolith: CRYPTOLITH_REWARDS },
       how: 'Drops from the Iskal Queen (Corsus, The Mist Fen). Use it on a Cryptolith tower — it can be in Earth, Rhom or Corsus — once per world, rerolling in between: ' +
         '1st use gives the Concentration trait, 2nd the Blood Bond trait, 3rd opens the Labyrinth room with the Labyrinth armor set (Labyrinth Helm, Armor and Greaves).',
@@ -239,6 +239,8 @@
     {
       id: 'heart', name: "Guardian's Heart", carried: /GuardiansHeart|Guardian_?Heart/i, from: 'SwampGuardian',
       world: 'Corsus', rewards: HEART_IKSAL.concat(HEART_UNDYING), usedAt: { IskalQueen: HEART_IKSAL, UndyingKing: HEART_UNDYING },
+      // Ixillis always drops the heart, so anything from that fight also shows you had it.
+      proof: HEART_IKSAL.concat(HEART_UNDYING, byName(['Guardian Axe', 'Hive Cannon', 'Executioner'])),
       how: 'Drops from Ixillis (Corsus). Give it to the Iskal Queen (Corsus) for the Crossbow and the Slayer set (Mask, Mantle, Boots), or take it to the Undying King on Rhom for the Riven. ' +
         'There is one heart per world and giving it to one locks the other out, so you need two worlds to get all of them.',
     },
@@ -280,7 +282,7 @@
       how: 'Spawns randomly anywhere on Earth. Give it to Ace in Ward 13 for the Magnum Revolver.' },
     { id: 'curio', name: 'Strange Curio', carried: /Curio/i, from: 'StuckMerchant', world: 'Yaesha', rewards: byName(['Radiant Visage', "Guardian's Blessing"]),
       how: 'In the back of the Stuck Merchant\'s wagon (Yaesha) — buy her Radiant Protector and Greaves first. Opens the Guardian Shrine: the Radiant Visage is on a statue at the end, and beating the Root Horror back at the wagon gives Guardian\'s Blessing.' },
-    { id: 'tarnishedring', name: 'Tarnished Ring', carried: /TarnishedRing/i, from: 'ReggiesRing', world: 'Earth', rewards: byName(['Scavenger']),
+    { id: 'tarnishedring', name: 'Tarnished Ring', carried: /TarnishedRing/i, from: 'ReggiesRing', world: 'Earth', rewards: byName(['Scavenger']), proof: [],
       how: 'Spawns at a random place on Earth. Give it to Reggie in Ward 13 (exhaust his dialogue) for the Scavenger trait — also earned by picking up 50,000 scrap.' },
     // Story and door keys: no collection item, recognised from your progress.
     { id: 'datla', name: 'D.A.T.L.A. Key', carried: /DATLA/i, world: 'Ward 13', rewards: [], seen: { socket: /DATLA/, achievements: ['Kill_Dreamer'], flags: ['Finished Game'] },
@@ -372,14 +374,19 @@
     return '<span class="st unk" title="Unknown">?</span>';
   }
 
-  // A quest item counts as done when you carry one, already own everything it unlocks, or (story keys)
-  // your progress shows you used it; story keys with no trace are unknown.
+  // A key item counts as yours when you carry one, the saves record handing it in, or you own something that
+  // only comes through it (`proof`, by default its rewards). The Sigil is used three times: it needs every reward.
+  // Story keys with no trace, and keys whose reward has another source (Tarnished Ring), are unknown.
   function itemOwned(it) {
     if (it.quest) {
       if (!character()) return null;
       if (carries(it) || questSeen(it)) return true;
+      if (it.repeat) return it.rewards.every(function (r) { return state.owns(r) === true; });
+      var proof = it.proof || it.rewards;
+      if (proof.some(function (r) { return state.owns(r) === true; })) return true;
       if (!it.rewards.length) return null;
-      return it.rewards.every(function (r) { return state.owns(r) === true; });
+      if (!proof.length) return it.rewards.every(function (r) { return state.owns(r) === true; }) ? null : false;
+      return false;
     }
     return UNTRACKED[it.category] ? null : state.owns(it);
   }
@@ -469,7 +476,7 @@
       if (!state.worldZones[ev.zone] || !state.worldTypes[ev.type]) return;
       var items = ev.items.map(itemForPath);
       // Quest items this event drops (Sigil from the Iskal Queen, heart from Ixillis), while something they unlock is missing.
-      QUEST_ITEMS.forEach(function (qi) { if (qi.from === ev.key && itemOwned(qi) !== true) items.push(qi); });
+      QUEST_ITEMS.forEach(function (qi) { if (qi.from === ev.key && (itemOwned(qi) !== true || qi.rewards.some(function (r) { return itemOwned(r) === false; }))) items.push(qi); });
       var wanted = function (it) { return itemOwned(it) === false; };
       if (!allCats) {
         items = items.filter(function (it) { return it.quest || state.worldCats[it.category]; });
@@ -961,9 +968,9 @@
     // Quest items that aren't regular gear (the Pocket Watch is also an amulet in the sheet).
     (x.questItems || []).filter(function (q) { return !q.item; }).forEach(function (q) { me.push('You carry <b>' + esc(q.name) + '</b>' + (q.item ? itemWikiLink(q.item) : '') + (/Sigil|Cryptolith/i.test(q.cls) ? ' — use it on a Cryptolith tower' : '')); });
     // Quest items whose rewards aren't all yours yet (the Sigil has its own panel above).
-    QUEST_ITEMS.filter(function (qi) { return !qi.hide && itemOwned(qi) === false; }).forEach(function (qi) {
+    QUEST_ITEMS.filter(function (qi) { return !qi.hide && qi.rewards.some(function (r) { return itemOwned(r) === false; }); }).forEach(function (qi) {
       var miss = qi.rewards.filter(function (r) { return itemOwned(r) === false; });
-      me.push('<b>' + esc(qi.name) + '</b>' + (carries(qi) ? ' (you carry one)' : '') + ': still missing ' + miss.map(function (r) { return esc(r.name) + itemWikiLink(r); }).join(', ') +
+      me.push('<b>' + esc(qi.name) + '</b>' + (carries(qi) ? ' (you carry one)' : itemOwned(qi) === true ? ' (you already had one — getting the rest needs another)' : '') + ': still missing ' + miss.map(function (r) { return esc(r.name) + itemWikiLink(r); }).join(', ') +
         '<div class="cat">' + esc(qi.how) + '</div>');
     });
     if ((x.newItems || []).length) me.push('New items you haven\'t looked at: ' + x.newItems.map(esc).join(', '));
