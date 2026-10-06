@@ -108,6 +108,11 @@ details.item[open] summary::before { content: "▾"; }
 .st.ok { color: var(--ok); }
 .st.miss { color: var(--miss); }
 .st.unk { color: var(--unknown); }
+/* Items you can't get yet (a key item or another item comes first): grey instead of red, with "needs …". */
+.blocked > summary, .evitem.blocked { color: var(--unknown); }
+.blocked .st.miss { color: var(--unknown); }
+.blocked .ico { opacity: .55; filter: grayscale(1); }
+.needs { display: inline-block; margin-left: 6px; padding: 0 6px; border: 1px dashed var(--line); border-radius: 10px; font-size: 11px; color: var(--muted); white-space: nowrap; }
 .cat { color: var(--muted); font-size: 12px; margin-left: 4px; }
 .tag { display: inline-block; font-size: 11px; padding: 0 6px; border-radius: 4px; margin-left: 4px; border: 1px solid var(--line); color: var(--muted); }
 .tag.now { border-color: var(--now); color: var(--now); }

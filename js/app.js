@@ -223,6 +223,7 @@
   //   from:    event that drops it, so the current world can list it
   //   usedAt:  events that only give these rewards for the item (not "available now" unless you carry it)
   //   hide:    the rewards are listed as this item instead (the Labyrinth set isn't something you pick up in Corsus)
+  //   notOnly: the rewards can also be earned without it (Scavenger: picking up 50,000 scrap)
   function byName(names) { return names.map(function (n) { return DATA.items.filter(function (i) { return i.name === n; })[0]; }).filter(Boolean); }
   var CRYPTOLITH_REWARDS = ((DATA.events.Cryptolith || {}).items || []).map(function (p) { return itemsByKey[p]; }).filter(Boolean);
   var HEART_IKSAL = byName(['Crossbow', 'Slayer Mask', 'Slayer Mantle', 'Slayer Boots']), HEART_UNDYING = byName(['Riven']);
@@ -282,7 +283,7 @@
       how: 'Spawns randomly anywhere on Earth. Give it to Ace in Ward 13 for the Magnum Revolver.' },
     { id: 'curio', name: 'Strange Curio', carried: /Curio/i, from: 'StuckMerchant', world: 'Yaesha', rewards: byName(['Radiant Visage', "Guardian's Blessing"]),
       how: 'In the back of the Stuck Merchant\'s wagon (Yaesha) — buy her Radiant Protector and Greaves first. Opens the Guardian Shrine: the Radiant Visage is on a statue at the end, and beating the Root Horror back at the wagon gives Guardian\'s Blessing.' },
-    { id: 'tarnishedring', name: 'Tarnished Ring', carried: /TarnishedRing/i, from: 'ReggiesRing', world: 'Earth', rewards: byName(['Scavenger']), proof: [],
+    { id: 'tarnishedring', name: 'Tarnished Ring', carried: /TarnishedRing/i, from: 'ReggiesRing', world: 'Earth', rewards: byName(['Scavenger']), proof: [], notOnly: true,
       how: 'Spawns at a random place on Earth. Give it to Reggie in Ward 13 (exhaust his dialogue) for the Scavenger trait — also earned by picking up 50,000 scrap.' },
     // Story and door keys: no collection item, recognised from your progress.
     { id: 'datla', name: 'D.A.T.L.A. Key', carried: /DATLA/i, world: 'Ward 13', rewards: [], seen: { socket: /DATLA/, achievements: ['Kill_Dreamer'], flags: ['Finished Game'] },
@@ -343,6 +344,32 @@
     return !!(need && state.owns && state.owns(need) === true);
   }
 
+  // What a missing item still needs that you don't have: a key item you aren't carrying and haven't
+  // used yet (the Akari set needs a Glowing Rod), or an item you don't own (the Bandit set needs the
+  // Pocket Watch). Empty when nothing blocks it. Shown greyed out with "needs …".
+  function blockedBy(it) {
+    if (!it || it.quest || !character() || itemOwned(it) !== false) return [];
+    var out = [];
+    var keys = QUEST_ITEMS.filter(function (q) { return !q.hide && !q.notOnly && q.rewards.indexOf(it) >= 0; });
+    // Any key of a chain is enough (Keycard → Fuse → Master Key for the Submachine Gun).
+    if (keys.length && !keys.some(function (q) { return carries(q) || questSeen(q); })) out.push(keys[0].name);
+    Object.keys(EXCHANGES).forEach(function (k) {
+      var x = EXCHANGES[k];
+      if (!x.items.test(it.key) || exchangeReady({ key: k })) return;
+      if (out.indexOf(x.needs) < 0) out.push(x.needs);
+    });
+    return out;
+  }
+  // One item of an event (World state, map): status, icon, name; greyed out with "needs …" when blocked.
+  function evItem(i, after) {
+    var needs = i.item ? needsTag(i.item) : '';
+    return '<div class="evitem' + (needs ? ' blocked' : '') + '">' + (i.item ? statusIcon(itemOwned(i.item)) : '') + ico(i.name) + esc(i.name) + (after || '') + needs + '</div>';
+  }
+  function needsTag(it) {
+    var b = blockedBy(it);
+    return b.length ? '<span class="needs" title="You can\'t get it before you have this">needs ' + esc(b.join(', ')) + '</span>' : '';
+  }
+
   // key -> where it can drop in the currently loaded world
   function availability() {
     var map = {}, save = current();
@@ -394,8 +421,9 @@
   function itemDetails(it, extra) {
     var meta = [it.category, it.world && WORLD_LABEL[it.world] !== undefined ? WORLD_LABEL[it.world] : it.world, it.mode && 'Mode: ' + it.mode, it.dlc && 'DLC: ' + it.dlc]
       .filter(Boolean).join(' · ');
-    return '<details class="item"><summary>' + statusIcon(itemOwned(it)) + ' ' + ico(it.name) + esc(it.name) + itemWikiLink(it) +
-      (it.category ? '<span class="cat">' + esc(it.category) + '</span>' : '') + (extra || '') + '</summary>' +
+    var needs = needsTag(it);
+    return '<details class="item' + (needs ? ' blocked' : '') + '"><summary>' + statusIcon(itemOwned(it)) + ' ' + ico(it.name) + esc(it.name) + itemWikiLink(it) +
+      (it.category ? '<span class="cat">' + esc(it.category) + '</span>' : '') + needs + (extra || '') + '</summary>' +
       '<div class="how">' + (it.how ? esc(it.how) : '<i>No description in the sheet.</i>') +
       (meta ? '<div class="meta">' + esc(meta) + '</div>' : '') + '</div></details>';
   }
@@ -839,7 +867,7 @@
       if (!list.length) return '';
       return panel(mode + ' events', '<table class="kv">' + list.map(function (e) {
         var st = status(e);
-        var items = e.items.map(function (i) { return '<span class="evitem">' + (i.item ? statusIcon(itemOwned(i.item)) : '') + ico(i.name) + esc(i.name) + (i.item ? itemWikiLink(i.item) : '') + '</span>'; }).join('');
+        var items = e.items.map(function (i) { return evItem(i, i.item ? itemWikiLink(i.item) : ''); }).join('');
         return '<tr><th><span class="st ' + st.cls + '">' + (st.cls === 'ok' ? '✔' : st.cls === 'miss' ? '✘' : '?') + '</span> ' + esc(e.name) +
           ' <span class="cat">' + esc(e.type) + (e.area ? ' · ' + esc(e.area) : '') + '</span>' + (e.area ? wikiLink(e.area) : '') + '</th><td>' +
           '<div class="cat">' + esc(st.text) + '</div>' + items + '</td></tr>';
@@ -1076,7 +1104,7 @@
       var sheet = e.items.filter(function (i) { return i.item; });
       var done = e.done ? true : e.type !== 'Item drop' ? false : sheet.length ? sheet.every(function (i) { return itemOwned(i.item) === true; }) : null;
       rows.push(statusIcon(done) + ' ' + esc(e.name) + ' <span class="cat">' + esc(e.type) + '</span>' +
-        e.items.map(function (i) { return '<div class="evitem">' + (i.item ? statusIcon(itemOwned(i.item)) : '') + ico(i.name) + esc(i.name) + '</div>'; }).join(''));
+        e.items.map(function (i) { return evItem(i); }).join(''));
     });
     z.links.filter(function (l) { return l.type !== 'Link'; }).forEach(function (l) {
       rows.push((l.type === 'Waypoint' ? '⚑ ' : '✚ ') + esc(l.label || (l.type === 'Waypoint' ? 'Waypoint' : 'Respawn checkpoint')) + (l.active ? '' : ' <span class="cat">inactive</span>'));

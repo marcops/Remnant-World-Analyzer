@@ -124,44 +124,44 @@
       }
     }
 
+    // Events the save doesn't list, placed with the ones it does, zone by zone.
+    var fixed = FIXED_EVENTS.filter(function (f) { return f.modes.indexOf(mode) !== -1; });
+    var placed = [];
     var out = [];
-    var campaign = mode === 'Campaign';
-    if (campaign) {
-      out.push(makeEvent('Ward13', 'Ward 13', 'Home', 'Earth: Ward 13', 'Earth'));
-      out.push(makeEvent('FoundersHideout', "Founder's Hideout", 'Point of Interest', 'Earth: Fairview', 'Earth'));
-    }
-    var churchAdded = false;
-    zoneEvents.Earth.forEach(function (ev) {
-      if (campaign && !churchAdded && ev.location.indexOf('Westcourt') !== -1) {
-        out.push.apply(out, churchEvents);
-        churchAdded = true;
-      }
-      out.push(ev);
+    ZONES.forEach(function (zone) {
+      var mine = fixed.filter(function (f) { return f.zone === zone; });
+      var put = function (f, location) {
+        if (placed.indexOf(f) !== -1) return;
+        placed.push(f);
+        if (f.church) out.push.apply(out, churchEvents);
+        else out.push(makeEvent(f.key, f.name, f.type, f.location || location, zone));
+      };
+      mine.forEach(function (f) { if (f.at === 'start') put(f); });
+      zoneEvents[zone].forEach(function (ev) {
+        mine.forEach(function (f) { if (f.before && (ev.key === f.before || ev.location.indexOf(f.before) !== -1)) put(f, ev.location); });
+        out.push(ev);
+      });
+      mine.forEach(function (f) { if (f.at === 'end') put(f); });
     });
-    out.push.apply(out, zoneEvents['Subject 2923']);
-    out.push.apply(out, zoneEvents.Rhom);
-    if (campaign) out.push(makeEvent('UndyingKing', 'Undying King', 'World Boss', 'Rhom: Undying Throne', 'Rhom'));
-    var queenAdded = false;
-    zoneEvents.Corsus.forEach(function (ev) {
-      if (campaign && !queenAdded && ev.location.indexOf('The Mist Fen') !== -1) {
-        out.push(makeEvent('IskalQueen', 'Iskal Queen', 'Point of Interest', 'Corsus: The Mist Fen', 'Corsus'));
-        queenAdded = true;
-      }
-      out.push(ev);
-    });
-    var navunAdded = false;
-    zoneEvents.Yaesha.forEach(function (ev) {
-      if (campaign && !navunAdded && ev.location.indexOf('The Scalding Glade') !== -1) {
-        out.push(makeEvent('SlaveRevolt', 'Fight With The Rebels', 'Siege', 'Yaesha: Shrine of the Immortals', 'Yaesha'));
-        navunAdded = true;
-      }
-      out.push(ev);
-    });
-    out.push.apply(out, zoneEvents.Reisum);
-    if (campaign) out.push(makeEvent('Ward17', 'The Dreamer', 'World Boss', 'Ward 17', 'Ward 17'));
-    if (mode === 'Subject2923') out.push(makeEvent('Ward17Root', 'Harsgaard', 'World Boss', 'Ward 17: Root Dimension', 'Ward 17'));
     return out;
   }
+
+  // Everything the world has that the save doesn't write as an event: Ward 13, fixed bosses and NPCs.
+  // modes: where it exists (Campaign, Subject2923, Adventure).
+  // at 'start' / 'end' of its zone, or `before` the first event with that key or location part
+  // (not added when that event isn't in the world); no `location` = the location of that event.
+  var FIXED_EVENTS = [
+    { key: 'Ward13', name: 'Ward 13', type: 'Home', location: 'Earth: Ward 13', zone: 'Earth', modes: ['Campaign'], at: 'start' },
+    { key: 'FoundersHideout', name: "Founder's Hideout", type: 'Point of Interest', location: 'Earth: Fairview', zone: 'Earth', modes: ['Campaign'], at: 'start' },
+    { church: true, zone: 'Earth', modes: ['Campaign'], before: 'Westcourt' },
+    { key: 'UndyingKing', name: 'Undying King', type: 'World Boss', location: 'Rhom: Undying Throne', zone: 'Rhom', modes: ['Campaign'], at: 'end' },
+    { key: 'IskalQueen', name: 'Iskal Queen', type: 'Point of Interest', location: 'Corsus: The Mist Fen', zone: 'Corsus', modes: ['Campaign'], before: 'The Mist Fen' },
+    // In adventure the Queen lives in her temple (Swamps of Corsus): her shop and Guardian's Heart rewards.
+    { key: 'IskalQueen', name: 'Iskal Queen', type: 'Point of Interest', zone: 'Corsus', modes: ['Adventure'], before: 'QueensTemple' },
+    { key: 'SlaveRevolt', name: 'Fight With The Rebels', type: 'Siege', location: 'Yaesha: Shrine of the Immortals', zone: 'Yaesha', modes: ['Campaign'], before: 'The Scalding Glade' },
+    { key: 'Ward17', name: 'The Dreamer', type: 'World Boss', location: 'Ward 17', zone: 'Ward 17', modes: ['Campaign'], at: 'end' },
+    { key: 'Ward17Root', name: 'Harsgaard', type: 'World Boss', location: 'Ward 17: Root Dimension', zone: 'Ward 17', modes: ['Subject2923'], at: 'end' },
+  ];
 
   function between(text, startMarker, endMarker) {
     var end = text.indexOf(endMarker);
