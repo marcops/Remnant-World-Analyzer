@@ -1392,8 +1392,9 @@
     if (!core.length) return '<p class="cat">No tile layout stored for this area (fixed map).</p>';
     var xs = core.map(function (t) { return t.x; }), ys = core.map(function (t) { return t.y; });
     var minX = Math.min.apply(null, xs), minY = Math.min.apply(null, ys), maxX = Math.max.apply(null, xs), maxY = Math.max.apply(null, ys);
-    var C = TILE_CELL, w = (maxX - minX + 1) * C, h = (maxY - minY + 1) * C;
-    var px = function (t) { return (t.x - minX) * C; }, py = function (t) { return (t.y - minY) * C; };
+    // The save's grid is turned 90° from the in-game map: its +Y is the map's right, its +X the map's up.
+    var C = TILE_CELL, w = (maxY - minY + 1) * C, h = (maxX - minX + 1) * C;
+    var px = function (t) { return (t.y - minY) * C; }, py = function (t) { return (maxX - t.x) * C; };
     var out = [];
     z.tiles.forEach(function (t) {
       if (t.kind !== 'vista' || t.x < minX || t.x > maxX || t.y < minY || t.y > maxY) return;
@@ -1402,7 +1403,8 @@
     // Corridors first so rooms sit on top of them.
     core.forEach(function (t) {
       var cx = px(t) + C / 2, cy = py(t) + C / 2;
-      WS.EDGES.forEach(function (e) { if (t.edges & e[0]) out.push('<line class="t-path" x1="' + cx + '" y1="' + cy + '" x2="' + (cx + e[1] * C / 2) + '" y2="' + (cy + e[2] * C / 2) + '"/>'); });
+      // Same turn for the passage directions (grid dx, dy -> screen dy, -dx).
+      WS.EDGES.forEach(function (e) { if (t.edges & e[0]) out.push('<line class="t-path" x1="' + cx + '" y1="' + cy + '" x2="' + (cx + e[2] * C / 2) + '" y2="' + (cy - e[1] * C / 2) + '"/>'); });
     });
     core.forEach(function (t) {
       var x = px(t), y = py(t);
@@ -1440,8 +1442,10 @@
     var bx = pick(0), by = pick(1);
     var cells = z.fow.filter(function (c) { return c[0] >= bx[0] && c[0] <= bx[1] && c[1] >= by[0] && c[1] <= by[1]; });
     var xs = cells.map(function (c) { return c[0]; }), ys = cells.map(function (c) { return c[1]; });
-    var minX = Math.min.apply(null, xs), minY = Math.min.apply(null, ys), w = Math.max.apply(null, xs) - minX + 1, h = Math.max.apply(null, ys) - minY + 1;
-    var d = cells.map(function (c) { return 'M' + (c[0] - minX) + ' ' + (c[1] - minY) + 'h1v1h-1z'; }).join('');
+    // Turned like the tile layout (90° counter-clockwise) to match the in-game map.
+    var maxX = Math.max.apply(null, xs), minX = Math.min.apply(null, xs), minY = Math.min.apply(null, ys);
+    var w = Math.max.apply(null, ys) - minY + 1, h = maxX - minX + 1;
+    var d = cells.map(function (c) { return 'M' + (c[1] - minY) + ' ' + (maxX - c[0]) + 'h1v1h-1z'; }).join('');
     var scale = Math.min(size ? 4 : 3, (size || 300) / Math.max(w, h));
     return '<svg class="zfog" viewBox="0 0 ' + w + ' ' + h + '" width="' + Math.round(w * scale) + '" height="' + Math.round(h * scale) + '" shape-rendering="crispEdges" role="img" aria-label="Explored part of ' + esc(z.name) + '"><path d="' + d + '"/></svg>';
   }
