@@ -1,4 +1,20 @@
+/* Light theme always, unless you pick the dark one with the ☾ button (saved in this browser). */
 :root {
+  --bg: #f5f3ef;
+  --panel: #ffffff;
+  --panel-2: #f0ede7;
+  --line: #dcd7cd;
+  --text: #23211d;
+  --muted: #6d6a63;
+  --accent: #b5601f;
+  --ok: #2f8a45;
+  --miss: #c23c36;
+  --unknown: #8a877f;
+  --now: #1f74ad;
+  --radius: 8px;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
   --bg: #15161a;
   --panel: #1e2026;
   --panel-2: #262932;
@@ -10,24 +26,7 @@
   --miss: #e0605a;
   --unknown: #8b8f9c;
   --now: #4fa3d9;
-  --radius: 8px;
   color-scheme: dark;
-}
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #f5f3ef;
-    --panel: #ffffff;
-    --panel-2: #f0ede7;
-    --line: #dcd7cd;
-    --text: #23211d;
-    --muted: #6d6a63;
-    --accent: #b5601f;
-    --ok: #2f8a45;
-    --miss: #c23c36;
-    --unknown: #8a877f;
-    --now: #1f74ad;
-    color-scheme: light;
-  }
 }
 
 * { box-sizing: border-box; }
@@ -62,6 +61,7 @@ kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4p
 
 /* Top right: the file being read, and under it the character picker. */
 .top-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.top-row { display: flex; gap: 8px; align-items: center; }
 .picker { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: flex-end; max-width: 100%; }
 .picker .btn { white-space: nowrap; }
 .picker select { max-width: 100%; min-width: 0; }

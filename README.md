@@ -23,6 +23,15 @@ Start.bat -SaveDir "D:\My saves\Remnant"
 
 Other options: `-Port 9000` (different port), `-NoBrowser` (don't open the browser).
 
+**From another PC or phone at home:** the window shows the address to open (e.g. `http://192.168.1.130:8765/`). Windows needs a one-time permission for that — in PowerShell **run as administrator**:
+
+```powershell
+netsh http add urlacl url=http://+:8765/ sddl=D:(A;;GX;;;WD)
+netsh advfirewall firewall add rule name="Remnant World Analyzer" dir=in action=allow protocol=TCP localport=8765 profile=private
+```
+
+and your home network must be set as **Private** (Settings › Network › your Wi-Fi › Private), then open Start.bat again. Until then the page works on this PC only. Anyone on your home network can then open the page and read your saves.
+
 > If Windows shows "Windows protected your PC" when opening the `.bat` from a ZIP download, click *More info → Run anyway*. The script only reads the save folder and serves the page on `http://localhost` — nothing leaves your PC.
 
 ### Manual (any OS, nothing to install)

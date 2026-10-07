@@ -1568,6 +1568,15 @@
       var text = $('save-path').textContent;
       (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () { $('copy-path').textContent = 'Copied!'; }, function () {});
     });
+    // Light / dark theme, remembered in this browser (index.html applies it before the page draws).
+    var showTheme = function () { $('theme').textContent = document.documentElement.dataset.theme === 'dark' ? '☀' : '☾'; };
+    showTheme();
+    $('theme').addEventListener('click', function () {
+      var dark = document.documentElement.dataset.theme !== 'dark';
+      if (dark) document.documentElement.dataset.theme = 'dark'; else delete document.documentElement.dataset.theme;
+      store('theme', dark ? 'dark' : 'light');
+      showTheme();
+    });
     $('reload').addEventListener('click', function () { $('loader').hidden = false; $('drop').scrollIntoView({ behavior: 'smooth' }); });
     $('character').addEventListener('change', function (e) { state.charIndex = +e.target.value; store('char', state.charIndex); render(); });
     document.querySelector('.tabs').addEventListener('click', function (e) {

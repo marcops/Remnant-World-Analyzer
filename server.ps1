@@ -1,8 +1,9 @@
 <#
   Remnant World Analyzer - local server.
 
-  Serves the page at http://localhost:8765, reads the saves straight from the game folder
-  and lets the page know when the game saves. Nothing is installed and nothing leaves your PC.
+  Serves the page at http://localhost:8765 (and to other PCs on your home network), reads the
+  saves straight from the game folder and lets the page know when the game saves.
+  Nothing is installed and nothing is sent to the internet.
 
   Normal use: double-click Start.bat.
   Options:  Start.bat -SaveDir "D:\other\folder" -Port 9000 -NoBrowser
@@ -21,13 +22,28 @@ $Mime = @{
   '.json' = 'application/json; charset=utf-8'; '.xml' = 'application/xml; charset=utf-8'; '.txt' = 'text/plain; charset=utf-8'; '.png' = 'image/png'; '.svg' = 'image/svg+xml'; '.ico' = 'image/x-icon'
 }
 
+# Listens on the whole network so other PCs at home can open the page. Windows only allows that
+# after a one-time permission (see the message printed below); until then it serves this PC only.
 function Start-Listener {
-  for ($p = $Port; $p -lt $Port + 10; $p++) {
-    $l = [System.Net.HttpListener]::new()
-    $l.Prefixes.Add("http://localhost:$p/")
-    try { $l.Start(); return @{ Listener = $l; Port = $p } } catch { $l.Close() }
+  foreach ($name in '+', 'localhost') {
+    for ($p = $Port; $p -lt $Port + 10; $p++) {
+      $l = [System.Net.HttpListener]::new()
+      $l.Prefixes.Add("http://${name}:$p/")
+      try { $l.Start(); return @{ Listener = $l; Port = $p; Lan = ($name -eq '+') } } catch { $l.Close() }
+    }
   }
   throw "No free port between $Port and $($Port + 9)."
+}
+
+# This PC's addresses on the home network (Wi-Fi / Ethernet).
+function Get-LanAddresses {
+  try {
+    @(Get-NetIPAddress -AddressFamily IPv4 -ErrorAction Stop | Where-Object {
+      $_.IPAddress -notlike '127.*' -and $_.IPAddress -notlike '169.254.*' -and $_.InterfaceAlias -notmatch 'vEthernet|Loopback|VirtualBox|VMware'
+    } | ForEach-Object { $_.IPAddress })
+  } catch {
+    @([Net.Dns]::GetHostAddresses([Net.Dns]::GetHostName()) | Where-Object { $_.AddressFamily -eq 'InterNetwork' -and -not $_.ToString().StartsWith('127.') } | ForEach-Object { $_.ToString() })
+  }
 }
 
 function Send($ctx, [int]$status, [string]$type, [byte[]]$bytes) {
@@ -104,6 +120,14 @@ $Host.UI.RawUI.WindowTitle = "Remnant World Analyzer - $url"
 Write-Host ''
 Write-Host '  Remnant World Analyzer' -ForegroundColor Yellow
 Write-Host "  Page:    $url"
+if ($server.Lan) {
+  foreach ($ip in (Get-LanAddresses)) { Write-Host "  Other PCs on your network:  http://${ip}:$($server.Port)/" -ForegroundColor Cyan }
+} else {
+  Write-Host '  Other PCs on your network can''t open it yet. Once, in PowerShell run as administrator:' -ForegroundColor DarkYellow
+  Write-Host "    netsh http add urlacl url=http://+:$Port/ sddl=D:(A;;GX;;;WD)"
+  Write-Host "    netsh advfirewall firewall add rule name=""Remnant World Analyzer"" dir=in action=allow protocol=TCP localport=$Port profile=private"
+  Write-Host '  then close this window and open Start.bat again.'
+}
 if (Test-Path -LiteralPath $SaveDir -PathType Container) {
   Write-Host "  Saves:   $SaveDir" -ForegroundColor Green
 } else {

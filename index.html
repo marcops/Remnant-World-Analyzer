@@ -7,7 +7,7 @@
   <meta name="description" content="Free Remnant: From the Ashes save analyzer: your world roll, missing items and key items, a map of every area, what to do next and your DPS.">
   <meta name="keywords" content="Remnant From the Ashes, Remnant 1, save analyzer, save checker, world analyzer, world roll, reroll checker, adventure mode, campaign reroll, missing items, item tracker, completionist checklist, 100% completion, rings, amulets, traits, weapon mods, armor sets, emotes, Survival mode, Hardcore mode, Swamps of Corsus, Subject 2923, Reisum, Ward Prime, save file location, world map, seed map, DPS calculator, build calculator, key items, Cryptolith Sigil, Labyrinth set, Guardian's Heart, Riven, Concentration, Blood Bond, Glowing Rod, Akari set, what to do next, character stats">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
-  <meta name="theme-color" content="#15161a">
+  <meta name="theme-color" content="#f5f3ef">
   <link rel="canonical" href="https://marcops.github.io/Remnant-World-Analyzer/">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2315161a'/%3E%3Ccircle cx='32' cy='32' r='18' fill='none' stroke='%23d9813f' stroke-width='6'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%23d9813f'/%3E%3C/svg%3E">
   <link rel="sitemap" type="application/xml" href="sitemap.xml">
@@ -41,7 +41,7 @@
         "operatingSystem": "Any (web browser); automatic mode on Windows",
         "browserRequirements": "Requires JavaScript",
         "isAccessibleForFree": true,
-        "softwareVersion": "2.9",
+        "softwareVersion": "2.10",
         "dateModified": "2026-10-07",
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
         "license": "https://www.gnu.org/licenses/gpl-3.0.html",
@@ -114,6 +114,8 @@
   }
   </script>
   <link rel="stylesheet" href="css/app.css">
+  <!-- Dark theme only when picked with the ☾ button; set before the page draws to avoid a flash. -->
+  <script>try { if (JSON.parse(localStorage.getItem('rwa.theme')) === 'dark') document.documentElement.dataset.theme = 'dark'; } catch (e) {}</script>
   <script src="js/version.js"></script>
   <script src="js/data.js"></script>
   <script src="js/wiki.js"></script>
@@ -132,7 +134,10 @@
       <p class="sub">Remnant: From the Ashes — what rolled in your world and what you still need to get</p>
     </div>
     <div class="top-right">
-      <div id="status" class="status" hidden></div>
+      <div class="top-row">
+        <div id="status" class="status" hidden></div>
+        <button id="theme" class="btn small" type="button" title="Dark / light theme" aria-label="Dark / light theme">☾</button>
+      </div>
       <div class="picker">
         <label class="field">Character
           <select id="character"></select>
@@ -289,7 +294,7 @@
 
   <section id="tab-credits" class="tab-panel credits" hidden>
     <h2>Version &amp; credits</h2>
-    <p class="version" id="version">Version 2.9 · Updated on <time datetime="2026-10-07">October 7, 2026</time></p>
+    <p class="version" id="version">Version 2.10 · Updated on <time datetime="2026-10-07">October 7, 2026</time></p>
     <p class="repo">Open source (GPL-3.0) — <a href="https://github.com/marcops/Remnant-World-Analyzer" target="_blank" rel="noopener">github.com/marcops/Remnant-World-Analyzer</a> · <a href="https://github.com/marcops/Remnant-World-Analyzer/archive/refs/heads/master.zip">download to run locally (automatic mode)</a></p>
     <h2>Credits</h2>
     <ul>
