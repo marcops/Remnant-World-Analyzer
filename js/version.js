@@ -1,3 +1,3 @@
 // Version shown in the page footer ("Version X · Updated on …"). Bump both with every release.
-var RWA_VERSION = { version: '2.8', date: '2026-10-06' };
+var RWA_VERSION = { version: '2.9', date: '2026-10-07' };
 if (typeof module !== 'undefined') module.exports = RWA_VERSION;

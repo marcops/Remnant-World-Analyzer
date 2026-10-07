@@ -21,6 +21,8 @@
     charIndex: null,
     tab: 'world', mode: 'adventure', mapMode: 'Adventure',
     worldZones: {}, worldTypes: {}, worldCats: {}, missingWorld: null, missingType: null, missingMode: null,
+    traitsShow: 'all', traitType: null, traitSel: null,
+    itemsShow: 'all', itemsType: null, itemsWorld: null, itemsMode: null, itemSel: null,
   };
   P.ZONES.forEach(function (z) { state.worldZones[z] = true; });
   Object.keys(TYPE_LABEL).forEach(function (t) { state.worldTypes[t] = true; });
@@ -176,8 +178,38 @@
     showLoadError('');
     $('loader').hidden = true;
     $('app').hidden = false;
+    document.body.classList.add('loaded');
+    if (state.tab === 'home') state.tab = 'world';
     if (!state.auto) setStatus('Manual · files loaded at ' + new Date().toLocaleTimeString(), false);
     render();
+  }
+
+  // Character card above the menu: class and level, time, difficulty, scrap and how much you've collected.
+  function renderWho() {
+    var ch = state.profile && state.profile.characters && state.profile.characters[state.charIndex];
+    var w = state.worlds && state.worlds[state.charIndex];
+    if (!ch && !w) { $('who').innerHTML = ''; return; }
+    var scrap = ch && (ch.resources || []).filter(function (r) { return r.name === 'Scrap'; })[0];
+    var have = 0, total = 0;
+    if (character()) TRACKED_ITEMS.forEach(function (it) { if (collectible(it)) { total++; if (itemOwned(it) === true) have++; } });
+    var pct = total ? Math.round(100 * have / total) : 0;
+    $('who').innerHTML = '<div class="name">' + esc(ch ? ch.archetype + ' · Level ' + ch.level : 'Character ' + (state.charIndex + 1)) + '</div>' +
+      '<div class="sub">' + esc([w && w.timePlayed ? duration(w.timePlayed) : '', w && w.difficulty, scrap ? num(scrap.quantity) + ' scrap' : ''].filter(Boolean).join(' · ')) + '</div>' +
+      (total ? '<div class="bar"><i style="width:' + pct + '%"></i></div><div class="xpl"><span>' + have + ' of ' + total + ' items</span><span>' + pct + '%</span></div>' : '');
+  }
+
+  // Which page is on screen. About and Version & credits are pages of their own and work before any
+  // save is loaded; the other sections need the saves (until then "Load your save" shows the drop zone).
+  var INFO_TABS = ['home', 'about', 'credits'];
+  function showPage() {
+    var loaded = document.body.classList.contains('loaded');
+    var page = !loaded && INFO_TABS.indexOf(state.tab) < 0 ? 'home' : state.tab;
+    var info = page === 'about' || page === 'credits';
+    document.querySelectorAll('.tab').forEach(function (b) { b.classList.toggle('active', b.dataset.tab === page); });
+    document.querySelectorAll('.tab-panel').forEach(function (p) { p.hidden = p.id !== 'tab-' + page; });
+    $('app').hidden = !loaded || info;
+    if (info) $('loader').hidden = true;
+    else if (!loaded) $('loader').hidden = false;
   }
 
   function render() {
@@ -185,15 +217,9 @@
     state.owns = P.ownership(character());
     state.available = availability();
     $('profile-note').hidden = !!character();
-    document.querySelectorAll('.tab').forEach(function (b) { b.classList.toggle('active', b.dataset.tab === state.tab); });
-    $('tab-world').hidden = state.tab !== 'world';
-    $('tab-missing').hidden = state.tab !== 'missing';
-    $('tab-character').hidden = state.tab !== 'character';
-    $('tab-build').hidden = state.tab !== 'build';
-    $('tab-state').hidden = state.tab !== 'state';
-    $('tab-map').hidden = state.tab !== 'map';
-    $('tab-tips').hidden = state.tab !== 'tips';
-    $('tab-raw').hidden = state.tab !== 'raw';
+    if (!$('tab-' + state.tab)) state.tab = 'world';
+    showPage();
+    renderWho();
     renderWorld();
     renderMissing();
     renderStateTab();
@@ -201,6 +227,8 @@
     renderTipsTab();
     renderRawTab();
     renderCharacterTab();
+    renderTraitsTab();
+    renderItemsTab();
     renderBuildTab();
   }
 
@@ -670,8 +698,203 @@
     $('missing-list').innerHTML = html || '<div class="empty">' + (hasProfile ? 'Nothing missing with these filters. 🎉' : 'Nothing matches these filters.') + '</div>';
   }
 
+  // ---- traits --------------------------------------------------------------
+  // Every trait as a picture: what you have (and its level), what you're missing, and a panel with
+  // what it does per level and how to get it.
+  var TRAITS = DATA.items.filter(function (it) { return it.category === 'Trait'; });
+  function traitType(it) {
+    var s = RWA_STATS.traits && RWA_STATS.traits[it.name];
+    return s && s.type ? s.type.replace(/\s+\)/, ')') : 'Other';
+  }
+  function traitLevels() {
+    var ch = state.profile && state.profile.characters && state.profile.characters[state.charIndex];
+    var lv = {};
+    ((ch && ch.traits) || []).forEach(function (t) { lv[t.name] = t.level; });
+    return lv;
+  }
+
+  function renderTraitsTab() {
+    var el = $('traits-view');
+    var hasProfile = !!character();
+    var lv = traitLevels();
+    var show = hasProfile ? state.traitsShow : 'all';
+    var rows = TRAITS.map(function (it) { return { it: it, owned: itemOwned(it), level: lv[it.name] || 0, type: traitType(it) }; });
+    var have = rows.filter(function (r) { return r.owned === true; }).length;
+    var ch = state.profile && state.profile.characters && state.profile.characters[state.charIndex];
+    var types = [];
+    rows.forEach(function (r) { if (types.indexOf(r.type) < 0) types.push(r.type); });
+    types.sort();
+
+    var list = rows.filter(function (r) {
+      if (show === 'owned' && r.owned !== true) return false;
+      if (show === 'missing' && r.owned === true) return false;
+      return !state.traitType || r.type === state.traitType;
+    });
+    var tile = function (r) {
+      var it = r.it, where = r.owned === true ? null : state.available[it.key];
+      var locked = r.owned === false ? blockedBy(it) : [];
+      var cls = 'ttile' + (r.owned === true ? ' owned' : r.owned == null ? '' : ' missing') + (locked.length ? ' blocked' : where ? ' now' : '') + (state.traitSel === it.name ? ' sel' : '');
+      return '<button type="button" class="' + cls + '" data-trait="' + esc(it.name) + '" title="' + esc(it.name + (locked.length ? ' — needs ' + locked.join(', ') : '')) + '">' +
+        (RWA_WIKI.icons && RWA_WIKI.icons[it.name] ? '<img src="' + esc(RWA_WIKI.icons[it.name]) + '" alt="" loading="lazy">' : '<span class="noimg"></span>') +
+        '<span class="n">' + esc(it.name) + '</span>' +
+        (r.owned === true ? '<span class="lv' + (r.level >= 20 ? ' max' : '') + '">' + (r.level ? r.level + ' / 20' : 'not leveled') + '</span><span class="tbar"><i style="width:' + Math.round(100 * r.level / 20) + '%"></i></span>'
+          : '<span class="lv">' + (locked.length ? '🔒 locked' : where ? 'in your world' : r.owned == null ? '?' : 'missing') + '</span>') + '</button>';
+    };
+    var section = function (title, rs) {
+      return rs.length ? '<h3 class="section-title more">' + esc(title) + ' (' + rs.length + ')</h3><div class="tgrid">' + rs.map(tile).join('') + '</div>' : '';
+    };
+    var owned = list.filter(function (r) { return r.owned === true; }).sort(function (a, b) { return b.level - a.level || a.it.name.localeCompare(b.it.name); });
+    var rest = list.filter(function (r) { return r.owned !== true; }).sort(function (a, b) {
+      var ra = state.available[a.it.key] ? 0 : 1, rb = state.available[b.it.key] ? 0 : 1;
+      return ra - rb || a.it.name.localeCompare(b.it.name);
+    });
+
+    el.innerHTML = '<div class="summary">' +
+      '<div class="card static"><div class="w">Traits</div><div class="n' + (have === TRAITS.length ? ' done' : ' neutral') + '">' + (hasProfile ? have + ' of ' + TRAITS.length : TRAITS.length) + '</div><div class="of">' + (hasProfile ? (TRAITS.length - have) + ' missing' : 'load profile.sav') + '</div></div>' +
+      (ch ? '<div class="card static"><div class="w">Points spent</div><div class="n neutral">' + num(ch.traitPointsSpent) + ' / ' + num(TRAIT_POINTS_MAX) + '</div><div class="of">' + num(ch.traitPoints) + ' earned · ' + num(Math.max(0, (ch.traitPoints || 0) - (ch.traitPointsSpent || 0))) + ' to spend</div></div>' +
+        '<div class="card static"><div class="w">At max</div><div class="n neutral">' + rows.filter(function (r) { return r.level >= 20; }).length + '</div><div class="of">traits at level 20</div></div>' : '') +
+      '</div>' +
+      '<div class="filters">' +
+      (hasProfile ? '<div class="seg" id="traits-show">' + [['all', 'All ' + TRAITS.length], ['owned', 'I have ' + have], ['missing', 'I don\'t have ' + (TRAITS.length - have)]].map(function (s) {
+        return '<button type="button" data-show="' + s[0] + '" class="' + (show === s[0] ? 'active' : '') + '">' + esc(s[1]) + '</button>';
+      }).join('') + '</div>' : '') +
+      '<div class="filter-row"><span class="filter-label">Type</span><div class="chips" id="traits-types">' +
+      '<span class="chip' + (!state.traitType ? ' on' : '') + '" data-type="">All</span>' +
+      types.map(function (t) { return '<span class="chip' + (state.traitType === t ? ' on' : '') + '" data-type="' + esc(t) + '">' + esc(t) + '</span>'; }).join('') +
+      '</div></div></div>' +
+      (owned.length || rest.length ? section('I have', owned) + section('I don\'t have', rest) : '<div class="empty">No traits with these filters.</div>');
+    renderTraitDrawer();
+  }
+
+  // Side panel of one trait.
+  function renderTraitDrawer() {
+    var el = $('trait-drawer');
+    // Only on the Traits page.
+    var it = state.tab === 'traits' && state.traitSel && TRAITS.filter(function (t) { return t.name === state.traitSel; })[0];
+    if (!it) { el.innerHTML = ''; return; }
+    var owned = itemOwned(it), level = traitLevels()[it.name] || 0;
+    var s = (RWA_STATS.traits && RWA_STATS.traits[it.name]) || {};
+    var where = owned === true ? null : state.available[it.key];
+    var locked = owned === false ? blockedBy(it) : [];
+    var row = function (k, v) { return v ? '<tr><th>' + esc(k) + '</th><td>' + esc(v) + '</td></tr>' : ''; };
+    el.innerHTML = '<aside class="tdrawer" role="dialog" aria-label="' + esc(it.name) + '"><button type="button" class="x" data-close-trait aria-label="Close">✕</button>' +
+      '<div class="hero">' + (RWA_WIKI.icons && RWA_WIKI.icons[it.name] ? '<img src="' + esc(RWA_WIKI.icons[it.name]) + '" alt="">' : '') + '</div>' +
+      '<h2>' + esc(it.name) + itemWikiLink(it) + '</h2>' +
+      '<p class="cat">' + esc(traitType(it)) + (it.world ? ' · ' + esc(WORLD_LABEL[it.world] || it.world) : '') + (it.mode ? ' · ' + esc(it.mode) : '') + (it.dlc ? ' · ' + esc(it.dlc) : '') + '</p>' +
+      '<p>' + statusIcon(owned) + ' ' + (owned === true ? 'You have it' + (level ? ' — level <b>' + level + ' / 20</b>' : ' — not leveled yet') : owned === false ? 'You don\'t have it' : 'Unknown (load profile.sav)') + '</p>' +
+      (owned === true ? '<div class="bar"><i style="width:' + Math.round(100 * level / 20) + '%"></i></div>' : '') +
+      (locked.length ? '<div class="how"><b>Needs first:</b> ' + esc(locked.join(', ')) + '</div>' : '') +
+      (where ? '<div class="where">In your world now: ' + where.map(function (x) { return esc(x.event + ' — ' + x.location) + wikiLink(x.location); }).join(' · ') + '</div>' : '') +
+      '<table class="kv">' + row('Effect', s.effect) + row('Per level', s.perLevel) + row('At level 20', s.max) + '</table>' +
+      '<h3 class="section-title more">How to get it</h3><div class="how">' + (it.how ? esc(it.how) : '<i>No description in the sheet.</i>') + '</div></aside>';
+  }
+
+  // ---- items (picture grid) ------------------------------------------------
+  // Same items as Missing items, as pictures by world: filter by what you have, type, world and mode;
+  // an item opens a panel on the side with its stats and how to get it.
+  function itemId(it) { return it.key || 'name:' + it.name; }
+  function typeLabel(it) { return it.category === 'Weapon' && it.group ? it.group : it.category; }
+  function iconImg(it) {
+    var src = RWA_WIKI.icons && RWA_WIKI.icons[it.name];
+    return src ? '<img src="' + esc(src) + '" alt="" loading="lazy">' : '<span class="noimg"></span>';
+  }
+
+  function renderItemsTab() {
+    var el = $('items-view');
+    var hasProfile = !!character();
+    var show = hasProfile ? state.itemsShow : 'all';
+    var q = $('items-search').value.trim().toLowerCase();
+    var typeTest = state.itemsType && testFor(COLLECTION, state.itemsType);
+    var modeTest = state.itemsMode && testFor(MODE_COLLECTION, state.itemsMode);
+    var all = TRACKED_ITEMS.filter(collectible);
+    // Counts on the chips: each group applies the other filters.
+    var keep = function (it, skip) {
+      if (skip !== 'type' && typeTest && !typeTest(it)) return false;
+      if (skip !== 'mode' && modeTest && !modeTest(it)) return false;
+      if (skip !== 'world' && state.itemsWorld != null && worldOf(it) !== state.itemsWorld) return false;
+      return true;
+    };
+    var have = all.filter(function (it) { return keep(it) && itemOwned(it) === true; }).length;
+    var total = all.filter(function (it) { return keep(it); }).length;
+    var chips = function (id, list, cur, skip) {
+      return '<div class="filter-row"><span class="filter-label">' + esc(skip) + '</span><div class="chips" id="' + id + '">' +
+        '<span class="chip' + (cur == null ? ' on' : '') + '" data-v="__all">All</span>' + list.map(function (x) {
+          var n = all.filter(function (it) { return keep(it, skip.toLowerCase()) && x.test(it); });
+          var h = n.filter(function (it) { return itemOwned(it) === true; }).length;
+          return n.length ? '<span class="chip' + (cur === x.value ? ' on' : '') + '" data-v="' + esc(x.value) + '">' + esc(x.label) + ' <small>' + (hasProfile ? h + '/' : '') + n.length + '</small></span>' : '';
+        }).join('') + '</div></div>';
+    };
+    var typeList = COLLECTION.map(function (c) { return { label: c[0], value: c[0], test: c[1] }; });
+    var modeList = MODE_COLLECTION.map(function (c) { return { label: c[0], value: c[0], test: c[1] }; });
+    var worldList = WORLD_ORDER.map(function (w) { return { label: WORLD_LABEL[w], value: w, test: function (it) { return worldOf(it) === w; } }; });
+
+    var groups = {};
+    all.forEach(function (it) {
+      if (!keep(it)) return;
+      var owned = itemOwned(it);
+      if (show === 'owned' && owned !== true) return;
+      if (show === 'missing' && owned === true) return;
+      if (q && (it.name + ' ' + it.how + ' ' + it.group).toLowerCase().indexOf(q) === -1) return;
+      var where = owned === true ? null : state.available[itemKeyForAvailability(it)];
+      (groups[worldOf(it)] = groups[worldOf(it)] || []).push({ it: it, owned: owned, where: where, locked: owned === false ? blockedBy(it) : [] });
+    });
+    var rank = function (r) { return r.owned === true ? 3 : r.locked.length ? 2 : r.where ? 0 : 1; };
+    var catOrder = function (it) { var i = COLLECTION.map(function (c) { return c[1](it); }).indexOf(true); return i < 0 ? 99 : i; };
+    var tile = function (r) {
+      var it = r.it, id = itemId(it);
+      var cls = 'ttile' + (r.owned === true ? ' owned' : r.owned == null ? '' : ' missing') + (r.locked.length ? ' blocked' : r.where ? ' now' : '') + (state.itemSel === id ? ' sel' : '');
+      var status = r.owned === true ? '✔ have it' : r.locked.length ? '🔒 needs ' + r.locked.join(', ') : r.where ? 'in your world' : r.owned == null ? '?' : 'missing';
+      return '<button type="button" class="' + cls + '" data-item="' + esc(id) + '" title="' + esc(it.name + (it.mode ? ' — ' + it.mode : '')) + '">' + iconImg(it) +
+        '<span class="n">' + esc(it.name) + '</span><span class="ty">' + esc(typeLabel(it)) + (it.mode ? ' · ' + esc(it.mode) : '') + '</span><span class="lv">' + esc(status) + '</span></button>';
+    };
+    var body = WORLD_ORDER.filter(function (w) { return groups[w]; }).map(function (w) {
+      var list = groups[w].sort(function (a, b) { return rank(a) - rank(b) || catOrder(a.it) - catOrder(b.it) || a.it.name.localeCompare(b.it.name); });
+      var h = list.filter(function (r) { return r.owned === true; }).length;
+      return '<div class="group"><h3>' + esc(WORLD_LABEL[w]) + ' <small>' + (hasProfile && show === 'all' ? h + ' of ' + list.length : list.length + ' items') + '</small></h3><div class="tgrid">' + list.map(tile).join('') + '</div></div>';
+    }).join('');
+
+    el.innerHTML = '<div class="filters">' +
+      (hasProfile ? '<div class="seg" id="items-show">' + [['all', 'All ' + total], ['owned', 'I have ' + have], ['missing', 'I don\'t have ' + (total - have)]].map(function (s) {
+        return '<button type="button" data-show="' + s[0] + '" class="' + (show === s[0] ? 'active' : '') + '">' + esc(s[1]) + '</button>';
+      }).join('') + '</div>' : '') +
+      chips('items-types', typeList, state.itemsType, 'Type') + chips('items-modes', modeList, state.itemsMode, 'Mode') + chips('items-worlds', worldList, state.itemsWorld, 'World') +
+      '</div>' + (body || '<div class="empty">No items with these filters.</div>');
+    renderItemDrawer();
+  }
+
+  // Side panel of one item.
+  function renderItemDrawer() {
+    var el = $('item-drawer');
+    var it = state.tab === 'items' && state.itemSel && TRACKED_ITEMS.filter(function (x) { return itemId(x) === state.itemSel; })[0];
+    if (!it) { el.innerHTML = ''; return; }
+    var owned = itemOwned(it);
+    var where = owned === true ? null : state.available[itemKeyForAvailability(it)];
+    var locked = owned === false ? blockedBy(it) : [];
+    var S = RWA_STATS || {};
+    var row = function (k, v) { return v || v === 0 ? '<tr><th>' + esc(k) + '</th><td>' + esc(String(v)) + '</td></tr>' : ''; };
+    var stats = '';
+    var w = S.weapons && S.weapons[it.name];
+    if (w) stats = row('Damage', w.damage + (w.damageNote ? ' (' + w.damageNote + ')' : '')) + row('Fire rate', w.rps ? w.rps + ' shots/s' : '') + row('Magazine', w.magazine) +
+      row('Ideal range', w.range ? w.range + ' m' : '') + row('Crit chance', w.crit ? w.crit + '%' : '') + row('Weak spot', w.weakspot ? '+' + w.weakspot + '%' : '') + row('Built-in mod', w.mod) + row('Special', w.special);
+    var fx = (it.category === 'Ring' && S.rings && S.rings[it.name]) || (it.category === 'Amulet' && S.amulets && S.amulets[it.name]) || (it.category === 'Mod' && S.mods && S.mods[it.name]);
+    if (fx) stats += row('Effect', fx.effect);
+    var set = it.category === 'Armor' && S.sets && S.sets[it.group];
+    if (set) stats += row('Set bonus', set.bonus + ' — ' + set.effect) + row('Per pieces', set.pieces.filter(Boolean).join(' · '));
+    el.innerHTML = '<aside class="tdrawer" role="dialog" aria-label="' + esc(it.name) + '"><button type="button" class="x" data-close-item aria-label="Close">✕</button>' +
+      '<div class="hero">' + (RWA_WIKI.icons && RWA_WIKI.icons[it.name] ? '<img src="' + esc(RWA_WIKI.icons[it.name]) + '" alt="">' : '') + '</div>' +
+      '<h2>' + esc(it.name) + itemWikiLink(it) + '</h2>' +
+      '<p class="cat">' + esc([typeLabel(it), WORLD_LABEL[worldOf(it)] || worldOf(it), it.mode, it.dlc, it.category === 'Armor' && it.group].filter(Boolean).join(' · ')) + '</p>' +
+      '<p>' + statusIcon(owned) + ' ' + (owned === true ? 'You have it' : owned === false ? 'You don\'t have it' : 'Unknown') + '</p>' +
+      (locked.length ? '<div class="how"><b>Needs first:</b> ' + esc(locked.join(', ')) + '</div>' : '') +
+      (where ? '<div class="where">In your world now: ' + where.map(function (x) { return esc(x.block + ' → ' + x.location + ' (' + x.event + ')') + wikiLink(x.location); }).join(' · ') + '</div>' : '') +
+      (stats ? '<table class="kv">' + stats + '</table>' : '') +
+      '<h3 class="section-title more">How to get it</h3><div class="how">' + (it.how ? esc(it.how) : '<i>No description in the sheet.</i>') + '</div></aside>';
+  }
+
   // ---- my character --------------------------------------------------------
   function num(n) { return Math.round(n).toLocaleString('en-US'); }
+  // Most trait points a character can have.
+  var TRAIT_POINTS_MAX = 640;
   function duration(sec) { var h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60); return h + 'h ' + (m < 10 ? '0' : '') + m + 'm'; }
   function rowGlobe(row) { return row.item ? itemWikiLink(row.item) : globe(RWA_WIKI.items[row.name], row.name); }
   function levelTag(row) { return row.level != null && (row.category === 'Weapon' || row.category === 'Armor') ? ' <span class="lvl">+' + row.level + '</span>' : ''; }
@@ -696,7 +919,7 @@
 
     var cards = [
       ['Character', 'Level ' + ch.level, ch.archetype + ' · ' + num(ch.experience) + ' XP'],
-      ['Traits', num(ch.traitPointsSpent) + ' points', leveled.length + ' traits leveled · ' + maxed + ' at max'],
+      ['Traits', num(ch.traitPointsSpent) + ' / ' + num(TRAIT_POINTS_MAX) + ' points', leveled.length + ' traits leveled · ' + maxed + ' at max · ' + num(ch.traitPoints) + ' earned'],
       world ? ['Time played', duration(world.timePlayed), world.difficulty ? world.difficulty + ' difficulty' : ''] : null,
       world && world.objective ? ['Current objective', world.objective, ''] : null,
       ['Dragon Heart', (heart && heart.entry.quantity != null ? heart.entry.quantity : '?') + ' charges', (res['Dragon Heart upgrades'] || 0) + ' upgrades · used ' + num(ch.dragonHeartUses) + ' times'],
@@ -760,7 +983,7 @@
       '<div class="summary">' + cards + '</div>' +
       '<div class="panels">' +
       panel('Loadout', loadout) +
-      panel('Traits (' + num(ch.traitPointsSpent) + ' / ' + num(ch.traitPoints) + ' points spent)', traits) +
+      panel('Traits (' + num(ch.traitPointsSpent) + ' / ' + num(ch.traitPoints) + ' points spent · max ' + num(TRAIT_POINTS_MAX) + ')', traits) +
       panel('Resources', tiles(resources)) +
       panel('Consumables', ch.consumables.length ? tiles(ch.consumables) : '<p class="cat">None.</p>') +
       panel('Weapon upgrades', arsenalList('Weapon')) +
@@ -1349,7 +1572,10 @@
     $('character').addEventListener('change', function (e) { state.charIndex = +e.target.value; store('char', state.charIndex); render(); });
     document.querySelector('.tabs').addEventListener('click', function (e) {
       var b = e.target.closest('.tab'); if (!b) return;
-      state.tab = b.dataset.tab; store('tab', state.tab); render();
+      state.tab = b.dataset.tab;
+      // Reopen on the last section with data, not on About.
+      if (INFO_TABS.indexOf(state.tab) < 0) store('tab', state.tab);
+      if (document.body.classList.contains('loaded')) render(); else showPage();
     });
     $('mode-switch').addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b) return;
@@ -1382,6 +1608,45 @@
       state.mapMode = b.dataset.mapMode; renderMapTab();
     });
     // Links from tips to the map: switch to the Map tab, then jump to the area.
+    // Items: have / don't have, type, mode, world, search; an item opens its panel on the side.
+    $('items-search').addEventListener('input', renderItemsTab);
+    $('items-view').addEventListener('click', function (e) {
+      var s = e.target.closest('[data-show]');
+      if (s) { state.itemsShow = s.dataset.show; renderItemsTab(); return; }
+      var c = e.target.closest('.chip[data-v]');
+      if (c) {
+        var key = { 'items-types': 'itemsType', 'items-modes': 'itemsMode', 'items-worlds': 'itemsWorld' }[c.parentNode.id];
+        var v = c.dataset.v === '__all' ? null : c.dataset.v;
+        state[key] = state[key] === v ? null : v; renderItemsTab(); return;
+      }
+      var b = e.target.closest('[data-item]');
+      if (b && !e.target.closest('a')) {
+        state.itemSel = state.itemSel === b.dataset.item ? null : b.dataset.item;
+        document.querySelectorAll('#items-view .ttile').forEach(function (x) { x.classList.toggle('sel', x.dataset.item === state.itemSel); });
+        renderItemDrawer();
+      }
+    });
+    $('item-drawer').addEventListener('click', function (e) {
+      if (e.target.closest('[data-close-item]')) { state.itemSel = null; renderItemsTab(); }
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && state.itemSel) { state.itemSel = null; renderItemsTab(); } });
+    // Traits: have / don't have, type, and a trait opens its panel on the side.
+    $('traits-view').addEventListener('click', function (e) {
+      var s = e.target.closest('[data-show]');
+      if (s) { state.traitsShow = s.dataset.show; renderTraitsTab(); return; }
+      var t = e.target.closest('#traits-types [data-type]');
+      if (t) { state.traitType = t.dataset.type || null; renderTraitsTab(); return; }
+      var b = e.target.closest('[data-trait]');
+      if (b) {
+        state.traitSel = state.traitSel === b.dataset.trait ? null : b.dataset.trait;
+        document.querySelectorAll('.ttile').forEach(function (x) { x.classList.toggle('sel', x.dataset.trait === state.traitSel); });
+        renderTraitDrawer();
+      }
+    });
+    $('trait-drawer').addEventListener('click', function (e) {
+      if (e.target.closest('[data-close-trait]')) { state.traitSel = null; renderTraitsTab(); }
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && state.traitSel) { state.traitSel = null; renderTraitsTab(); } });
     $('tips-view').addEventListener('click', function (e) {
       var a = e.target.closest('[data-goto-map]'); if (!a) return;
       e.preventDefault();
@@ -1423,5 +1688,6 @@
 
   showVersion();
   wire();
+  showPage();
   tryAuto();
 })();

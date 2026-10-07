@@ -41,8 +41,8 @@
         "operatingSystem": "Any (web browser); automatic mode on Windows",
         "browserRequirements": "Requires JavaScript",
         "isAccessibleForFree": true,
-        "softwareVersion": "2.8",
-        "dateModified": "2026-10-06",
+        "softwareVersion": "2.9",
+        "dateModified": "2026-10-07",
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
         "license": "https://www.gnu.org/licenses/gpl-3.0.html",
         "codeRepository": "https://github.com/marcops/Remnant-World-Analyzer",
@@ -131,10 +131,44 @@
       <h1>Remnant World Analyzer</h1>
       <p class="sub">Remnant: From the Ashes — what rolled in your world and what you still need to get</p>
     </div>
-    <div id="status" class="status" hidden></div>
+    <div class="top-right">
+      <div id="status" class="status" hidden></div>
+      <div class="picker">
+        <label class="field">Character
+          <select id="character"></select>
+        </label>
+        <button id="reload" class="btn small" type="button">Load other files</button>
+      </div>
+    </div>
   </header>
 
   <main>
+    <div class="layout">
+    <div class="sidebar">
+    <div class="who" id="who"></div>
+    <nav class="tabs" role="tablist">
+      <div class="navdata">
+          <div class="nav-sec">World</div>
+          <button class="tab active" data-tab="world" role="tab"><span class="ic">☰</span>Current world</button>
+          <button class="tab" data-tab="tips" role="tab"><span class="ic">✦</span>Tips</button>
+          <button class="tab" data-tab="map" role="tab"><span class="ic">⌗</span>Map</button>
+          <button class="tab" data-tab="state" role="tab"><span class="ic">◈</span>World state</button>
+          <div class="nav-sec">Collection</div>
+          <button class="tab" data-tab="items" role="tab"><span class="ic">▣</span>Items</button>
+          <button class="tab" data-tab="missing" role="tab"><span class="ic">▦</span>Missing items</button>
+          <button class="tab" data-tab="traits" role="tab"><span class="ic">✧</span>Traits</button>
+          <button class="tab" data-tab="character" role="tab"><span class="ic">☺</span>My character</button>
+          <button class="tab" data-tab="build" role="tab"><span class="ic">⚔</span>Build &amp; DPS</button>
+          <div class="nav-sec">Advanced</div>
+          <button class="tab" data-tab="raw" role="tab"><span class="ic">{}</span>Raw data</button>
+      </div>
+      <div class="nav-sec">Info</div>
+      <button class="tab" data-tab="home" id="nav-home" role="tab"><span class="ic">⇪</span>Load your save</button>
+      <button class="tab" data-tab="about" role="tab"><span class="ic">ⓘ</span>About</button>
+      <button class="tab" data-tab="credits" role="tab"><span class="ic">♥</span>Version &amp; credits</button>
+    </nav>
+    </div>
+    <div class="panels-area">
     <section id="loader" class="loader">
       <div id="drop" class="drop" tabindex="0">
         <p class="drop-title">Drop <b>save_N.sav</b> and <b>profile.sav</b> here</p>
@@ -149,24 +183,8 @@
     </section>
 
     <section id="app" hidden>
-      <div class="toolbar">
-        <label class="field">Character
-          <select id="character"></select>
-        </label>
-        <p id="profile-note" class="note" hidden>No <b>profile.sav</b>: can't tell what you already have. Load profile.sav too.</p>
-        <button id="reload" class="btn small" type="button">Load other files</button>
-      </div>
+      <p id="profile-note" class="note" hidden>No <b>profile.sav</b>: can't tell what you already have. Load profile.sav too.</p>
 
-      <nav class="tabs" role="tablist">
-        <button class="tab active" data-tab="world" role="tab">Current world</button>
-        <button class="tab" data-tab="missing" role="tab">Missing items</button>
-        <button class="tab" data-tab="tips" role="tab">Tips</button>
-        <button class="tab" data-tab="state" role="tab">World state</button>
-        <button class="tab" data-tab="map" role="tab">Map</button>
-        <button class="tab" data-tab="character" role="tab">My character</button>
-        <button class="tab" data-tab="build" role="tab">Build &amp; DPS</button>
-        <button class="tab" data-tab="raw" role="tab">Raw data</button>
-      </nav>
 
       <div id="tab-world" class="tab-panel">
         <div class="seg" id="mode-switch"></div>
@@ -216,6 +234,15 @@
         <div id="raw-view"></div>
       </div>
 
+      <div id="tab-items" class="tab-panel" hidden>
+        <div class="filters"><input id="items-search" type="search" placeholder="Search item or how to obtain…"></div>
+        <div id="items-view"></div>
+      </div>
+
+      <div id="tab-traits" class="tab-panel" hidden>
+        <div id="traits-view"></div>
+      </div>
+
       <div id="tab-character" class="tab-panel" hidden>
         <div id="character-view"></div>
       </div>
@@ -224,16 +251,17 @@
         <div id="build-view"></div>
       </div>
     </section>
-  </main>
 
-  <section class="about">
+  <section id="tab-about" class="tab-panel about" hidden>
     <h2>About Remnant World Analyzer</h2>
     <p>A free save analyzer for <b>Remnant: From the Ashes</b>. Load your save and it shows which bosses, minibosses, side dungeons, sieges, points of interest and item drops rolled in your <b>campaign</b> or <b>adventure</b>, what each event drops, and every weapon, armor piece, ring, amulet, mod, trait, emote and key item you already have or are still missing — by world (Earth, Subject 2923, Rhom, Corsus, Yaesha, Reisum, Ward 13, Ward 17, Ward Prime), by item type and by game mode (Normal, Survival, Hardcore). Includes the Swamps of Corsus and Subject 2923 DLC.</p>
     <p>Use it as a <b>world roll checker</b> before deciding to reroll your campaign or adventure mode, as a <b>completionist checklist</b> and <b>item tracker</b> on your way to 100%, as a <b>map of your world</b>, as a <b>DPS calculator</b> for your build, or to find out <b>what to do next</b> and <b>where to farm</b> a specific ring, amulet, trait or weapon. It is free, needs no install or account, and works in any browser. (For Remnant: From the Ashes only — Remnant II uses a different save format.)</p>
     <h3>What it shows</h3>
     <ul class="about-list">
       <li><b>Current world</b> — every event in your campaign or adventure, where it is and what it drops, marked owned (✔) or missing (✘).</li>
+      <li><b>Items</b> — every weapon, armor piece, amulet, ring, mod, trait, emote and key item as a picture, filtered by what you have or don't have, type, mode and world; click one for its stats from the wiki and how to get it.</li>
       <li><b>Missing items</b> — "x of y" with percentages by item type and by world, plus the 29 <b>key items</b> (Cryptolith Sigil, Guardian's Heart, Glowing Rod, Acid Cleaned Key…), with what drops in your current world flagged.</li>
+      <li><b>Traits</b> — all 50 traits with your level in each, trait points spent out of 640, and what every trait gives per level.</li>
       <li><b>Tips</b> — what to do next, worked out from your save: gear and trait books left on the ground, events with items you don't have, merchants selling what you're missing, closed chests, unspent trait points, upgrades, the Cryptolith questline and the best world to reroll.</li>
       <li><b>World state</b> — events completed, chests opened per area, merchant stock, NPC conversations, key items and time played per mode.</li>
       <li><b>Map</b> — every area of your world drawn from the save: tiles, events, waypoints, chests and loot per tile, and the path you walked.</li>
@@ -259,8 +287,9 @@
     <p>No. The files are read by your own browser; nothing is sent to any server.</p>
   </section>
 
-  <footer class="credits">
-    <p class="version" id="version">Version 2.8 · Updated on <time datetime="2026-10-06">October 6, 2026</time></p>
+  <section id="tab-credits" class="tab-panel credits" hidden>
+    <h2>Version &amp; credits</h2>
+    <p class="version" id="version">Version 2.9 · Updated on <time datetime="2026-10-07">October 7, 2026</time></p>
     <p class="repo">Open source (GPL-3.0) — <a href="https://github.com/marcops/Remnant-World-Analyzer" target="_blank" rel="noopener">github.com/marcops/Remnant-World-Analyzer</a> · <a href="https://github.com/marcops/Remnant-World-Analyzer/archive/refs/heads/master.zip">download to run locally (automatic mode)</a></p>
     <h2>Credits</h2>
     <ul>
@@ -277,6 +306,11 @@
         <a href="https://github.com/chris-faulkner/Remnant-World-Analyzer" target="_blank" rel="noopener">chris-faulkner</a>.</li>
       <li>/u/FAOAB on Reddit, for the <a href="https://docs.google.com/spreadsheets/d/1VzmDx0ZXQWN5N_9_zP0gEqToyuB9ZjlxgZOEGdiuA6A" target="_blank" rel="noopener">name spreadsheet</a> used by the original.</li>
     </ul>
-  </footer>
+  </section>
+    </div>
+    </div>
+  </main>
+  <div id="trait-drawer"></div>
+  <div id="item-drawer"></div>
 </body>
 </html>
