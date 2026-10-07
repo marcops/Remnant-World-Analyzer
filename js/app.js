@@ -908,7 +908,9 @@
       if (show === 'owned' && owned !== true) return;
       if (show === 'missing' && owned === true) return;
       if (q && (it.name + ' ' + it.how + ' ' + it.group).toLowerCase().indexOf(q) === -1) return;
-      var where = owned === true ? null : state.available[itemKeyForAvailability(it)];
+      // Skins can always be bought in Ward 13, so they aren't flagged as "in your world": a skin you
+      // don't have looks faded like any other missing item.
+      var where = owned === true || it.category === 'Skin' ? null : state.available[itemKeyForAvailability(it)];
       (groups[worldOf(it)] = groups[worldOf(it)] || []).push({ it: it, owned: owned, where: where, locked: owned === false ? blockedBy(it) : [] });
     });
     var rank = function (r) { return r.owned === true ? 3 : r.locked.length ? 2 : r.where ? 0 : 1; };
