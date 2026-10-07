@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 
@@ -29,5 +30,17 @@ jobs:
       - uses: actions/upload-pages-artifact@v5
         with:
           path: .
+      # In one job the deploy step can ask for the package before GitHub lists it ("Found 0
+      # artifact(s)"), so wait until it shows up.
+      - name: Wait for the site package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in $(seq 1 30); do
+            n=$(gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" --jq '[.artifacts[] | select(.name == "github-pages")] | length')
+            if [ "$n" -ge 1 ]; then echo "package listed after $((i * 5 - 5))s"; exit 0; fi
+            sleep 5
+          done
+          echo "the site package never showed up"; exit 1
       - id: deploy
         uses: actions/deploy-pages@v5
