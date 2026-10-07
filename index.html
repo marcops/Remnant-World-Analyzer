@@ -41,7 +41,7 @@
         "operatingSystem": "Any (web browser); automatic mode on Windows",
         "browserRequirements": "Requires JavaScript",
         "isAccessibleForFree": true,
-        "softwareVersion": "2.10",
+        "softwareVersion": "2.11",
         "dateModified": "2026-10-07",
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
         "license": "https://www.gnu.org/licenses/gpl-3.0.html",
@@ -171,6 +171,7 @@
       <button class="tab" data-tab="home" id="nav-home" role="tab"><span class="ic">⇪</span>Load your save</button>
       <button class="tab" data-tab="about" role="tab"><span class="ic">ⓘ</span>About</button>
       <button class="tab" data-tab="credits" role="tab"><span class="ic">♥</span>Version &amp; credits</button>
+      <button class="tab" data-tab="notes" role="tab"><span class="ic">✎</span>Release notes</button>
     </nav>
     </div>
     <div class="panels-area">
@@ -240,6 +241,7 @@
       </div>
 
       <div id="tab-items" class="tab-panel" hidden>
+        <div id="items-cards"></div>
         <div class="filters"><input id="items-search" type="search" placeholder="Search item or how to obtain…"></div>
         <div id="items-view"></div>
       </div>
@@ -259,58 +261,125 @@
 
   <section id="tab-about" class="tab-panel about" hidden>
     <h2>About Remnant World Analyzer</h2>
-    <p>A free save analyzer for <b>Remnant: From the Ashes</b>. Load your save and it shows which bosses, minibosses, side dungeons, sieges, points of interest and item drops rolled in your <b>campaign</b> or <b>adventure</b>, what each event drops, and every weapon, armor piece, ring, amulet, mod, trait, emote and key item you already have or are still missing — by world (Earth, Subject 2923, Rhom, Corsus, Yaesha, Reisum, Ward 13, Ward 17, Ward Prime), by item type and by game mode (Normal, Survival, Hardcore). Includes the Swamps of Corsus and Subject 2923 DLC.</p>
-    <p>Use it as a <b>world roll checker</b> before deciding to reroll your campaign or adventure mode, as a <b>completionist checklist</b> and <b>item tracker</b> on your way to 100%, as a <b>map of your world</b>, as a <b>DPS calculator</b> for your build, or to find out <b>what to do next</b> and <b>where to farm</b> a specific ring, amulet, trait or weapon. It is free, needs no install or account, and works in any browser. (For Remnant: From the Ashes only — Remnant II uses a different save format.)</p>
-    <h3>What it shows</h3>
-    <ul class="about-list">
-      <li><b>Current world</b> — every event in your campaign or adventure, where it is and what it drops, marked owned (✔) or missing (✘).</li>
-      <li><b>Items</b> — every weapon, armor piece, amulet, ring, mod, trait, emote and key item as a picture, filtered by what you have or don't have, type, mode and world; click one for its stats from the wiki and how to get it.</li>
-      <li><b>Missing items</b> — "x of y" with percentages by item type and by world, plus the 29 <b>key items</b> (Cryptolith Sigil, Guardian's Heart, Glowing Rod, Acid Cleaned Key…), with what drops in your current world flagged.</li>
-      <li><b>Traits</b> — all 50 traits with your level in each, trait points spent out of 640, and what every trait gives per level.</li>
-      <li><b>Tips</b> — what to do next, worked out from your save: gear and trait books left on the ground, events with items you don't have, merchants selling what you're missing, closed chests, unspent trait points, upgrades, the Cryptolith questline and the best world to reroll.</li>
-      <li><b>World state</b> — events completed, chests opened per area, merchant stock, NPC conversations, key items and time played per mode.</li>
-      <li><b>Map</b> — every area of your world drawn from the save: tiles, events, waypoints, chests and loot per tile, and the path you walked.</li>
-      <li><b>My character</b> — level, loadout with upgrade levels and mods, traits, resources, kills per weapon, deaths per quest and achievement progress.</li>
-      <li><b>Build &amp; DPS</b> — damage per second of your guns with your weapon levels, traits, rings, amulet and armor set, and how many summons your weapon mods give.</li>
-      <li><b>Raw data</b> — everything stored in your save files, browsable.</li>
-    </ul>
-    <h3>Where are the Remnant: From the Ashes save files?</h3>
-    <p>On PC (Steam and Epic) they are in <code>%LOCALAPPDATA%\Remnant\Saved\SaveGames</code>. <code>save_0.sav</code> is character 1, <code>save_1.sav</code> is character 2, and <code>profile.sav</code> holds the items every character owns.</p>
-    <h3>How do I see what is missing in my Remnant world?</h3>
-    <p>Drop your <code>save_N.sav</code> and <code>profile.sav</code> on this page. The <b>Current world</b> tab lists every event in your campaign or adventure with its items; the <b>Missing items</b> tab counts what you still need by world and item type and highlights what you can get in your current world right now; the <b>Tips</b> tab tells you what to do next.</p>
-    <h3>How do I get the Cryptolith Sigil and the Labyrinth set?</h3>
-    <p>The Cryptolith Sigil drops from the Iskal Queen in Corsus (The Mist Fen). Use it on a Cryptolith tower — it can spawn in Earth, Rhom or Corsus — once per world, rerolling in between: the 1st use gives the Concentration trait, the 2nd the Blood Bond trait, the 3rd opens the Labyrinth room with the Labyrinth armor set. The Tips tab shows whether you carry a Sigil, how many times you used the tower and whether your world has one.</p>
-    <h3>Should I give the Guardian's Heart to the Iskal Queen or the Undying King?</h3>
-    <p>The Guardian's Heart drops from Ixillis in Corsus, one per world. The Iskal Queen gives the Crossbow and the Slayer set for it; the Undying King on Rhom gives the Riven. Giving it to one locks the other out, so you need two worlds for all of them. Remnant World Analyzer tracks which of these rewards you already have.</p>
-    <h3>Is there a DPS calculator for Remnant: From the Ashes?</h3>
-    <p>Yes — the <b>Build &amp; DPS</b> tab estimates the damage per second of your equipped guns and every weapon you own, from the wiki's weapon stats, your upgrade levels and the bonuses of your traits (Executioner, Kingslayer, Exploiter, Mind's Eye, Trigger Happy…), rings, amulet and armor set. Conditional bonuses can be switched on, and it counts the summons of your two weapon mods.</p>
-    <h3>Can I see a map of my Remnant world?</h3>
-    <p>Yes — the <b>Map</b> tab draws every area of your campaign and adventure from the save, with events, waypoints, chests and loot on each tile, next to the path you walked there.</p>
-    <h3>Does it update while I play?</h3>
-    <p>Run it locally with <b>Start.bat</b> (Windows): it finds your save folder by itself and refreshes the page every time the game saves. In the browser, drop the files again to refresh.</p>
-    <h3>Are my save files uploaded?</h3>
-    <p>No. The files are read by your own browser; nothing is sent to any server.</p>
+    <div class="ibox">
+      <p>A free save analyzer for <b>Remnant: From the Ashes</b>. Load your save and it shows which bosses, minibosses, side dungeons, sieges, points of interest and item drops rolled in your <b>campaign</b> or <b>adventure</b>, what each event drops, and every weapon, armor piece, ring, amulet, mod, trait, emote and key item you already have or are still missing — by world (Earth, Subject 2923, Rhom, Corsus, Yaesha, Reisum, Ward 13, Ward 17, Ward Prime), by item type and by game mode (Normal, Survival, Hardcore). Includes the Swamps of Corsus and Subject 2923 DLC.</p>
+      <p>Use it as a <b>world roll checker</b> before deciding to reroll your campaign or adventure mode, as a <b>completionist checklist</b> and <b>item tracker</b> on your way to 100%, as a <b>map of your world</b>, as a <b>DPS calculator</b> for your build, or to find out <b>what to do next</b> and <b>where to farm</b> a specific ring, amulet, trait or weapon. It is free, needs no install or account, and works in any browser. (For Remnant: From the Ashes only — Remnant II uses a different save format.)</p>
+    </div>
+    <div class="ibox">
+      <h3>What it shows</h3>
+      <ul class="about-list">
+        <li><b>Current world</b> — every event in your campaign or adventure, where it is and what it drops, marked owned (✔) or missing (✘).</li>
+        <li><b>Items</b> — every weapon, armor piece, amulet, ring, mod, trait, emote and key item as a picture, filtered by what you have or don't have, type, mode and world; click one for its stats from the wiki and how to get it.</li>
+        <li><b>Missing items</b> — "x of y" with percentages by item type and by world, plus the 29 <b>key items</b> (Cryptolith Sigil, Guardian's Heart, Glowing Rod, Acid Cleaned Key…), with what drops in your current world flagged.</li>
+        <li><b>Traits</b> — all 50 traits with your level in each, trait points spent out of 640, and what every trait gives per level.</li>
+        <li><b>Tips</b> — what to do next, worked out from your save: gear and trait books left on the ground, events with items you don't have, merchants selling what you're missing, closed chests, unspent trait points, upgrades, the Cryptolith questline and the best world to reroll.</li>
+        <li><b>World state</b> — events completed, chests opened per area, merchant stock, NPC conversations, key items and time played per mode.</li>
+        <li><b>Map</b> — every area of your world drawn from the save: tiles, events, waypoints, chests and loot per tile, and the path you walked.</li>
+        <li><b>My character</b> — level, loadout with upgrade levels and mods, traits, resources, kills per weapon, deaths per quest and achievement progress.</li>
+        <li><b>Build &amp; DPS</b> — damage per second of your guns with your weapon levels, traits, rings, amulet and armor set, and how many summons your weapon mods give.</li>
+        <li><b>Raw data</b> — everything stored in your save files, browsable.</li>
+      </ul>
+    </div>
+    <div class="ibox">
+      <h3>Where are the Remnant: From the Ashes save files?</h3>
+      <p>On PC (Steam and Epic) they are in <code>%LOCALAPPDATA%\Remnant\Saved\SaveGames</code>. <code>save_0.sav</code> is character 1, <code>save_1.sav</code> is character 2, and <code>profile.sav</code> holds the items every character owns.</p>
+    </div>
+    <div class="ibox">
+      <h3>How do I see what is missing in my Remnant world?</h3>
+      <p>Drop your <code>save_N.sav</code> and <code>profile.sav</code> on this page. The <b>Current world</b> tab lists every event in your campaign or adventure with its items; the <b>Missing items</b> tab counts what you still need by world and item type and highlights what you can get in your current world right now; the <b>Tips</b> tab tells you what to do next.</p>
+    </div>
+    <div class="ibox">
+      <h3>How do I get the Cryptolith Sigil and the Labyrinth set?</h3>
+      <p>The Cryptolith Sigil drops from the Iskal Queen in Corsus (The Mist Fen). Use it on a Cryptolith tower — it can spawn in Earth, Rhom or Corsus — once per world, rerolling in between: the 1st use gives the Concentration trait, the 2nd the Blood Bond trait, the 3rd opens the Labyrinth room with the Labyrinth armor set. The Tips tab shows whether you carry a Sigil, how many times you used the tower and whether your world has one.</p>
+    </div>
+    <div class="ibox">
+      <h3>Should I give the Guardian's Heart to the Iskal Queen or the Undying King?</h3>
+      <p>The Guardian's Heart drops from Ixillis in Corsus, one per world. The Iskal Queen gives the Crossbow and the Slayer set for it; the Undying King on Rhom gives the Riven. Giving it to one locks the other out, so you need two worlds for all of them. Remnant World Analyzer tracks which of these rewards you already have.</p>
+    </div>
+    <div class="ibox">
+      <h3>Is there a DPS calculator for Remnant: From the Ashes?</h3>
+      <p>Yes — the <b>Build &amp; DPS</b> tab estimates the damage per second of your equipped guns and every weapon you own, from the wiki's weapon stats, your upgrade levels and the bonuses of your traits (Executioner, Kingslayer, Exploiter, Mind's Eye, Trigger Happy…), rings, amulet and armor set. Conditional bonuses can be switched on, and it counts the summons of your two weapon mods.</p>
+    </div>
+    <div class="ibox">
+      <h3>Can I see a map of my Remnant world?</h3>
+      <p>Yes — the <b>Map</b> tab draws every area of your campaign and adventure from the save, with events, waypoints, chests and loot on each tile, next to the path you walked there.</p>
+    </div>
+    <div class="ibox">
+      <h3>Does it update while I play?</h3>
+      <p>Run it locally with <b>Start.bat</b> (Windows): it finds your save folder by itself and refreshes the page every time the game saves. In the browser, drop the files again to refresh.</p>
+    </div>
+    <div class="ibox">
+      <h3>Are my save files uploaded?</h3>
+      <p>No. The files are read by your own browser; nothing is sent to any server.</p>
+    </div>
   </section>
 
   <section id="tab-credits" class="tab-panel credits" hidden>
     <h2>Version &amp; credits</h2>
-    <p class="version" id="version">Version 2.10 · Updated on <time datetime="2026-10-07">October 7, 2026</time></p>
-    <p class="repo">Open source (GPL-3.0) — <a href="https://github.com/marcops/Remnant-World-Analyzer" target="_blank" rel="noopener">github.com/marcops/Remnant-World-Analyzer</a> · <a href="https://github.com/marcops/Remnant-World-Analyzer/archive/refs/heads/master.zip">download to run locally (automatic mode)</a></p>
-    <h2>Credits</h2>
-    <ul>
-      <li><a href="https://github.com/hzla/Remnant-World-Analyzer" target="_blank" rel="noopener">hzla/Remnant-World-Analyzer</a> — the original project this is a fork of.</li>
-      <li><a href="https://github.com/Razzmatazzz/RemnantSaveManager" target="_blank" rel="noopener">Razzmatazzz/RemnantSaveManager</a> (GPL-3.0) — campaign/adventure/inventory parsing logic and the event → item database (GameInfo.xml).</li>
-      <li><a href="https://docs.google.com/spreadsheets/d/1rmmwn-kaVS44qWgub7ubXqL26fAgM7TBIi-dNc7VGdI" target="_blank" rel="noopener">Remnant: From the Ashes — Completionist's Checklist</a> by Amythyst34 — full item list and “How to Obtain”.</li>
-      <li><a href="https://remnantfromtheashes.wiki.fextralife.com/" target="_blank" rel="noopener">Remnant: From the Ashes Wiki</a> by Fextralife — the item and location pages linked by the 🌐 icons.</li>
-      <li>Forks that contributed fixes and ideas:
-        <a href="https://github.com/axllency/Remnant-World-Analyzer" target="_blank" rel="noopener">axllency</a>,
-        <a href="https://github.com/tkerzmann/Remnant-World-Analyzer" target="_blank" rel="noopener">tkerzmann</a>,
-        <a href="https://github.com/paige404/Remnant-World-Analyzer" target="_blank" rel="noopener">paige404</a>,
-        <a href="https://github.com/gmferise/Remnant-World-Analyzer" target="_blank" rel="noopener">gmferise</a>,
-        <a href="https://github.com/northy/Remnant-World-Analyzer" target="_blank" rel="noopener">northy</a>,
-        <a href="https://github.com/chris-faulkner/Remnant-World-Analyzer" target="_blank" rel="noopener">chris-faulkner</a>.</li>
-      <li>/u/FAOAB on Reddit, for the <a href="https://docs.google.com/spreadsheets/d/1VzmDx0ZXQWN5N_9_zP0gEqToyuB9ZjlxgZOEGdiuA6A" target="_blank" rel="noopener">name spreadsheet</a> used by the original.</li>
-    </ul>
+    <div class="ibox">
+      <p class="version" id="version">Version 2.11 · Updated on <time datetime="2026-10-07">October 7, 2026</time></p>
+      <p class="repo">Open source (GPL-3.0) — <a href="https://github.com/marcops/Remnant-World-Analyzer" target="_blank" rel="noopener">github.com/marcops/Remnant-World-Analyzer</a> · <a href="https://github.com/marcops/Remnant-World-Analyzer/archive/refs/heads/master.zip">download to run locally (automatic mode)</a></p>
+    </div>
+    <div class="ibox">
+      <h3>Credits</h3>
+      <ul>
+        <li><a href="https://github.com/hzla/Remnant-World-Analyzer" target="_blank" rel="noopener">hzla/Remnant-World-Analyzer</a> — the original project this is a fork of.</li>
+        <li><a href="https://github.com/Razzmatazzz/RemnantSaveManager" target="_blank" rel="noopener">Razzmatazzz/RemnantSaveManager</a> (GPL-3.0) — campaign/adventure/inventory parsing logic and the event → item database (GameInfo.xml).</li>
+        <li><a href="https://docs.google.com/spreadsheets/d/1rmmwn-kaVS44qWgub7ubXqL26fAgM7TBIi-dNc7VGdI" target="_blank" rel="noopener">Remnant: From the Ashes — Completionist's Checklist</a> by Amythyst34 — full item list and “How to Obtain”.</li>
+        <li><a href="https://remnantfromtheashes.wiki.fextralife.com/" target="_blank" rel="noopener">Remnant: From the Ashes Wiki</a> by Fextralife — the item and location pages linked by the 🌐 icons.</li>
+        <li>Forks that contributed fixes and ideas:
+          <a href="https://github.com/axllency/Remnant-World-Analyzer" target="_blank" rel="noopener">axllency</a>,
+          <a href="https://github.com/tkerzmann/Remnant-World-Analyzer" target="_blank" rel="noopener">tkerzmann</a>,
+          <a href="https://github.com/paige404/Remnant-World-Analyzer" target="_blank" rel="noopener">paige404</a>,
+          <a href="https://github.com/gmferise/Remnant-World-Analyzer" target="_blank" rel="noopener">gmferise</a>,
+          <a href="https://github.com/northy/Remnant-World-Analyzer" target="_blank" rel="noopener">northy</a>,
+          <a href="https://github.com/chris-faulkner/Remnant-World-Analyzer" target="_blank" rel="noopener">chris-faulkner</a>.</li>
+        <li>/u/FAOAB on Reddit, for the <a href="https://docs.google.com/spreadsheets/d/1VzmDx0ZXQWN5N_9_zP0gEqToyuB9ZjlxgZOEGdiuA6A" target="_blank" rel="noopener">name spreadsheet</a> used by the original.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="tab-notes" class="tab-panel notes" hidden>
+    <h2>Release notes</h2>
+    <p class="cat">The last 5 versions.</p>
+    <div class="release">
+      <h3>Version 2.11 <time datetime="2026-10-07">October 7, 2026</time></h3>
+      <ul>
+        <li><b>Armor skins</b>: all 48 skins Whispers sells in Ward 13, with the picture of the armor they dress and a SKIN tag; the ones you bought are read from your profile. Shown in Items, Missing items and the Ward 13 map.</li>
+        <li><b>Tips</b>: which skins your scrap and Glowing Fragments can buy right now.</li>
+        <li><b>Items</b>: totals at the top, and Consumables with how many you carry.</li>
+        <li>Release notes in the Info menu.</li>
+      </ul>
+    </div>
+    <div class="release">
+      <h3>Version 2.10 <time datetime="2026-10-07">October 7, 2026</time></h3>
+      <ul>
+        <li>Light theme everywhere by default; the ☾ button switches to dark and is remembered.</li>
+        <li>Start.bat also serves the page to other PCs and phones on your home network.</li>
+      </ul>
+    </div>
+    <div class="release">
+      <h3>Version 2.9 <time datetime="2026-10-07">October 7, 2026</time></h3>
+      <ul>
+        <li>Side menu with a card of your character (class, level, time, scrap, collection).</li>
+        <li><b>Items</b> and <b>Traits</b> as picture grids with a side panel: wiki stats, trait level and effect per level, what an item needs, where it drops.</li>
+        <li>About and Version &amp; credits as pages of their own; character picker at the top right.</li>
+      </ul>
+    </div>
+    <div class="release">
+      <h3>Version 2.8 <time datetime="2026-10-06">October 6, 2026</time></h3>
+      <ul>
+        <li>Items you can't get yet are shown in grey with "needs …" (the Akari set needs a Glowing Rod).</li>
+        <li>The Iskal Queen and her rewards now show in Corsus adventures too.</li>
+      </ul>
+    </div>
+    <div class="release">
+      <h3>Version 2.7 <time datetime="2026-10-05">October 5, 2026</time></h3>
+      <ul>
+        <li>Pictures for every item, from the Fextralife wiki.</li>
+        <li>Event items one per line in World state and on the map.</li>
+      </ul>
+    </div>
   </section>
     </div>
     </div>

@@ -212,6 +212,7 @@ table.kv { width: 100%; border-collapse: collapse; font-size: 14px; }
 .ttile .n { font-size: 13px; font-weight: 600; line-height: 1.2; }
 .ttile .lv { font-size: 12px; color: var(--muted); }
 .ttile .ty { font-size: 11px; color: var(--muted); margin-top: -3px; }
+.skin-tag { position: absolute; top: 6px; left: 6px; font-size: 9px; font-weight: 700; letter-spacing: .08em; padding: 1px 5px; border-radius: 4px; background: var(--accent); color: #fff; }
 .chip small { color: var(--muted); margin-left: 2px; }
 .ttile .lv.max { color: var(--ok); font-weight: 700; }
 .ttile .tbar { width: 100%; height: 4px; background: var(--panel-2); border-radius: 2px; overflow: hidden; margin-top: auto; }
@@ -310,6 +311,21 @@ details.raw > summary { cursor: pointer; }
 .credits a { color: var(--accent); }
 .credits .repo { margin: 18px 0 0; }
 .credits .version { margin: 18px 0 0; font-size: 15px; font-weight: 600; color: var(--text); }
+/* Release notes */
+.notes { color: var(--muted); font-size: 15px; line-height: 1.5; padding-bottom: 40px; max-width: 900px; }
+.notes > h2 { font-size: 18px; color: var(--text); margin: 0 0 2px; }
+.release, .ibox { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 16px; margin: 12px 0; }
+/* About and Version & credits use the same boxes. */
+.ibox > :first-child { margin-top: 0; }
+.ibox > :last-child { margin-bottom: 0; }
+.ibox h3 { font-size: 16px; color: var(--text); margin: 0 0 6px; }
+.about, .credits { max-width: 900px; }
+.credits .ibox .version { margin: 0; }
+.credits .ibox .repo { margin: 6px 0 0; }
+.release h3 { margin: 0 0 6px; font-size: 16px; color: var(--text); display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.release h3 time { color: var(--muted); font-size: 13px; font-weight: 400; }
+.release ul { margin: 0; padding-left: 18px; }
+.release li { margin: 3px 0; }
 .drop-hint.download { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
 
 @media (max-width: 720px) {

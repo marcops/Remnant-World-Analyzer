@@ -11,8 +11,8 @@
   var TYPE_LABEL = { 'World Boss': 'Boss', 'Miniboss': 'Miniboss', 'Side Dungeon': 'Dungeon', 'Siege': 'Siege',
     'Point of Interest': 'Point of interest', 'Item Drop': 'Item', 'Loot Beetle': 'Beetle', 'Home': 'Home', 'Quest Event': 'Event' };
   var CATEGORIES = ['Weapon', 'Armor', 'Amulet', 'Ring', 'Mod', 'Trait', 'Emote', 'Skin', 'Consumable'];
-  // Skins and consumables are not stored as unlocks in the profile, so we can't tell if you have them.
-  var UNTRACKED = { 'Skin': true, 'Consumable': true };
+  // Consumables are used up, so there's nothing to collect (skins are tracked, see "armor skins" below).
+  var UNTRACKED = { 'Consumable': true };
 
   var state = {
     auto: false, dir: '', listing: null,
@@ -48,6 +48,63 @@
   }
   function itemForPath(p) { return itemsByKey[p] || { name: prettyPath(p), category: '', how: '', key: p, world: '' }; }
   function itemKeyForAvailability(it) { return it.comesWith != null ? DATA.items[it.comesWith].key : it.key; }
+
+  // ---- armor skins -----------------------------------------------------------
+  // Each skin is the look of an armor piece ("Vanguard Great Helm" = Carapace Great Helm). Whispers sells
+  // them in Ward 13 (next to the Root Mother) for scrap and Glowing Fragments, which drop in Survival
+  // mode; any character can buy them. The profile keeps a bought skin as the piece's path + "_Skin"
+  // (Armor_Head_Carapace_Skin), and the skin uses the piece's picture.
+  var SKIN_OF = {
+    Survivor: 'Adventurer', Survival: 'Adventurer', Adventurer: 'Adventurer', Brigand: 'Bandit', Corrupted: 'Twisted',
+    Headhunter: 'Osseous', Ritualist: 'Cultist', Roughneck: 'Scrapper', Vagrant: 'Drifter', Widowmaker: 'Hunter',
+    Sentinel: 'Leto', Shadow: 'Akari', Harbringer: 'Slayer', Chaos: 'Void', Vanguard: 'Carapace', Bloodletter: 'Elder',
+    Mystic: 'Labyrinth', Crusader: 'Radiant',
+  };
+  function armorSlot(name) {
+    return /legging|trousers|greaves|pants|boots|kilt|britches|tassets/i.test(name) ? 'Legs' : /mask|hood|helm|goggles|visage|headdress|hat|skull|shroud/i.test(name) ? 'Head' : 'Body';
+  }
+  // The sheet lists the Adventurer Goggles Rigs sells among the skins, but that's the armor piece itself
+  // (its skin is Whispers' Survival Goggles): the entry becomes another way to get the armor.
+  DATA.items.forEach(function (it) {
+    if (it.category !== 'Skin') return;
+    var twin = DATA.items.filter(function (a) { return a.category === 'Armor' && a.name === it.name; })[0];
+    if (!twin) return;
+    twin.how = twin.how + ' Or: ' + it.how;
+    it.merged = true;
+  });
+  DATA.items.forEach(function (it) {
+    if (it.category !== 'Skin' || it.merged) return;
+    var words = it.name.split(' '), set = SKIN_OF[words[0]], last = words[words.length - 1];
+    var pieces = DATA.items.filter(function (a) { return a.category === 'Armor' && set && a.name.replace(/'s\b/, '').indexOf(set) === 0; });
+    var base = pieces.filter(function (a) { return a.name.split(' ').pop() === last; })[0];
+    if (!base) return;
+    // Path of the piece; Adventurer Tunic and Leggings have none in the sheet, so take a sibling's folder.
+    var sibling = base.key ? base : pieces.filter(function (a) { return a.key; })[0];
+    var path = sibling && sibling.key.replace(/Armor_(Head|Body|Legs)_/, 'Armor_' + armorSlot(base.name) + '_');
+    var seller = /Whispers/.test(it.how) ? 'Whispers' : /Rigs/.test(it.how) ? 'Rigs' : '';
+    it.base = base;
+    // The skin's path is its key: the profile lists it, and Whispers (Ward 13) sells it. Only Whispers'
+    // skins: the "Adventurer Goggles" Rigs sells would share the Survival Goggles' path, so it stays unknown.
+    it.skinPath = path && seller === 'Whispers' && !itemsByKey[path + '_Skin'] ? path + '_Skin' : null;
+    if (it.skinPath) {
+      it.key = it.skinPath;
+      itemsByKey[it.key] = it;
+      (DATA.events.Whispers = DATA.events.Whispers || { altName: null, items: [] }).items.push(it.key);
+    }
+    it.world = 'Ward 13';
+    it.mode = '';
+    it.how = it.how + (seller ? ' ' + seller + ' is in Ward 13' + (seller === 'Whispers' ? ', next to the Root Mother' : '') + '; ' : ' ') +
+      'Glowing Fragments drop in Survival mode. The skin gives ' + base.name + ' this look.';
+    if (RWA_WIKI.icons && !RWA_WIKI.icons[it.name] && RWA_WIKI.icons[base.name]) RWA_WIKI.icons[it.name] = RWA_WIKI.icons[base.name];
+  });
+  // Bought skins of the selected character (from the profile's inventory).
+  var skinCache = { ch: null, have: {} };
+  function skinOwned(it) {
+    var ch = character();
+    if (!ch || !it.skinPath) return null;
+    if (skinCache.ch !== ch) { skinCache.ch = ch; skinCache.have = {}; (ch.inventory || []).forEach(function (p) { skinCache.have[p] = true; }); }
+    return !!skinCache.have[it.skinPath];
+  }
 
   // ---- loading -----------------------------------------------------------
   function saveIndexOf(name) { var m = /save_(\d+)\.(sav|bak)$/i.exec(name); return m ? +m[1] : null; }
@@ -200,11 +257,11 @@
 
   // Which page is on screen. About and Version & credits are pages of their own and work before any
   // save is loaded; the other sections need the saves (until then "Load your save" shows the drop zone).
-  var INFO_TABS = ['home', 'about', 'credits'];
+  var INFO_TABS = ['home', 'about', 'credits', 'notes'];
   function showPage() {
     var loaded = document.body.classList.contains('loaded');
     var page = !loaded && INFO_TABS.indexOf(state.tab) < 0 ? 'home' : state.tab;
-    var info = page === 'about' || page === 'credits';
+    var info = page === 'about' || page === 'credits' || page === 'notes';
     document.querySelectorAll('.tab').forEach(function (b) { b.classList.toggle('active', b.dataset.tab === page); });
     document.querySelectorAll('.tab-panel').forEach(function (p) { p.hidden = p.id !== 'tab-' + page; });
     $('app').hidden = !loaded || info;
@@ -443,6 +500,7 @@
       if (!proof.length) return it.rewards.every(function (r) { return state.owns(r) === true; }) ? null : false;
       return false;
     }
+    if (it.category === 'Skin') return skinOwned(it);
     return UNTRACKED[it.category] ? null : state.owns(it);
   }
 
@@ -534,6 +592,8 @@
     var hideOwned = $('world-hide-owned').checked && !!character();
     var rows = [], lastZone = null, shown = 0;
     block.events.forEach(function (ev) {
+      // Whispers' skins are shown in Items, Missing items and the Ward 13 map, not in this table.
+      if (ev.key === 'Whispers') return;
       if (!state.worldZones[ev.zone] || !state.worldTypes[ev.type]) return;
       var items = ev.items.map(itemForPath);
       // Quest items this event drops (Sigil from the Iskal Queen, heart from Ixillis), while something they unlock is missing.
@@ -578,10 +638,11 @@
     ['Mods', function (it) { return it.category === 'Mod'; }],
     ['Traits', function (it) { return it.category === 'Trait'; }],
     ['Emotes', function (it) { return it.category === 'Emote'; }],
+    ['Skins', function (it) { return it.category === 'Skin'; }],
     ['Quest items', function (it) { return it.category === 'Quest item'; }],
   ];
   // The tutorial blade is taken away when the tutorial ends, so it can never be collected.
-  function collectible(it) { return !UNTRACKED[it.category] && !(/^New characters begin/.test(it.how) && /removed/.test(it.how)); }
+  function collectible(it) { return !UNTRACKED[it.category] && !it.merged && !(/^New characters begin/.test(it.how) && /removed/.test(it.how)); }
 
   // Items that only drop in a given game mode (the sheet's "Mode" column); Normal is everything else.
   var MODE_COLLECTION = [['Normal', function (it) { return it.mode !== 'Survival' && it.mode !== 'Hardcore'; }]].concat(
@@ -806,7 +867,17 @@
     var q = $('items-search').value.trim().toLowerCase();
     var typeTest = state.itemsType && testFor(COLLECTION, state.itemsType);
     var modeTest = state.itemsMode && testFor(MODE_COLLECTION, state.itemsMode);
-    var all = TRACKED_ITEMS.filter(collectible);
+    var base = TRACKED_ITEMS.filter(collectible);
+    // Consumables are used up, so they aren't part of the collection: they're listed only under their
+    // own type, with how many this character carries.
+    var pc = state.profile && state.profile.characters && state.profile.characters[state.charIndex];
+    var qty = {};
+    ((pc && pc.consumables) || []).forEach(function (c) { qty[c.name] = (qty[c.name] || 0) + (c.quantity || 0); });
+    var CONS = DATA.items.filter(function (it) { return it.category === 'Consumable'; });
+    var cons = state.itemsType === 'Consumables';
+    if (cons) typeTest = null;
+    var all = cons ? CONS : base;
+    var ownedOf = function (it) { return it.category === 'Consumable' ? (hasProfile ? qty[it.name] > 0 : null) : itemOwned(it); };
     // Counts on the chips: each group applies the other filters.
     var keep = function (it, skip) {
       if (skip !== 'type' && typeTest && !typeTest(it)) return false;
@@ -814,24 +885,26 @@
       if (skip !== 'world' && state.itemsWorld != null && worldOf(it) !== state.itemsWorld) return false;
       return true;
     };
-    var have = all.filter(function (it) { return keep(it) && itemOwned(it) === true; }).length;
+    var have = all.filter(function (it) { return keep(it) && ownedOf(it) === true; }).length;
     var total = all.filter(function (it) { return keep(it); }).length;
     var chips = function (id, list, cur, skip) {
       return '<div class="filter-row"><span class="filter-label">' + esc(skip) + '</span><div class="chips" id="' + id + '">' +
         '<span class="chip' + (cur == null ? ' on' : '') + '" data-v="__all">All</span>' + list.map(function (x) {
-          var n = all.filter(function (it) { return keep(it, skip.toLowerCase()) && x.test(it); });
-          var h = n.filter(function (it) { return itemOwned(it) === true; }).length;
+          var from = skip === 'Type' ? (x.value === 'Consumables' ? CONS : base) : all;
+          var n = from.filter(function (it) { return keep(it, skip.toLowerCase()) && x.test(it); });
+          var h = n.filter(function (it) { return ownedOf(it) === true; }).length;
           return n.length ? '<span class="chip' + (cur === x.value ? ' on' : '') + '" data-v="' + esc(x.value) + '">' + esc(x.label) + ' <small>' + (hasProfile ? h + '/' : '') + n.length + '</small></span>' : '';
         }).join('') + '</div></div>';
     };
-    var typeList = COLLECTION.map(function (c) { return { label: c[0], value: c[0], test: c[1] }; });
+    var typeList = COLLECTION.map(function (c) { return { label: c[0], value: c[0], test: c[1] }; })
+      .concat([{ label: 'Consumables', value: 'Consumables', test: function (it) { return it.category === 'Consumable'; } }]);
     var modeList = MODE_COLLECTION.map(function (c) { return { label: c[0], value: c[0], test: c[1] }; });
     var worldList = WORLD_ORDER.map(function (w) { return { label: WORLD_LABEL[w], value: w, test: function (it) { return worldOf(it) === w; } }; });
 
     var groups = {};
     all.forEach(function (it) {
       if (!keep(it)) return;
-      var owned = itemOwned(it);
+      var owned = ownedOf(it);
       if (show === 'owned' && owned !== true) return;
       if (show === 'missing' && owned === true) return;
       if (q && (it.name + ' ' + it.how + ' ' + it.group).toLowerCase().indexOf(q) === -1) return;
@@ -843,9 +916,9 @@
     var tile = function (r) {
       var it = r.it, id = itemId(it);
       var cls = 'ttile' + (r.owned === true ? ' owned' : r.owned == null ? '' : ' missing') + (r.locked.length ? ' blocked' : r.where ? ' now' : '') + (state.itemSel === id ? ' sel' : '');
-      var status = r.owned === true ? '✔ have it' : r.locked.length ? '🔒 needs ' + r.locked.join(', ') : r.where ? 'in your world' : r.owned == null ? '?' : 'missing';
+      var status = it.category === 'Consumable' ? (r.owned ? '×' + qty[it.name] + ' in your bag' : r.owned === false ? 'none' : '?') : r.owned === true ? '✔ have it' : r.locked.length ? '🔒 needs ' + r.locked.join(', ') : r.where ? 'in your world' : r.owned == null ? '?' : 'missing';
       return '<button type="button" class="' + cls + '" data-item="' + esc(id) + '" title="' + esc(it.name + (it.mode ? ' — ' + it.mode : '')) + '">' + iconImg(it) +
-        '<span class="n">' + esc(it.name) + '</span><span class="ty">' + esc(typeLabel(it)) + (it.mode ? ' · ' + esc(it.mode) : '') + '</span><span class="lv">' + esc(status) + '</span></button>';
+        (it.category === 'Skin' ? '<span class="skin-tag">SKIN</span>' : '') + '<span class="n">' + esc(it.name) + '</span><span class="ty">' + esc(typeLabel(it)) + (it.mode ? ' · ' + esc(it.mode) : '') + '</span><span class="lv">' + esc(status) + '</span></button>';
     };
     var body = WORLD_ORDER.filter(function (w) { return groups[w]; }).map(function (w) {
       var list = groups[w].sort(function (a, b) { return rank(a) - rank(b) || catOrder(a.it) - catOrder(b.it) || a.it.name.localeCompare(b.it.name); });
@@ -853,6 +926,30 @@
       return '<div class="group"><h3>' + esc(WORLD_LABEL[w]) + ' <small>' + (hasProfile && show === 'all' ? h + ' of ' + list.length : list.length + ' items') + '</small></h3><div class="tgrid">' + list.map(tile).join('') + '</div></div>';
     }).join('');
 
+    // Totals for the whole collection (the filters below don't change them).
+    var tot = { have: 0, total: 0, now: 0, locked: 0, skins: 0, skinsHave: 0 };
+    base.forEach(function (it) {
+      var o = itemOwned(it);
+      tot.total++;
+      if (o === true) tot.have++;
+      else if (o === false && blockedBy(it).length) tot.locked++;
+      else if (state.available[itemKeyForAvailability(it)]) tot.now++;
+      if (it.category === 'Skin') { tot.skins++; if (o === true) tot.skinsHave++; }
+    });
+    var held = CONS.filter(function (it) { return qty[it.name] > 0; }).length;
+    var pct = tot.total ? Math.round(100 * tot.have / tot.total) : 0;
+    var card = function (title, big, sub, cls) {
+      return '<div class="card static"><div class="w">' + esc(title) + '</div><div class="n ' + (cls || 'neutral') + '">' + big + '</div><div class="of">' + sub + '</div></div>';
+    };
+    var cards = hasProfile ? '<div class="summary">' +
+      card('Collection', tot.have + ' of ' + tot.total, (tot.total - tot.have) + ' missing · ' + pct + '%', tot.have === tot.total ? 'done' : 'neutral') +
+      card('Obtainable now', tot.now, 'in the worlds you have loaded and Ward 13') +
+      card('Need something first', tot.locked, 'a key item or another item comes first') +
+      card('Skins', tot.skinsHave + ' of ' + tot.skins, 'bought from Whispers in Ward 13') +
+      card('Consumables', held + ' of ' + CONS.length, 'kinds in your bag (not counted)') +
+      '</div>' : '';
+
+    $('items-cards').innerHTML = cards;
     el.innerHTML = '<div class="filters">' +
       (hasProfile ? '<div class="seg" id="items-show">' + [['all', 'All ' + total], ['owned', 'I have ' + have], ['missing', 'I don\'t have ' + (total - have)]].map(function (s) {
         return '<button type="button" data-show="' + s[0] + '" class="' + (show === s[0] ? 'active' : '') + '">' + esc(s[1]) + '</button>';
@@ -863,6 +960,14 @@
   }
 
   // Side panel of one item.
+  // How many of a consumable the character carries.
+  function carried(it) {
+    var pc = state.profile && state.profile.characters && state.profile.characters[state.charIndex];
+    if (!pc) return 'Load profile.sav to see how many you carry.';
+    var n = (pc.consumables || []).filter(function (c) { return c.name === it.name; }).reduce(function (t, c) { return t + (c.quantity || 0); }, 0);
+    return n ? 'You carry <b>×' + n + '</b>.' : 'None in your bag.';
+  }
+
   function renderItemDrawer() {
     var el = $('item-drawer');
     var it = state.tab === 'items' && state.itemSel && TRACKED_ITEMS.filter(function (x) { return itemId(x) === state.itemSel; })[0];
@@ -883,8 +988,9 @@
     el.innerHTML = '<aside class="tdrawer" role="dialog" aria-label="' + esc(it.name) + '"><button type="button" class="x" data-close-item aria-label="Close">✕</button>' +
       '<div class="hero">' + (RWA_WIKI.icons && RWA_WIKI.icons[it.name] ? '<img src="' + esc(RWA_WIKI.icons[it.name]) + '" alt="">' : '') + '</div>' +
       '<h2>' + esc(it.name) + itemWikiLink(it) + '</h2>' +
-      '<p class="cat">' + esc([typeLabel(it), WORLD_LABEL[worldOf(it)] || worldOf(it), it.mode, it.dlc, it.category === 'Armor' && it.group].filter(Boolean).join(' · ')) + '</p>' +
-      '<p>' + statusIcon(owned) + ' ' + (owned === true ? 'You have it' : owned === false ? 'You don\'t have it' : 'Unknown') + '</p>' +
+      '<p class="cat">' + esc([typeLabel(it), WORLD_LABEL[worldOf(it)] || worldOf(it), it.mode, it.dlc, it.category === 'Armor' && it.group, it.base && 'look of ' + it.base.name].filter(Boolean).join(' · ')) + '</p>' +
+      (it.category === 'Consumable' ? '<p>' + carried(it) + '</p>' :
+        '<p>' + statusIcon(owned) + ' ' + (owned === true ? 'You have it' : owned === false ? 'You don\'t have it' : 'Unknown') + '</p>') +
       (locked.length ? '<div class="how"><b>Needs first:</b> ' + esc(locked.join(', ')) + '</div>' : '') +
       (where ? '<div class="where">In your world now: ' + where.map(function (x) { return esc(x.block + ' → ' + x.location + ' (' + x.event + ')') + wikiLink(x.location); }).join(' · ') + '</div>' : '') +
       (stats ? '<table class="kv">' + stats + '</table>' : '') +
@@ -1244,8 +1350,27 @@
     var ranked = Object.keys(gaps).sort(function (a, b) { return gaps[b].length - gaps[a].length; });
     if (ranked.length) coll.push('<b>Best world to roll next:</b> ' + ranked.map(function (w) { return esc(WORLD_LABEL[w] || w) + ' (' + gaps[w].length + ' missing)'; }).join(' · '));
     Object.keys(modeOnly).forEach(function (m) { if (modeOnly[m].length) coll.push('<b>' + m + ' mode</b> only: ' + modeOnly[m].length + ' items missing — ' + modeOnly[m].map(function (i) { return esc(i.name) + itemWikiLink(i); }).join(', ')); });
+    // Armor skins: what Whispers (Ward 13) would sell you with the scrap and Glowing Fragments you have.
+    var pc = state.profile && state.profile.characters && state.profile.characters[state.charIndex];
+    if (pc) {
+      var res = {};
+      (pc.resources || []).forEach(function (r) { res[r.name] = r.quantity || 0; });
+      var skins = DATA.items.filter(function (it) { return it.category === 'Skin' && !it.merged && itemOwned(it) === false; }).map(function (it) {
+        var m = /([\d,]+) Scrap and (\d+) Glowing Fragments/i.exec(it.how);
+        return m && { it: it, scrap: +m[1].replace(/,/g, ''), frag: +m[2] };
+      }).filter(Boolean).sort(function (a, b) { return a.frag - b.frag || a.scrap - b.scrap || a.it.name.localeCompare(b.it.name); });
+      if (skins.length) {
+        var frag = res['Glowing Fragment'] || 0, scrap = res.Scrap || 0, buy = [], f = frag, s = scrap;
+        skins.forEach(function (x) { if (x.frag <= f && x.scrap <= s) { buy.push(x); f -= x.frag; s -= x.scrap; } });
+        var allFrag = skins.reduce(function (n, x) { return n + x.frag; }, 0);
+        coll.push('<b>Armor skins</b> from Whispers (Ward 13): you have ' + num(frag) + ' Glowing Fragments and ' + num(scrap) + ' scrap — ' +
+          (buy.length ? 'enough for <b>' + buy.length + '</b> of the ' + skins.length + ' skins you don\'t have, cheapest first: ' + buy.map(function (x) { return ico(x.it.name) + esc(x.it.name) + ' <span class="cat">' + x.frag + ' fragments</span>'; }).join(', ')
+            : 'not enough for any yet (the cheapest takes ' + skins[0].frag + ' fragments and ' + num(skins[0].scrap) + ' scrap)') +
+          '. All ' + skins.length + ' take ' + num(allFrag) + ' fragments; they drop in Survival mode.');
+      }
+    }
     if (state.available) {
-      var now = DATA.items.filter(function (it) { var k = itemKeyForAvailability(it); return collectible(it) && itemOwned(it) === false && k && state.available[k]; });
+      var now = DATA.items.filter(function (it) { var k = itemKeyForAvailability(it); return collectible(it) && it.category !== 'Skin' && itemOwned(it) === false && k && state.available[k]; });
       if (now.length) coll.push(now.length + ' missing items drop in the world you have loaded — see <b>Missing items</b> › "Only what I can get in my world right now".');
     }
 
@@ -1329,6 +1454,12 @@
       rows.push(statusIcon(done) + ' ' + esc(e.name) + ' <span class="cat">' + esc(e.type) + '</span>' +
         e.items.map(function (i) { return evItem(i); }).join(''));
     });
+    // Ward 13: Whispers and the armor skins he sells (the world save doesn't list merchants' stock as events).
+    if (/^Ward 13\b/.test(z.name) && DATA.events.Whispers) {
+      var skins = DATA.events.Whispers.items.map(function (p) { return { name: itemsByKey[p].name, item: itemsByKey[p] }; });
+      rows.push(statusIcon(skins.every(function (i) { return itemOwned(i.item) === true; })) + ' Whispers <span class="cat">Merchant · armor skins for scrap and Glowing Fragments</span>' +
+        skins.map(function (i) { return evItem(i); }).join(''));
+    }
     z.links.filter(function (l) { return l.type !== 'Link'; }).forEach(function (l) {
       rows.push((l.type === 'Waypoint' ? '⚑ ' : '✚ ') + esc(l.label || (l.type === 'Waypoint' ? 'Waypoint' : 'Respawn checkpoint')) + (l.active ? '' : ' <span class="cat">inactive</span>'));
     });

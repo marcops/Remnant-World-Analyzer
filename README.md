@@ -57,7 +57,8 @@ and your home network must be set as **Private** (Settings › Network › your 
 - **Build & DPS** — damage per second of your equipped guns and every weapon you own, at your upgrade levels and at max level: damage per hit, crit chance and multiplier, weak spot multiplier, fire rate, damage per magazine. Counts traits (Executioner, Kingslayer, Exploiter, Mind's Eye, Trigger Happy…), rings, amulet and armor set bonuses; conditional bonuses (after a kill, set stacks, Song of Swords…) can be switched on. Also shows your two weapon mods together: how many summons you can have at once (e.g. 2 Iron Sentinel turrets) and their damage. Weapon stats come from the Fextralife wiki; the wiki has no reload times, so DPS is "while firing".
 - Mods that come built into weapons (e.g. Skewer on the Devastator) count as yours when you have the weapon.
 - Summary tiles by item type (hand guns, long guns, melee, armor, …) and by mode (Normal, Survival, Hardcore) with "x of y" and %. Type, mode and world all filter each other and the list.
-- **Skins and consumables** are left out of the counts: the save doesn't store them in a way that can be checked. They still show up (with a **?**) in the current world view.
+- **Armor skins** (sold by Whispers in Ward 13 for scrap and Glowing Fragments) are tracked: the profile records the ones you bought, each shows the picture of the armor it dresses, and Tips says which ones your fragments can buy now. **Consumables** are listed in Items with how many you carry, but left out of the counts.
+- **Release notes** (Info menu) list what changed in the last 5 versions.
 
 ## For developers
 

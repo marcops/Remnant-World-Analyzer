@@ -125,7 +125,8 @@
     }
 
     // Events the save doesn't list, placed with the ones it does, zone by zone.
-    var fixed = FIXED_EVENTS.filter(function (f) { return f.modes.indexOf(mode) !== -1; });
+    // Only events the data knows (Whispers exists when the page has set up the skins).
+    var fixed = FIXED_EVENTS.filter(function (f) { return f.modes.indexOf(mode) !== -1 && (f.church || DATA.events[f.key]); });
     var placed = [];
     var out = [];
     ZONES.forEach(function (zone) {
@@ -152,6 +153,8 @@
   // (not added when that event isn't in the world); no `location` = the location of that event.
   var FIXED_EVENTS = [
     { key: 'Ward13', name: 'Ward 13', type: 'Home', location: 'Earth: Ward 13', zone: 'Earth', modes: ['Campaign'], at: 'start' },
+    // Armor skins sold in Ward 13, reachable from every campaign and adventure (the page fills DATA.events.Whispers).
+    { key: 'Whispers', name: 'Whispers', type: 'Merchant', location: 'Ward 13', zone: 'Earth', modes: ['Campaign', 'Subject2923', 'Adventure'], at: 'start' },
     { key: 'FoundersHideout', name: "Founder's Hideout", type: 'Point of Interest', location: 'Earth: Fairview', zone: 'Earth', modes: ['Campaign'], at: 'start' },
     { church: true, zone: 'Earth', modes: ['Campaign'], before: 'Westcourt' },
     { key: 'UndyingKing', name: 'Undying King', type: 'World Boss', location: 'Rhom: Undying Throne', zone: 'Rhom', modes: ['Campaign'], at: 'end' },
