@@ -369,6 +369,7 @@
     { id: 'curio', name: 'Strange Curio', carried: /Curio/i, from: 'StuckMerchant', world: 'Yaesha', rewards: byName(['Radiant Visage', "Guardian's Blessing"]),
       how: 'In the back of the Stuck Merchant\'s wagon (Yaesha) — buy her Radiant Protector and Greaves first. Opens the Guardian Shrine: the Radiant Visage is on a statue at the end, and beating the Root Horror back at the wagon gives Guardian\'s Blessing.' },
     { id: 'tarnishedring', name: 'Tarnished Ring', carried: /TarnishedRing/i, from: 'ReggiesRing', world: 'Earth', rewards: byName(['Scavenger']), proof: [], notOnly: true,
+      seen: { talk: ['ReggieGaveRing'], achievements: ['Return_Reggie_Ring'] },
       how: 'Spawns at a random place on Earth. Give it to Reggie in Ward 13 (exhaust his dialogue) for the Scavenger trait — also earned by picking up 50,000 scrap.' },
     // Story and door keys: no collection item, recognised from your progress.
     { id: 'datla', name: 'D.A.T.L.A. Key', carried: /DATLA/i, world: 'Ward 13', rewards: [], seen: { socket: /DATLA/, achievements: ['Kill_Dreamer'], flags: ['Finished Game'] },
@@ -491,15 +492,15 @@
     return '<span class="st unk" title="Unknown">?</span>';
   }
 
-  // A key item counts as yours when you carry one, the saves record handing it in, or you own something that
-  // only comes through it (`proof`, by default its rewards). The Sigil is used three times: it needs every reward.
-  // A key whose reward also comes another way (the Tarnished Ring: Scavenger also comes from picking up 50,000
-  // scrap) is judged by itself: missing until you carry it. Story keys with no trace are unknown.
+  // A key item counts as yours when you carry one, the saves record handing it in (the Tarnished Ring:
+  // "ReggieGaveRing"), you already own everything it gives (nothing left to get from it), or you own something
+  // that only comes through it (`proof`, by default its rewards). Story keys with no trace are unknown.
   function itemOwned(it) {
     if (it.quest) {
       if (!character()) return null;
       if (carries(it) || questSeen(it)) return true;
-      if (it.repeat) return it.rewards.every(function (r) { return state.owns(r) === true; });
+      if (it.rewards.length && it.rewards.every(function (r) { return state.owns(r) === true; })) return true;
+      if (it.repeat) return false;
       if ((it.proof || it.rewards).some(function (r) { return state.owns(r) === true; })) return true;
       return it.rewards.length || it.proof ? false : null;
     }
@@ -751,9 +752,9 @@
       var list = groups[w].sort(function (a, b) { return (a.where ? 0 : 1) - (b.where ? 0 : 1) || a.it.category.localeCompare(b.it.category) || a.it.name.localeCompare(b.it.name); });
       return '<div class="group"><h3>' + esc(WORLD_LABEL[w]) + ' <small>' + list.length + ' items</small></h3>' + list.map(function (row) {
         var it = row.it;
-        var tags = (row.where ? '<span class="tag now">available now</span>' : '') +
+        var tags = (row.where && row.owned !== true ? '<span class="tag now">available now</span>' : '') +
           (it.mode ? '<span class="tag mode">' + esc(it.mode) + '</span>' : '') + (it.dlc ? '<span class="tag">' + esc(it.dlc) + '</span>' : '');
-        var where = row.where ? '<div class="where">In your world: ' + row.where.map(function (x) {
+        var where = row.where && row.owned !== true ? '<div class="where">In your world: ' + row.where.map(function (x) {
           return esc(x.block + ' → ' + x.location + ' (' + x.event + ')') + wikiLink(x.location);
         }).join(' · ') + '</div>' : '';
         return '<div class="mrow">' + itemDetails(it, tags) + where + '</div>';
