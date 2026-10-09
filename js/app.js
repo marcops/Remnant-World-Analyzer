@@ -1462,6 +1462,12 @@
       if (t.kind !== 'vista' || t.x < minX || t.x > maxX || t.y < minY || t.y > maxY) return;
       out.push('<rect class="t-vista" x="' + (px(t) + 6) + '" y="' + (py(t) + 6) + '" width="' + (C - 12) + '" height="' + (C - 12) + '" rx="6"/>');
     });
+    // Connections between tiles, drawn first so the tiles (all opaque) cover them: only the short bar
+    // between two boxes shows. Turned like the tiles (grid dx, dy -> screen dy, -dx).
+    core.forEach(function (t) {
+      var cx = px(t) + C / 2, cy = py(t) + C / 2;
+      WS.EDGES.forEach(function (e) { if (t.edges & e[0]) out.push('<line class="t-path" x1="' + cx + '" y1="' + cy + '" x2="' + (cx + e[2] * C / 2) + '" y2="' + (cy - e[1] * C / 2) + '"/>'); });
+    });
     // Where you've been: tiles the save proves (an area you walked: its start, an opened chest, a completed
     // event, a passage or waypoint you used), plus every tile on the way from the start to each of them,
     // following the tiles' connections (you can't reach them without walking through).
