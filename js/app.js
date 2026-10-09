@@ -423,6 +423,9 @@
   var EXCHANGES = {
     Brabus: { needs: 'Pocket Watch', items: /\/Armor\/Bandit\//, note: 'The Bandit set needs the Pocket Watch from Mudtooth.' },
   };
+  // Items only someone who owns another item can get, wherever they are: the Twisted Mask lets you
+  // talk to the Wailing Tree for Bark Skin.
+  var REQUIRES = { 'Bark Skin': 'Twisted Mask' };
   function exchangeReady(ev) {
     var x = EXCHANGES[ev.key]; if (!x) return true;
     var need = DATA.items.filter(function (i) { return i.name === x.needs; })[0];
@@ -443,6 +446,8 @@
       if (!x.items.test(it.key) || exchangeReady({ key: k })) return;
       if (out.indexOf(x.needs) < 0) out.push(x.needs);
     });
+    var need = REQUIRES[it.name] && DATA.items.filter(function (x) { return x.name === REQUIRES[it.name]; })[0];
+    if (need && itemOwned(need) === false && out.indexOf(need.name) < 0) out.push(need.name);
     return out;
   }
   // One item of an event (World state, map): status, icon, name; greyed out with "needs …" when blocked.

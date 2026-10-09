@@ -22,9 +22,24 @@ export const MANUAL_KEYS = {
   'Amulet|Pocket Watch': '/Quests/Quest_OverworldPOI_MudTooth/Quest_BrabusPocketWatch',
   // Removed when leaving the tutorial, so it can never be "owned".
   'Weapon|Blade of Adventure': null,
+  // Seen in a real profile; the sheet's names don't match them automatically.
+  'Mod|Hot Shot': '/Items/Mods/HotShot',
+  "Mod|Hunter's Mark": '/Items/Mods/HuntersMark',
+  "Mod|Mender's Aura": '/Items/Mods/MendersAura',
+  'Armor|Bomber Hat': '/Items/Armor/Bomber/Armor_Head_Bomber',
+  'Armor|Adventurer Tunic': '/Items/Armor/Adventurer/Armor_Body_Adventurer',
+  'Armor|Adventurer Leggings': '/Items/Armor/Adventurer/Armor_Legs_Adventurer',
 };
 
-export const EXTRA_EVENT_ITEMS = {};
+// Ward 13: Ace hands out the Repeater Pistol, and the archetype mods are sold there too.
+export const EXTRA_EVENT_ITEMS = {
+  Ward13: [
+    '/Items/Weapons/Basic/HandGuns/RepeaterPistol/Weapon_RepeaterPistol',
+    '/Items/Mods/HotShot',
+    '/Items/Mods/HuntersMark',
+    '/Items/Mods/MendersAura',
+  ],
+};
 
 export const WEAPON_ALIASES = {
   devestator: 'devastator',

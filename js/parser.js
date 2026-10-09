@@ -269,7 +269,9 @@
       if (item.comesWith != null) return owns(DATA.items[item.comesWith]);
       if (item.key && have[item.key]) return true;
       if (item.category === 'Consumable' || item.category === 'Skin') return null;
-      if (item.category === 'Armor') {
+      // Armor can also be matched by set and slot, except pieces that are quest items of their own (the
+      // Twisted Mask is not the Twisted Hood, though both are the set's head).
+      if (item.category === 'Armor' && (item.key || '').indexOf('/QuestItems/') < 0) {
         var set = norm((item.group || '').replace(/ Set$/, '').replace(/'s$/, ''));
         var slot = /legging|trousers|greaves|pants|boots|kilt|britches|tassets/i.test(item.name) ? 'Legs'
           : /mask|hood|helm|goggles|visage|headdress|hat|skull|shroud/i.test(item.name) ? 'Head' : 'Body';
