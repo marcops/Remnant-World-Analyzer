@@ -1263,15 +1263,18 @@
     var queen = ws ? ws.events.filter(function (e) { return e.key === 'IskalQueen'; })[0] : null;
     var soul = sheetItem('Soul Link');
 
+    // The counter goes back to 0 after the third use, so owning every reward also means done.
+    var allOwned = rewards.every(function (r) { return r[1].every(function (n) { var it = sheetItem(n); return it && itemOwned(it) === true; }); });
+    if (allOwned) phase = 3;
     var next;
-    if (phase >= 3) next = 'All three Cryptolith rewards unlocked.';
+    if (phase >= 3) next = 'Done: all three Cryptolith rewards are yours (Concentration, Blood Bond and the Labyrinth set).';
     else if (sigil) next = towers.length ? 'Use the Sigil on the Cryptolith tower in ' + towers[0].area + ' (tile ' + towers[0].tileId + ').' : 'Use the Sigil on a Cryptolith tower — this world has none; reroll an adventure until one shows up.';
     else next = queen ? (queen.done ? 'You defeated the Iskal Queen in this world — if you didn\'t get the Sigil, it drops from her.' : 'Defeat the Iskal Queen in ' + queen.area + ' to get the Cryptolith Sigil.')
       : 'Get the Cryptolith Sigil from the Iskal Queen (Corsus, The Mist Fen) — she is not in this world.';
 
     var rows = [
       ['Next step', '<b>' + esc(next) + '</b>'],
-      ['Sigil in your inventory', sigil ? '<span class="st ok">✔</span> yes' : '<span class="st miss">✘</span> no'],
+      ['Sigil in your inventory', sigil ? '<span class="st ok">✔</span> yes' : allOwned ? 'no — not needed any more (all three rewards are yours)' : '<span class="st miss">✘</span> no'],
       ['Times used on a tower', phase + ' of 3' + (phase < 3 ? ' — reroll the world between uses' : '')],
       ['Rewards', rewards.map(function (r, i) {
         return '<div>' + (phase > i ? '✔ ' : '') + '<span class="cat">' + r[0] + ':</span> ' + r[1].map(function (n) { var it = sheetItem(n); return ownedMark(it) + esc(n) + (it ? itemWikiLink(it) : ''); }).join(', ') + '</div>';
