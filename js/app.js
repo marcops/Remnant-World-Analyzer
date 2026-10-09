@@ -30,6 +30,44 @@
   function store(k, v) { try { localStorage.setItem('rwa.' + k, JSON.stringify(v)); } catch (e) { /* private mode */ } }
   function recall(k, d) { try { var v = localStorage.getItem('rwa.' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }
   state.tab = recall('tab', 'world');
+
+  // ---- where you left off ---------------------------------------------------
+  // Everything the page shows (section, filters, searches, switches, open item, scroll of each section) is kept
+  // in this browser and put back on the next visit; the defaults only apply to what you never changed.
+  var VIEW_FIELDS = ['tab', 'mode', 'mapMode', 'worldZones', 'worldTypes', 'worldCats', 'missingWorld', 'missingType', 'missingMode',
+    'itemsShow', 'itemsType', 'itemsWorld', 'itemsMode', 'itemSel', 'traitsShow', 'traitType', 'traitSel'];
+  var VIEW_INPUTS = ['world-search', 'world-only-missing', 'world-hide-owned', 'missing-search', 'missing-only-now', 'missing-show-owned', 'items-search'];
+  var savedView = recall('view', null) || {};
+  VIEW_FIELDS.forEach(function (f) {
+    if (!(f in savedView)) return;
+    var v = savedView[f], cur = state[f];
+    // Filter sets (worlds, event types, categories): keep entries added since, take the saved on/off.
+    if (v && cur && typeof v === 'object' && typeof cur === 'object') Object.keys(cur).forEach(function (k) { if (k in v) cur[k] = v[k]; });
+    else state[f] = v;
+  });
+  function restoreInputs() {
+    var saved = savedView.inputs || {};
+    VIEW_INPUTS.forEach(function (id) {
+      var el = $(id); if (!el || !(id in saved)) return;
+      if (el.type === 'checkbox') el.checked = !!saved[id]; else el.value = saved[id];
+    });
+  }
+  function saveView() {
+    var v = { inputs: {}, scroll: savedView.scroll || {} };
+    VIEW_FIELDS.forEach(function (f) { v[f] = state[f]; });
+    // About, credits and the drop zone aren't where you "left off": keep the last section with data.
+    if (['home', 'about', 'credits', 'notes'].indexOf(state.tab) >= 0) v.tab = savedView.tab || 'world';
+    VIEW_INPUTS.forEach(function (id) { var el = $(id); if (el) v.inputs[id] = el.type === 'checkbox' ? el.checked : el.value; });
+    if (document.body.classList.contains('loaded')) v.scroll[state.tab] = Math.round(window.scrollY);
+    if (typeof dpsOn !== 'undefined') v.dps = dpsOn;
+    savedView = v;
+    store('view', v);
+  }
+  // Scroll of a section as you left it (on the first load and when you come back to it).
+  function restoreScroll() {
+    var y = (savedView.scroll || {})[state.tab] || 0;
+    setTimeout(function () { window.scrollTo(0, y); }, 60);
+  }
   // Every tab opens on the adventure (falls back to the campaign when the save has none).
 
   function esc(s) {
@@ -239,6 +277,8 @@
     if (state.tab === 'home') state.tab = 'world';
     if (!state.auto) setStatus('Manual · files loaded at ' + new Date().toLocaleTimeString(), false);
     render();
+    // Back where you left off, once (the automatic mode calls this again on every game save).
+    if (!state.viewRestored) { state.viewRestored = true; restoreScroll(); }
   }
 
   // Character card above the menu: class and level, time, difficulty, scrap and how much you've collected.
@@ -1323,6 +1363,15 @@
       if (closed.length) world.push((ws.chests.total - ws.chests.open) + ' chests still closed: ' + closed.map(function (z) { return mapLink(z.id, z.name) + ' ' + (z.chests - z.chestsOpen); }).join(', '));
       var undone = ws.events.filter(function (e) { return !e.done && e.type !== 'Item drop' && !e.items.some(function (i) { return missing(i.item); }); });
       if (undone.length) world.push('Not done yet (nothing new for you, but XP and scrap): ' + undone.map(function (e) { return esc(e.name); }).join(', '));
+      // Leto's Amulet: its rare secret room is the "Penitent" event. In the world: go; not: reroll.
+      var leto = sheetItem("Leto's Amulet");
+      if (missing(leto)) {
+        var save = current(), room = null;
+        [save && save.campaign, save && save.adventure].forEach(function (b) { if (b && !room && b.events.some(function (e) { return e.key === 'Penitent'; })) room = b; });
+        world.push(ico(leto.name) + '<b>Leto\'s Amulet</b>' + itemWikiLink(leto) + ': ' +
+          (room ? '<b>in this world</b> (' + esc(room.label) + ') — secret room inside the Sunken Passage or the Hidden Sanctum, behind the wall "Only the penitent man may pass": crouch and walk into it.'
+            : 'not in this world. <b>Reroll.</b>'));
+      }
     }
 
     // Your character.
@@ -1459,6 +1508,7 @@
     var C = TILE_CELL, w = (maxY - minY + 1) * C, h = (maxX - minX + 1) * C;
     var px = function (t) { return (t.y - minY) * C; }, py = function (t) { return (maxX - t.x) * C; };
     var out = [];
+    var fixedOnTile = fixedEventsIn(z);
     z.tiles.forEach(function (t) {
       if (t.kind !== 'vista' || t.x < minX || t.x > maxX || t.y < minY || t.y > maxY) return;
       out.push('<rect class="t-vista" x="' + (px(t) + 6) + '" y="' + (py(t) + 6) + '" width="' + (C - 12) + '" height="' + (C - 12) + '" rx="6"/>');
@@ -1514,6 +1564,7 @@
         '<rect x="' + (x + 8) + '" y="' + (y + 8) + '" width="' + (C - 16) + '" height="' + (C - 16) + '" rx="7"/>');
       var lines = [];
       if (t.kind === 'start') lines.push(['Start', '']);
+      fixedOnTile.forEach(function (x) { if (x.tile(t)) lines.push([short(x.ev.name, 15), 'acc']); });
       // Passages by the name of the area they lead to; otherwise the tile's tag ("→ City").
       var named = t.links.map(function (l) { return passageTo(l, z); }).filter(Boolean);
       named.forEach(function (p) { lines.push([short(p.text, 15), p.kind === 'teleport' ? 'acc' : '']); });
@@ -1550,8 +1601,26 @@
   }
 
   // Everything an area holds, as a list: events, waypoints, chests and loot on the ground.
+  // Fixed places the world save keeps no event for, shown where they are on the map: Founder's Hideout is
+  // the start of Fairview (the tile the save tags "POI_Ford"), in the main Earth campaign.
+  var FIXED_ON_MAP = { FoundersHideout: { zone: 'Fairview', tile: function (t) { return /Ford/.test(t.tag || ''); } } };
+  function fixedEventsIn(z) {
+    var save = current(), out = [];
+    if (!save) return out;
+    [save.campaign, save.adventure].forEach(function (b) {
+      if (!b) return;
+      b.events.forEach(function (ev) { var f = FIXED_ON_MAP[ev.key]; if (f && f.zone === z.name) out.push({ ev: ev, tile: f.tile }); });
+    });
+    return out;
+  }
+
   function zoneContents(z, ws) {
     var rows = [];
+    fixedEventsIn(z).forEach(function (x) {
+      var items = x.ev.items.map(function (p) { var it = itemsByKey[p]; return { name: it ? it.name : p, item: it }; });
+      rows.push(statusIcon(items.every(function (i) { return i.item && itemOwned(i.item) === true; })) + ' ' + esc(x.ev.name) + ' <span class="cat">' + esc(TYPE_LABEL[x.ev.type] || x.ev.type) + ' · on the start tile</span>' +
+        items.map(function (i) { return evItem(i); }).join(''));
+    });
     ws.events.filter(function (e) { return e.zoneId === z.id || e.ownZone === z.id; }).forEach(function (e) {
       // Item drops don't record completion: they count as done when you own the item; trait books can't be told.
       var sheet = e.items.filter(function (i) { return i.item; });
@@ -1598,7 +1667,9 @@
     var switcher = modes.length > 1 ? '<div class="seg" id="map-mode">' + modes.map(function (m) {
       return '<button type="button" data-map-mode="' + esc(m) + '" class="' + (m === state.mapMode ? 'active' : '') + '">' + esc(m) + ' <span class="cat">' + ws.zones.filter(function (z) { return z.mode === m; }).length + '</span></button>';
     }).join('') + '</div>' : '';
-    var index = zones.map(function (z) { return '<a class="chip on" href="#zone-' + z.id + '">' + '·'.repeat(depthOf(z)) + esc(z.name) + '</a>'; }).join('');
+    // Place filter in alphabetical order.
+    var index = zones.slice().sort(function (a, b) { return a.name.localeCompare(b.name); })
+      .map(function (z) { return '<a class="chip on" href="#zone-' + z.id + '">' + esc(z.name) + '</a>'; }).join('');
     var legend = '<div class="legend"><span class="lg t-start">Start</span><span class="lg t-exit">Exit / way to another area</span><span class="lg t-poi">Event / point of interest</span>' +
       '<span class="lg t-straight">Path</span><span class="lg t-vista">Scenery</span> <span class="cat">faded tile: no sign you have been there yet · ✔ completed · ⚑ waypoint · ✚ respawn checkpoint · ▣ chests opened/total · • loot on the ground · ★ gear or trait book on the ground · hover a tile for everything in it</span></div>';
     el.innerHTML = switcher + '<div class="chips map-index">' + index + '</div>' + legend + zones.map(function (z) {
@@ -1823,10 +1894,12 @@
     $('character').addEventListener('change', function (e) { state.charIndex = +e.target.value; store('char', state.charIndex); render(); });
     document.querySelector('.tabs').addEventListener('click', function (e) {
       var b = e.target.closest('.tab'); if (!b) return;
+      // Remember how far down the section you leave was, and open the next one where you left it.
+      if (document.body.classList.contains('loaded')) (savedView.scroll = savedView.scroll || {})[state.tab] = Math.round(window.scrollY);
       state.tab = b.dataset.tab;
       // Reopen on the last section with data, not on About.
       if (INFO_TABS.indexOf(state.tab) < 0) store('tab', state.tab);
-      if (document.body.classList.contains('loaded')) render(); else showPage();
+      if (document.body.classList.contains('loaded')) { render(); restoreScroll(); } else showPage();
     });
     $('mode-switch').addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b) return;
@@ -1938,7 +2011,14 @@
   }
 
   showVersion();
+  restoreInputs();
+  if (savedView.dps) Object.keys(savedView.dps).forEach(function (k) { dpsOn[k] = savedView.dps[k]; });
   wire();
+  // Keep what you change: after every click, typing or switch, and the scroll as you move.
+  ['click', 'input', 'change'].forEach(function (t) { document.addEventListener(t, function () { setTimeout(saveView, 0); }, true); });
+  var scrollTimer = null;
+  window.addEventListener('scroll', function () { clearTimeout(scrollTimer); scrollTimer = setTimeout(saveView, 250); });
+  window.addEventListener('beforeunload', saveView);
   showPage();
   tryAuto();
 })();
