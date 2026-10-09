@@ -70,9 +70,11 @@
     var n = className(t.TileLevelName), id = t.ID;
     // Event areas keep a placeholder tile at (-1000, -1000): not part of the map.
     if (/^Tile_Blank/.test(n) || t.Tag === 'Blank' || Math.abs(t.Coord.X) >= 1000) return 'blank';
-    if (/VistaNear|Vista/.test(n)) return 'vista';
+    // Scenery around the playable tiles (the level name or the tag says so).
+    if (/VistaNear|Vista/.test(n) || /Vista/.test(t.Tag || '')) return 'vista';
     if (id === 'Start') return 'start';
-    if (id === 'End' || /End_Transition|Transition_End|_End_/.test(n)) return 'exit';
+    // Ways to other areas: the zone's end, and dungeon entrances / exits ("Dungeon", "Dungeon1_Entrance").
+    if (id === 'End' || /^Dungeon/.test(id || '') || /End_Transition|Transition_End|_End_/.test(n)) return 'exit';
     if (/POI/.test(id) || /^Quest_/.test(n)) return 'poi';
     if (/_CRN_|_CNR_/.test(n)) return 'corner';
     if (/_TJ_/.test(n)) return 'junction';

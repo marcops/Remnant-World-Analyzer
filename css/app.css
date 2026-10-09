@@ -262,6 +262,8 @@ ul.tips li { margin: 5px 0; font-size: 14px; }
 /* What's here: rows bring their own marks (✔ ⚑ ▣ •); event items indented under their event. */
 .here { list-style: none; margin: 0; padding: 0; font-size: 14px; }
 .here li { margin: 0 0 7px; }
+.here a { color: var(--now); text-decoration: none; }
+.here a:hover { text-decoration: underline; }
 .here .evitem { margin: 2px 0 0 20px; font-size: 13px; }
 svg.zmap { display: block; }
 .zmap .tile rect { fill: var(--panel-2); stroke: var(--line); stroke-width: 1.5; }

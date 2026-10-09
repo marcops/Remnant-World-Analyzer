@@ -1392,6 +1392,27 @@
   function short(s, n) { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
 
   // Tile layout of one zone as SVG: rooms, corridors (edge bits), events, chests, loot and waypoints.
+  // Where a passage leads. "1007_Zone" is the area whose quest id is 1007 (Junk Town), "1008_Zone_POI"
+  // the way out of that area's dungeon back here, and the Cryptolith teleporter goes to the Labyrinth.
+  // Returns { zone, kind: 'entrance' | 'way' | 'back' | 'teleport', text } or null.
+  function passageTo(l, here) {
+    var ws = state.worldStates && state.worldStates[state.charIndex];
+    if (!ws || !ws.zones || l.type !== 'Link') return null;
+    var zone = null, kind;
+    var m = /^(\d+)_Zone(_POI)?$/.exec(l.to || '');
+    if (m) {
+      zone = ws.zones.filter(function (x) { return String(x.questId) === m[1]; })[0];
+      kind = m[2] ? 'back' : 'way';
+    } else if (/CryptolithTeleporter/.test(l.name)) {
+      zone = ws.zones.filter(function (x) { return /Cryptolith/.test(x.name) && x.parent != null; })[0];
+      kind = 'teleport';
+    }
+    if (!zone) return null;
+    if (kind === 'way' && here && zone.parent === here.id) kind = 'entrance';
+    var text = { entrance: '→ ' + zone.name, way: '→ ' + zone.name, back: '↩ out of ' + zone.name, teleport: '⇄ ' + zone.name }[kind];
+    return { zone: zone, kind: kind, text: text };
+  }
+
   function zoneLayoutSvg(z) {
     var core = z.tiles.filter(function (t) { return t.kind !== 'blank' && t.kind !== 'vista'; });
     if (!core.length) return '<p class="cat">No tile layout stored for this area (fixed map).</p>';
@@ -1416,14 +1437,21 @@
       var precious = t.loot.some(function (l) { return l.item && /Ring|Amulet|Weapon|Armor|Mod|Trait/.test(l.item.category) || l.name === 'Trait Book'; });
       var tip = [z.name + ' — tile ' + t.id + ' (' + t.level + ')', t.role !== 'None' ? 'Role: ' + t.role : '', t.tag && t.tag !== 'None' ? 'Tag: ' + t.tag : '']
         .concat(t.events.map(function (e) { return e.type + ': ' + e.name + (e.done ? ' (completed)' : ''); }))
-        .concat(t.links.map(function (l) { return ({ Waypoint: 'Waypoint', Checkpoint: 'Respawn checkpoint', Link: 'Passage' }[l.type] || l.type) + (l.label ? ': ' + l.label : '') + (l.used ? ' (used)' : '') + (l.active ? '' : ' (inactive)'); }))
+        .concat(t.links.map(function (l) {
+          var p = passageTo(l, z);
+          if (p) return { entrance: 'Entrance: ', way: 'Way to: ', back: 'Way out of: ', teleport: 'Teleporter to: ' }[p.kind] + p.zone.name + (l.used ? ' (used)' : '');
+          return ({ Waypoint: 'Waypoint', Checkpoint: 'Respawn checkpoint', Link: 'Passage' }[l.type] || l.type) + (l.label ? ': ' + l.label : '') + (l.used ? ' (used)' : '') + (l.active ? '' : ' (inactive)');
+        }))
         .concat(t.chests ? ['Chests: ' + t.chestsOpen + ' of ' + t.chests + ' opened'] : [])
         .concat(t.loot.map(function (l) { return 'On the ground: ' + l.name + (l.quantity > 1 ? ' ×' + l.quantity : ''); }))
         .filter(Boolean).join('\n');
       out.push('<g class="tile t-' + t.kind + '"><title>' + esc(tip) + '</title><rect x="' + (x + 8) + '" y="' + (y + 8) + '" width="' + (C - 16) + '" height="' + (C - 16) + '" rx="7"/>');
       var lines = [];
       if (t.kind === 'start') lines.push(['Start', '']);
-      if (t.kind === 'exit') lines.push([short(t.tag && t.tag !== 'None' ? t.tag.replace(/^To/, '→ ') : 'Exit', 12), '']);
+      // Passages by the name of the area they lead to; otherwise the tile's tag ("→ City").
+      var named = t.links.map(function (l) { return passageTo(l, z); }).filter(Boolean);
+      named.forEach(function (p) { lines.push([short(p.text, 15), p.kind === 'teleport' ? 'acc' : '']); });
+      if (!named.length && t.kind === 'exit') lines.push([short(t.tag && t.tag !== 'None' ? t.tag.replace(/^To/, '→ ') : 'Exit', 12), '']);
       t.events.forEach(function (e) { lines.push([(e.done ? '✔ ' : '') + short(e.name, 13), e.done ? 'ok' : e.type === 'Item drop' ? 'acc' : 'miss']); });
       if (t.links.some(function (l) { return l.type === 'Waypoint'; })) lines.push(['⚑ waypoint', 'now']);
       if (t.links.some(function (l) { return l.type === 'Checkpoint'; })) lines.push(['✚ checkpoint', 'now']);
@@ -1471,6 +1499,12 @@
       rows.push(statusIcon(skins.every(function (i) { return itemOwned(i.item) === true; })) + ' Whispers <span class="cat">Merchant · armor skins for scrap and Glowing Fragments</span>' +
         skins.map(function (i) { return evItem(i); }).join(''));
     }
+    // Passages: dungeon entrances, ways to other areas and out of a dungeon, the Cryptolith teleporter.
+    z.links.forEach(function (l) {
+      var p = passageTo(l, z); if (!p) return;
+      var what = { entrance: 'dungeon entrance', way: 'way to another area', back: 'way out of its dungeon', teleport: 'Cryptolith teleporter' }[p.kind];
+      rows.push('<a href="#zone-' + p.zone.id + '">' + esc(p.text) + '</a> <span class="cat">' + what + (l.used ? ' · used' : '') + '</span>');
+    });
     z.links.filter(function (l) { return l.type !== 'Link'; }).forEach(function (l) {
       rows.push((l.type === 'Waypoint' ? '⚑ ' : '✚ ') + esc(l.label || (l.type === 'Waypoint' ? 'Waypoint' : 'Respawn checkpoint')) + (l.active ? '' : ' <span class="cat">inactive</span>'));
     });
