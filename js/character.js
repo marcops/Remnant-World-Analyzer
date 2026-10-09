@@ -184,6 +184,7 @@
       dragonHeartUses: counters['Counter.DragonHeart'] || 0,
       stats: {
         weakspotKills: stats.WeakspotKills || 0,
+        explosiveKills: stats.ExplosiveDamageKills || 0,
         revives: stats.NumRevives || 0,
         timesRevived: stats.NumTimesRevived || 0,
         downedByTeammates: stats.NumTimesDownedByTeammates || 0,
