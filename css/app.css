@@ -271,6 +271,10 @@ svg.zmap { display: block; }
 .zmap .t-exit rect { fill: color-mix(in srgb, var(--now) 30%, var(--panel)); }
 .zmap .t-poi rect { fill: color-mix(in srgb, var(--accent) 30%, var(--panel)); }
 .zmap .tile:hover rect { stroke: var(--accent); stroke-width: 2.5; }
+/* Tiles with no sign you have been there yet. */
+.zmap .tile.unseen rect.base { fill: var(--panel); stroke: none; opacity: 1; }
+.zmap .tile.unseen rect:not(.base), .zmap .tile.unseen text { opacity: .4; }
+.zmap .tile.unseen:hover rect:not(.base), .zmap .tile.unseen:hover text { opacity: .85; }
 .zmap .t-vista { fill: none; stroke: var(--line); stroke-dasharray: 3 3; }
 .zmap .t-path { stroke: var(--muted); stroke-width: 6; stroke-linecap: round; opacity: .55; }
 .zmap .tl { font-size: 9.5px; fill: var(--text); }

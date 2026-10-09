@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MANUAL_KEYS, EXTRA_EVENT_ITEMS, WEAPON_ALIASES } from './overrides.mjs';
+import { MANUAL_KEYS, EXTRA_EVENT_ITEMS, WEAPON_ALIASES, MODE_FIX } from './overrides.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(ROOT, 'tools/source');
@@ -190,6 +190,16 @@ function build({ report }) {
     for (const p of paths) if (!gameInfo.events[ev].items.includes(p)) gameInfo.events[ev].items.push(p);
   }
   const { unusedPaths } = link(items, gameInfo);
+
+  // Campaign-only / adventure-only items the sheet doesn't tag (tools/overrides.mjs).
+  for (const it of items) {
+    const fix = MODE_FIX[it.category + '|' + it.name];
+    if (!fix) continue;
+    it.mode = fix[0];
+    if (fix[1] && !it.how.includes(fix[1].trim())) it.how += fix[1];
+  }
+  const unknown = Object.keys(MODE_FIX).filter((k) => !items.some((it) => it.category + '|' + it.name === k));
+  if (unknown.length) console.warn('MODE_FIX names not in the sheet:', unknown.join(', '));
 
   items.forEach((it, i) => { it.id = i; });
   // "Comes equipped in the Repulsor": the mod is owned/available exactly when the weapon is.

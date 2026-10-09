@@ -44,3 +44,25 @@ export const EXTRA_EVENT_ITEMS = {
 export const WEAPON_ALIASES = {
   devestator: 'devastator',
 };
+
+// Mode tag for items that exist only in the campaign (their event is a fixed campaign place: the Undying
+// King, the Dreamer, Harsgaard, the Root Mother's church, the rebels' siege, Founder's Hideout, the Ward Prime
+// story) or only in Adventure mode. "Category|Name": [mode, extra "how to obtain" text or ''].
+const CAMPAIGN_ONLY = ' Only in the campaign: it never shows up in Adventure mode.';
+export const MODE_FIX = {
+  'Weapon|Ruin': ['Campaign', CAMPAIGN_ONLY],
+  'Trait|Kingslayer': ['Campaign', CAMPAIGN_ONLY],
+  'Weapon|Riven': ['Campaign', CAMPAIGN_ONLY],
+  'Emote|Gravedigger Emote': ['Campaign', CAMPAIGN_ONLY],
+  'Trait|Triage': ['Campaign', CAMPAIGN_ONLY],
+  'Weapon|Repulsor': ['Campaign', CAMPAIGN_ONLY],
+  "Trait|Mind's Eye": ['Campaign', CAMPAIGN_ONLY],
+  'Emote|Praise the Gun Emote': ['Campaign', CAMPAIGN_ONLY],
+  'Weapon|Fusion Rifle': ['Campaign', ' Only in the Subject 2923 campaign: it never shows up in Adventure mode.'],
+  "Weapon|World's Edge": ['Campaign', ' Only in the Subject 2923 campaign: it never shows up in Adventure mode.'],
+  'Weapon|Sniper Rifle': ['Campaign', CAMPAIGN_ONLY],
+  'Trait|Wisdom': ['Campaign', CAMPAIGN_ONLY],
+  "Armor|Drifter's Overcoat": ['Campaign', ' Only in the main Earth campaign (Fairview, right after Ward 13): not in Adventure mode or the Subject 2923 campaign, so reroll the main campaign to get it.'],
+  "Armor|Drifter's Trousers": ['Campaign', ' Only in the main Earth campaign (Fairview, right after Ward 13): not in Adventure mode or the Subject 2923 campaign, so reroll the main campaign to get it.'],
+  'Mod|Vampiric': ['Adventure', ' Only in Adventure mode.'],
+};

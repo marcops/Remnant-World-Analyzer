@@ -493,17 +493,15 @@
 
   // A key item counts as yours when you carry one, the saves record handing it in, or you own something that
   // only comes through it (`proof`, by default its rewards). The Sigil is used three times: it needs every reward.
-  // Story keys with no trace, and keys whose reward has another source (Tarnished Ring), are unknown.
+  // A key whose reward also comes another way (the Tarnished Ring: Scavenger also comes from picking up 50,000
+  // scrap) is judged by itself: missing until you carry it. Story keys with no trace are unknown.
   function itemOwned(it) {
     if (it.quest) {
       if (!character()) return null;
       if (carries(it) || questSeen(it)) return true;
       if (it.repeat) return it.rewards.every(function (r) { return state.owns(r) === true; });
-      var proof = it.proof || it.rewards;
-      if (proof.some(function (r) { return state.owns(r) === true; })) return true;
-      if (!it.rewards.length) return null;
-      if (!proof.length) return it.rewards.every(function (r) { return state.owns(r) === true; }) ? null : false;
-      return false;
+      if ((it.proof || it.rewards).some(function (r) { return state.owns(r) === true; })) return true;
+      return it.rewards.length || it.proof ? false : null;
     }
     if (it.category === 'Skin') return skinOwned(it);
     return UNTRACKED[it.category] ? null : state.owns(it);
@@ -1348,7 +1346,7 @@
     });
 
     // Collection.
-    var coll = [], gaps = {}, modeOnly = { Survival: [], Hardcore: [] };
+    var coll = [], gaps = {}, modeOnly = { Survival: [], Hardcore: [], Campaign: [] };
     DATA.items.forEach(function (it) {
       if (!collectible(it) || itemOwned(it) !== false) return;
       if (modeOnly[it.mode]) { modeOnly[it.mode].push(it); return; }
@@ -1356,7 +1354,8 @@
     });
     var ranked = Object.keys(gaps).sort(function (a, b) { return gaps[b].length - gaps[a].length; });
     if (ranked.length) coll.push('<b>Best world to roll next:</b> ' + ranked.map(function (w) { return esc(WORLD_LABEL[w] || w) + ' (' + gaps[w].length + ' missing)'; }).join(' · '));
-    Object.keys(modeOnly).forEach(function (m) { if (modeOnly[m].length) coll.push('<b>' + m + ' mode</b> only: ' + modeOnly[m].length + ' items missing — ' + modeOnly[m].map(function (i) { return esc(i.name) + itemWikiLink(i); }).join(', ')); });
+    // Campaign-only items are left out of "best world to roll": an adventure never has them.
+    Object.keys(modeOnly).forEach(function (m) { if (modeOnly[m].length) coll.push((m === 'Campaign' ? '<b>Campaign only</b> (never in an adventure, reroll the campaign): ' : '<b>' + m + ' mode</b> only: ') + modeOnly[m].length + ' items missing — ' + modeOnly[m].map(function (i) { return esc(i.name) + itemWikiLink(i); }).join(', ')); });
     // Armor skins: what Whispers (Ward 13) would sell you with the scrap and Glowing Fragments you have.
     var pc = state.profile && state.profile.characters && state.profile.characters[state.charIndex];
     if (pc) {
@@ -1413,6 +1412,40 @@
     return { zone: zone, kind: kind, text: text };
   }
 
+  // Tiles your walked path (fog of war cells) covers. The save doesn't say how its cells line up with the
+  // tiles, so every tile size (40–64 cells) and offset that puts nearly all cells on tiles and covers the
+  // tiles known to be visited is tried; a tile counts only when all of them agree. Cached per area.
+  var walkedCache = {};
+  function walkedTiles(z, core, known) {
+    var key = z.id + ':' + z.fow.length;
+    if (walkedCache[key]) return walkedCache[key];
+    var set = {};
+    core.forEach(function (t) { set[t.x + ',' + t.y] = t; });
+    var anchors = core.filter(function (t) { return known[t.id]; });
+    var mx = Infinity, my = Infinity;
+    z.fow.forEach(function (c) { if (c[0] < mx) mx = c[0]; if (c[1] < my) my = c[1]; });
+    var votes = {}, fits = 0;
+    for (var S = 40; S <= 64; S += 2) {
+      for (var ox = 0; ox < S; ox += 4) for (var oy = 0; oy < S; oy += 4) {
+        var cnt = {};
+        z.fow.forEach(function (c) { var k = Math.floor((c[0] - mx + ox) / S) + ',' + Math.floor((c[1] - my + oy) / S); cnt[k] = (cnt[k] || 0) + 1; });
+        var cells = Object.keys(cnt).map(function (k) { var p = k.split(','); return [+p[0], +p[1], cnt[k]]; });
+        // The first known tile (the start) has to hold some cells: only shifts that put a cell group on it.
+        var shifts = anchors.length ? cells.map(function (c) { return [anchors[0].x - c[0], anchors[0].y - c[1]]; }) : [];
+        for (var si = 0; si < shifts.length; si++) {
+          var dx = shifts[si][0], dy = shifts[si][1], hit = 0;
+          cells.forEach(function (c) { if (set[(c[0] + dx) + ',' + (c[1] + dy)]) hit += c[2]; });
+          if (hit < z.fow.length * 0.97) continue;
+          if (!anchors.every(function (t) { return cnt[(t.x - dx) + ',' + (t.y - dy)]; })) continue;
+          fits++;
+          core.forEach(function (t) { if ((cnt[(t.x - dx) + ',' + (t.y - dy)] || 0) >= 3) votes[t.id] = (votes[t.id] || 0) + 1; });
+        }
+      }
+    }
+    walkedCache[key] = fits ? core.filter(function (t) { return votes[t.id] === fits; }).map(function (t) { return t.id; }) : [];
+    return walkedCache[key];
+  }
+
   function zoneLayoutSvg(z) {
     var core = z.tiles.filter(function (t) { return t.kind !== 'blank' && t.kind !== 'vista'; });
     if (!core.length) return '<p class="cat">No tile layout stored for this area (fixed map).</p>';
@@ -1426,12 +1459,29 @@
       if (t.kind !== 'vista' || t.x < minX || t.x > maxX || t.y < minY || t.y > maxY) return;
       out.push('<rect class="t-vista" x="' + (px(t) + 6) + '" y="' + (py(t) + 6) + '" width="' + (C - 12) + '" height="' + (C - 12) + '" rx="6"/>');
     });
-    // Corridors first so rooms sit on top of them.
-    core.forEach(function (t) {
-      var cx = px(t) + C / 2, cy = py(t) + C / 2;
-      // Same turn for the passage directions (grid dx, dy -> screen dy, -dx).
-      WS.EDGES.forEach(function (e) { if (t.edges & e[0]) out.push('<line class="t-path" x1="' + cx + '" y1="' + cy + '" x2="' + (cx + e[2] * C / 2) + '" y2="' + (cy - e[1] * C / 2) + '"/>'); });
-    });
+    // Where you've been: tiles the save proves (an area you walked: its start, an opened chest, a completed
+    // event, a passage or waypoint you used), plus every tile on the way from the start to each of them,
+    // following the tiles' connections (you can't reach them without walking through).
+    var at = {};
+    core.forEach(function (t) { at[t.x + ',' + t.y] = t; });
+    var proved = function (t) { return t.kind === 'start' || t.chestsOpen > 0 || t.events.some(function (e) { return e.done; }) || t.links.some(function (l) { return l.used; }); };
+    var been = {};
+    var start = z.fow.length ? core.filter(function (t) { return t.kind === 'start'; })[0] : null;
+    if (start) {
+      // Shortest way from the start to every tile (breadth-first over the tile connections).
+      var prev = {}, queue = [start], seen = {};
+      seen[start.id] = true;
+      while (queue.length) {
+        var t0 = queue.shift();
+        WS.EDGES.forEach(function (e) {
+          var n = (t0.edges & e[0]) && at[(t0.x + e[1]) + ',' + (t0.y + e[2])];
+          if (n && !seen[n.id]) { seen[n.id] = true; prev[n.id] = t0; queue.push(n); }
+        });
+      }
+      core.filter(proved).forEach(function (t) { for (var p = t; p; p = prev[p.id]) been[p.id] = true; });
+      // Plus the tiles your walked path covers, when every way of laying it on the tiles agrees.
+      if (core.length > 2) walkedTiles(z, core, been).forEach(function (id) { been[id] = true; });
+    }
     core.forEach(function (t) {
       var x = px(t), y = py(t);
       var precious = t.loot.some(function (l) { return l.item && /Ring|Amulet|Weapon|Armor|Mod|Trait/.test(l.item.category) || l.name === 'Trait Book'; });
@@ -1445,7 +1495,13 @@
         .concat(t.chests ? ['Chests: ' + t.chestsOpen + ' of ' + t.chests + ' opened'] : [])
         .concat(t.loot.map(function (l) { return 'On the ground: ' + l.name + (l.quantity > 1 ? ' ×' + l.quantity : ''); }))
         .filter(Boolean).join('\n');
-      out.push('<g class="tile t-' + t.kind + '"><title>' + esc(tip) + '</title><rect x="' + (x + 8) + '" y="' + (y + 8) + '" width="' + (C - 16) + '" height="' + (C - 16) + '" rx="7"/>');
+      // Full colour where the save proves you were (the start of an area you walked, an opened chest,
+      // a completed event, a passage or waypoint you used); faded everywhere else.
+      var was = !!been[t.id];
+      out.push('<g class="tile t-' + t.kind + (was ? ' been' : ' unseen') + '"><title>' + esc(tip + (was ? '' : '\n(no sign you have been here yet)')) + '</title>' +
+        // A faded tile still hides the passage lines under it: an opaque base, then the tile's colour faded.
+        (was ? '' : '<rect class="base" x="' + (x + 8) + '" y="' + (y + 8) + '" width="' + (C - 16) + '" height="' + (C - 16) + '" rx="7"/>') +
+        '<rect x="' + (x + 8) + '" y="' + (y + 8) + '" width="' + (C - 16) + '" height="' + (C - 16) + '" rx="7"/>');
       var lines = [];
       if (t.kind === 'start') lines.push(['Start', '']);
       // Passages by the name of the area they lead to; otherwise the tile's tag ("→ City").
@@ -1534,7 +1590,7 @@
     }).join('') + '</div>' : '';
     var index = zones.map(function (z) { return '<a class="chip on" href="#zone-' + z.id + '">' + '·'.repeat(depthOf(z)) + esc(z.name) + '</a>'; }).join('');
     var legend = '<div class="legend"><span class="lg t-start">Start</span><span class="lg t-exit">Exit / way to another area</span><span class="lg t-poi">Event / point of interest</span>' +
-      '<span class="lg t-straight">Path</span><span class="lg t-vista">Scenery</span> <span class="cat">✔ completed · ⚑ waypoint · ✚ respawn checkpoint · ▣ chests opened/total · • loot on the ground · ★ gear or trait book on the ground · hover a tile for everything in it</span></div>';
+      '<span class="lg t-straight">Path</span><span class="lg t-vista">Scenery</span> <span class="cat">faded tile: no sign you have been there yet · ✔ completed · ⚑ waypoint · ✚ respawn checkpoint · ▣ chests opened/total · • loot on the ground · ★ gear or trait book on the ground · hover a tile for everything in it</span></div>';
     el.innerHTML = switcher + '<div class="chips map-index">' + index + '</div>' + legend + zones.map(function (z) {
       var parent = z.parent != null ? ws.zones.filter(function (x) { return x.id === z.parent; })[0] : null;
       // Travel points (waypoints) by name; respawn checkpoints and passages to other areas as counts.
