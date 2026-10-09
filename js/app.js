@@ -1109,7 +1109,8 @@
     var kills = ch.kills.map(function (k) { return meter(ico(k.name) + esc(k.name) + rowGlobe(k), num(k.kills), topKills ? k.kills / topKills : 0); }).join('');
     var s = ch.stats;
     var statRows = [
-      ['Kills with your weapons', ch.kills.reduce(function (n, k) { return n + k.kills; }, 0)], ['Weak spot kills', s.weakspotKills], ['Kills with explosive damage', s.explosiveKills],
+      ['Kills with your weapons', ch.kills.reduce(function (n, k) { return n + k.kills; }, 0)], ['Weapons with 100+ kills', ch.kills.filter(function (k) { return k.kills >= 100; }).length],
+      ['Weak spot kills', s.weakspotKills], ['Kills with explosive damage', s.explosiveKills],
       ['Allies revived', s.revives], ['Times revived', s.timesRevived],
       ['Downed by teammates', s.downedByTeammates], ['Damage to armored enemies', s.armoredDamage], ['Status effects applied', s.statusEffects],
       ['Status effects cleansed', s.cleansed], ['Fall damage taken', s.fallDamage], ['Obstacles vaulted', s.vaults],
