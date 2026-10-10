@@ -198,6 +198,8 @@
       var key = parts.slice(2).join('_'), ev = DATA.events[key];
       // The Cryptolith tower has one quest per world (Cryptolith_City, _Swamp, _Wasteland) but one reward list.
       if (/^Cryptolith_/.test(key)) { ev = DATA.events.Cryptolith; key = 'Cryptolith'; }
+      // The Sketterling Temple (Corsus beetles: Hardened Carapace, Red Vikorian drops) is the "Sketterling" event.
+      if (key === 'Sketterling_Temple') { ev = DATA.events.Sketterling; key = 'Sketterling'; }
       var z = zones[q.zoneId] || zones[q.inZone];
       var r = rootOf(q), mode = r && /AdventureMode/.test(r.cls) ? 'Adventure' : r && /Campaign/.test(r.cls) ? 'Campaign' : '';
       var e = {

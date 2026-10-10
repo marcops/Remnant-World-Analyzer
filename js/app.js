@@ -166,6 +166,10 @@
       catch (e) { console.error(e); state.parsed[i] = { error: String(e), file: name }; }
       try { state.worlds[i] = CHAR.readWorld(state.files[name]); } catch (e) { console.error(e); state.worlds[i] = null; }
       try { state.worldStates[i] = WS.read(state.files[name]); } catch (e) { console.error(e); state.worldStates[i] = { error: String(e) }; }
+      // Key items an event drops go first in its list (the Hardened Carapace before the Carapace set it buys).
+      ((state.worldStates[i] || {}).events || []).forEach(function (e) {
+        QUEST_ITEMS.forEach(function (q) { if (q.from === e.key) e.items.unshift({ name: q.name, item: q }); });
+      });
     });
     var indexes = Object.keys(state.parsed).map(Number);
     if (state.charIndex == null || !state.parsed[state.charIndex]) {
@@ -386,6 +390,9 @@
       how: 'Behind the giant fan in the Ward 13 basement (after the keycard and the fuse). Opens the door at the end of level B2, where the Submachine Gun lies on a table.' },
     { id: 'glowingrod', name: 'Glowing Rod', carried: /GlowingRod/i, from: 'ArmorVault', world: 'Rhom', rewards: byName(['Akari Mask', 'Akari Garb', 'Akari Leggings']),
       how: 'Found in dungeons on Rhom when the Vault of the Heralds (Armor Vault) is in the world. Each of the three doors at the end of the vault needs one rod: Akari Mask, Garb and Leggings.' },
+    { id: 'carapace', name: 'Hardened Carapace', carried: /Hardened_?Carapace/i, from: 'Sketterling', world: 'Corsus', dlc: 'Swamps of Corsus', repeat: true,
+      rewards: byName(['Carapace Great Helm', 'Carapace Shell', 'Carapace Greaves']),
+      how: 'Dropped by the Black Vikorian Beetles during the Sketterling Temple event (Corsus). With the Parasite effect (from an Iskal Infector), Mar\'Gosh sells each Carapace piece for one Hardened Carapace plus scrap (Great Helm 500, Shell 1,500, Greaves 1,000).' },
     { id: 'homestead', name: 'Homestead Basement Key', carried: /Homestead_?Key/i, from: 'WardPrime', world: 'Ward Prime', dlc: 'Subject 2923', rewards: byName(['Vanguard Ring']),
       how: 'In Dr. Enji Sato and Dr. Sebastian Weisskoof\'s office in Ward Prime, when the Homestead is in your Rural Earth. Destroy the shelves in the Homestead house, go down and unlock the basement for the Vanguard Ring.' },
     { id: 'hunterskey', name: "Hunter's Key", carried: /HuntersKey|HunterKey/i, from: 'HuntersHideout', world: 'Earth', rewards: byName(['Hunting Pistol']),
@@ -447,7 +454,7 @@
     return false;
   }
   var SIGIL = QUEST_ITEMS[0], SIGIL_KEY = SIGIL.key;
-  // Everything the Missing items tab counts: the sheet's items plus the quest items.
+  // Everything the Checklist tab counts: the sheet's items plus the quest items.
   var TRACKED_ITEMS = DATA.items.concat(QUEST_ITEMS);
   // Rewards listed as their quest item instead of on their own.
   function isCryptolithReward(it) { return QUEST_ITEMS.some(function (q) { return q.hide && q.rewards.indexOf(it) >= 0; }); }
@@ -672,12 +679,12 @@
     var hideOwned = $('world-hide-owned').checked && !!character();
     var rows = [], lastZone = null, shown = 0;
     block.events.forEach(function (ev) {
-      // Whispers' skins are shown in Items, Missing items and the Ward 13 map, not in this table.
+      // Whispers' skins are shown in Items, Checklist and the Ward 13 map, not in this table.
       if (ev.key === 'Whispers') return;
       if (!state.worldZones[ev.zone] || !state.worldTypes[ev.type]) return;
       var items = ev.items.map(itemForPath);
       // Quest items this event drops (Sigil from the Iskal Queen, heart from Ixillis), while something they unlock is missing.
-      QUEST_ITEMS.forEach(function (qi) { if (qi.from === ev.key && (itemOwned(qi) !== true || qi.rewards.some(function (r) { return itemOwned(r) === false; }))) items.push(qi); });
+      QUEST_ITEMS.forEach(function (qi) { if (qi.from === ev.key && (itemOwned(qi) !== true || qi.rewards.some(function (r) { return itemOwned(r) === false; }))) items.unshift(qi); });
       var wanted = function (it) { return itemOwned(it) === false; };
       if (!allCats) {
         items = items.filter(function (it) { return it.quest || state.worldCats[it.category]; });
@@ -931,7 +938,7 @@
   }
 
   // ---- items (picture grid) ------------------------------------------------
-  // Same items as Missing items, as pictures by world: filter by what you have, type, world and mode;
+  // Same items as the Checklist, as pictures by world: filter by what you have, type, world and mode;
   // an item opens a panel on the side with its stats and how to get it.
   function itemId(it) { return it.key || 'name:' + it.name; }
   function typeLabel(it) { return it.category === 'Weapon' && it.group ? it.group : it.category; }
@@ -1147,12 +1154,14 @@
     var statRows = [
       ['Kills with your weapons', ch.kills.reduce(function (n, k) { return n + k.kills; }, 0)], ['Weapons with 100+ kills', ch.kills.filter(function (k) { return k.kills >= 100; }).length],
       ['Weak spot kills', s.weakspotKills], ['Kills with explosive damage', s.explosiveKills],
+      // The save keeps no count of summon kills: only the Invoker trait (100 of them) tells.
+      ['Kills by your summons', ch.traits.some(function (t) { return t.name === 'Invoker'; }) ? '100 or more (Invoker unlocked)' : 'under 100 (Invoker not unlocked yet)'],
       ['Allies revived', s.revives], ['Times revived', s.timesRevived],
       ['Downed by teammates', s.downedByTeammates], ['Damage to armored enemies', s.armoredDamage], ['Status effects applied', s.statusEffects],
       ['Status effects cleansed', s.cleansed], ['Fall damage taken', s.fallDamage], ['Obstacles vaulted', s.vaults],
       ['Weapon mods acquired', s.modsAcquired], ['Times the dog was petted', s.dogPets],
     ];
-    var stats = '<table class="kv">' + statRows.map(function (r) { return '<tr><th>' + esc(r[0]) + '</th><td>' + num(r[1]) + '</td></tr>'; }).join('') + '</table>';
+    var stats = '<table class="kv">' + statRows.map(function (r) { return '<tr><th>' + esc(r[0]) + '</th><td>' + (typeof r[1] === 'string' ? esc(r[1]) : num(r[1])) + '</td></tr>'; }).join('') + '</table>';
 
     var deaths = world && world.deaths.length ? '<table class="kv">' + world.deaths.slice(0, 15).map(function (d) {
       return '<tr><th>' + esc(d.name) + (d.type ? ' <span class="cat">' + esc(d.type) + '</span>' : '') + '</th><td>' + d.count + '</td></tr>';
@@ -1468,7 +1477,7 @@
     }
     if (state.available) {
       var now = DATA.items.filter(function (it) { var k = itemKeyForAvailability(it); return collectible(it) && it.category !== 'Skin' && itemOwned(it) === false && k && state.available[k]; });
-      if (now.length) coll.push(now.length + ' missing items drop in the world you have loaded — see <b>Missing items</b> › "Only what I can get in my world right now".');
+      if (now.length) coll.push(now.length + ' missing items drop in the world you have loaded — see <b>Checklist</b> › "Only what I can get in my world right now".');
     }
 
     el.innerHTML = '<div class="panels">' + cryptolithPanel(ch, ws) +
