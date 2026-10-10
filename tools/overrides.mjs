@@ -66,3 +66,9 @@ export const MODE_FIX = {
   "Armor|Drifter's Trousers": ['Campaign', ' Only in the main Earth campaign (Fairview, right after Ward 13): not in Adventure mode or the Subject 2923 campaign, so reroll the main campaign to get it.'],
   'Mod|Vampiric': ['Adventure', ' Only in Adventure mode.'],
 };
+
+// Events the game files name differently from the game's map: the Felmourn Burrow (where the Frostborne is)
+// is the quest "Quest_OverworldPOI_VargylBones"; its waypoint in the save reads "Felmourn Burrow".
+export const EVENT_NAMES = {
+  VargylBones: 'Felmourn Burrow',
+};

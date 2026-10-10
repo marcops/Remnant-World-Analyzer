@@ -263,6 +263,16 @@ ul.tips li { margin: 5px 0; font-size: 14px; }
 .zviews .zhere { flex: 1 1 260px; min-width: 240px; }
 /* What's here: rows bring their own marks (✔ ⚑ ▣ •); event items indented under their event. */
 .here { list-style: none; margin: 0; padding: 0; font-size: 14px; }
+/* What's here, under the maps: one box per group (Items, Enemies, Farm, Scenery), side by side. */
+.zhere { margin-top: 14px; }
+.here-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; align-items: start; }
+.here-box { background: var(--panel-2); border: 1px solid var(--line); border-top: 3px solid var(--line); border-radius: 8px; padding: 10px 12px; min-width: 0; }
+.here-box.hb-items { border-top-color: var(--accent); }
+.here-box.hb-foes { border-top-color: var(--miss); }
+.here-box.hb-farm { border-top-color: var(--ok); }
+.here-box.hb-scenery { border-top-color: var(--now); }
+.here-h { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; }
+.here-h small { color: var(--muted); font-weight: 400; letter-spacing: 0; }
 .here li { margin: 0 0 7px; }
 .here a { color: var(--now); text-decoration: none; }
 .here a:hover { text-decoration: underline; }
@@ -284,6 +294,9 @@ svg.zmap { display: block; }
 .zmap .tl.miss { fill: var(--miss); }
 .zmap .tl.acc { fill: var(--accent); }
 .zmap .tl.now { fill: var(--now); }
+.zmap .tl.rare { fill: var(--accent); font-weight: 700; }
+/* Simulacrum in What's here. */
+.here .rare { color: var(--accent); }
 svg.zfog { display: block; background: var(--panel-2); border-radius: 6px; }
 .zfog path { fill: var(--accent); stroke: var(--accent); stroke-width: 1.4; stroke-linejoin: round; }
 .spawns { margin-top: 6px; }

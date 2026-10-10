@@ -616,10 +616,24 @@
     var t = e.tally, what = e.key === 'Wisp' ? 'Hives destroyed' : 'Destroyed';
     return '<div class="hint">' + what + ': <b>' + t.done + ' of ' + t.of + '</b>' + (e.key === 'Wisp' ? (t.done >= t.of ? ' — all of them' : ' — ' + (t.of - t.done) + ' left') + ' (Evocation: without a wisp hitting you)' : '') + '</div>';
   }
-  function tallyFor(key, mode) {
+  // The world save's copy of an event (tally, intro, spawns) for one of Current world's events.
+  function wsEventFor(key, mode) {
     var ws = state.worldStates && state.worldStates[state.charIndex];
-    return ((ws && ws.events) || []).filter(function (e) { return e.key === key && e.tally && (!mode || e.mode.toLowerCase() === mode); })[0] || null;
+    return ((ws && ws.events) || []).filter(function (e) { return e.key === key && (!mode || e.mode.toLowerCase() === mode); })[0] || null;
   }
+  // Bosses whose intro played: you already reached them.
+  function introHtml(e) {
+    if (!e || !e.intro) return '';
+    return e.done ? '<div class="cat">Intro seen</div>' : '<div class="hint">You already reached it — its intro played, not beaten yet</div>';
+  }
+  // "Root Splitter ×6, Root Broken Weak ×5" from { name: count }.
+  function creatureList(by) { return Object.keys(by).sort(function (a, b) { return by[b] - by[a] || a.localeCompare(b); }).map(function (n) { return esc(n) + (by[n] > 1 ? ' ×' + by[n] : ''); }).join(', '); }
+  // Who an event brings (from the save's spawn lists; names are the game's own class names).
+  function spawnsHtml(e) {
+    if (!e || !e.spawns || !e.spawns.length) return '';
+    return '<div class="cat" title="What the game spawns for this event, by the names the game uses">Spawns: ' + e.spawns.map(function (s) { return esc(s.role) + ' — ' + creatureList(s.creatures); }).join(' · ') + '</div>';
+  }
+  function eventExtras(e) { return tallyHtml(e) + introHtml(e) + spawnsHtml(e); }
 
   // Fextralife wiki pages for the areas our locations name, keyed by lowercase alphanumerics.
   // Every slug was checked to exist; areas without a page (Fairview, Reisum's areas, …) get no link.
@@ -719,7 +733,7 @@
       if (ev.zone !== lastZone) { rows.push('<tr class="zone-row"><td colspan="4">' + esc(WORLD_LABEL[ev.zone]) + '</td></tr>'); lastZone = ev.zone; }
       shown++;
       rows.push('<tr><td class="loc">' + esc(ev.location) + wikiLink(ev.location) + '</td><td class="type"><span class="type-badge">' + esc(TYPE_LABEL[ev.type] || ev.type) +
-        '</span></td><td class="name">' + esc(ev.name) + tallyHtml(tallyFor(ev.key, state.mode)) + (puzzleHintFor(ev.key) ? '<div class="hint">Magir Test: <b>' + esc(puzzleHintFor(ev.key).short) + '</b></div>' : '') +
+        '</span></td><td class="name">' + esc(ev.name) + tallyHtml(wsEventFor(ev.key, state.mode)) + (puzzleHintFor(ev.key) ? '<div class="hint">Magir Test: <b>' + esc(puzzleHintFor(ev.key).short) + '</b></div>' : '') +
         // Events that want a quest item: say which rewards need it and whether you carry it.
         gatedAt(ev).map(function (qi) {
           return '<div class="cat">' + esc(qi.usedAt[ev.key].length === qi.rewards.length ? 'Needs the ' + qi.name + '.' : qi.usedAt[ev.key].map(function (i) { return i.name; }).join(', ') + ' need the ' + qi.name + '.') +
@@ -1312,7 +1326,7 @@
         var items = e.items.map(function (i) { return evItem(i, i.item ? itemWikiLink(i.item) : ''); }).join('');
         return '<tr><th><span class="st ' + st.cls + '">' + (st.cls === 'ok' ? '✔' : st.cls === 'miss' ? '✘' : '?') + '</span> ' + esc(e.name) +
           ' <span class="cat">' + esc(e.type) + (e.area ? ' · ' + esc(e.area) : '') + '</span>' + (e.area ? wikiLink(e.area) : '') + '</th><td>' +
-          '<div class="cat">' + esc(st.text) + '</div>' + tallyHtml(e) + (e.correctStatue != null ? '<div class="hint">Magir Test: <b>press ' + esc(statueText(e.correctStatue)) + '</b></div>' : '') + items + '</td></tr>';
+          '<div class="cat">' + esc(st.text) + '</div>' + eventExtras(e) + (e.correctStatue != null ? '<div class="hint">Magir Test: <b>press ' + esc(statueText(e.correctStatue)) + '</b></div>' : '') + items + '</td></tr>';
       }).join('') + '</table>', true);
     };
 
@@ -1621,6 +1635,9 @@
         }))
         .concat(t.chests ? ['Chests: ' + t.chestsOpen + ' of ' + t.chests + ' opened'] : [])
         .concat(t.loot.map(function (l) { return 'On the ground: ' + l.name + (l.quantity > 1 ? ' ×' + l.quantity : ''); }))
+        .concat((z.ambient || []).filter(function (a) { return a.tileId === t.id; }).map(function (a) {
+          return 'Enemies: ' + Object.keys(a.creatures).map(function (n) { return n + (a.creatures[n] > 1 ? ' ×' + a.creatures[n] : ''); }).join(', ');
+        }))
         .filter(Boolean).join('\n');
       // Full colour where the save proves you were (the start of an area you walked, an opened chest,
       // a completed event, a passage or waypoint you used); faded everywhere else.
@@ -1637,7 +1654,7 @@
       named.forEach(function (p) { lines.push([short(p.text, 15), p.kind === 'teleport' ? 'acc' : '']); });
       if (!named.length && t.kind === 'exit') lines.push([short(t.tag && t.tag !== 'None' ? t.tag.replace(/^To/, '→ ') : 'Exit', 12), '']);
       t.events.forEach(function (e) {
-        lines.push([(e.done ? '✔ ' : '') + short(e.name, 13), e.done ? 'ok' : e.type === 'Item drop' ? 'acc' : 'miss']);
+        lines.push([(e.done ? '✔ ' : RARE.test(e.name) ? '★ ' : '') + short(e.name, 13), e.done ? 'ok' : RARE.test(e.name) ? 'rare' : e.type === 'Item drop' ? 'acc' : 'miss']);
         if (e.correctStatue != null) lines.push(['statue no. ' + e.correctStatue, 'now']);
         if (e.tally) lines.push([(e.key === 'Wisp' ? 'hives ' : '') + e.tally.done + '/' + e.tally.of, e.tally.done >= e.tally.of ? 'ok' : 'now']);
       });
@@ -1685,43 +1702,70 @@
     return out;
   }
 
+  // What's in an area, in four groups: items (events and what they give), enemies, farm (left on the
+  // ground, chests) and scenery (passages, waypoints, people).
+  // Worth a detour: Simulacrum (the rarest upgrade material) is set apart wherever it shows up on the map.
+  var RARE = /Simulacrum/i;
+  function rareName(name) { return RARE.test(name) ? '<b class="rare">★ ' + esc(name) + '</b>' : esc(name); }
   function zoneContents(z, ws) {
-    var rows = [];
+    var items = [], foes = [], farm = [], scenery = [];
     fixedEventsIn(z).forEach(function (x) {
-      var items = x.ev.items.map(function (p) { var it = itemsByKey[p]; return { name: it ? it.name : p, item: it }; });
-      rows.push(statusIcon(items.every(function (i) { return i.item && itemOwned(i.item) === true; })) + ' ' + esc(x.ev.name) + ' <span class="cat">' + esc(TYPE_LABEL[x.ev.type] || x.ev.type) + ' · on the start tile</span>' +
-        items.map(function (i) { return evItem(i); }).join(''));
+      var list = x.ev.items.map(function (p) { var it = itemsByKey[p]; return { name: it ? it.name : p, item: it }; });
+      items.push(statusIcon(list.every(function (i) { return i.item && itemOwned(i.item) === true; })) + ' ' + esc(x.ev.name) + ' <span class="cat">' + esc(TYPE_LABEL[x.ev.type] || x.ev.type) + ' · on the start tile</span>' +
+        list.map(function (i) { return evItem(i); }).join(''));
     });
-    ws.events.filter(function (e) { return e.zoneId === z.id || e.ownZone === z.id; }).forEach(function (e) {
+    var events = ws.events.filter(function (e) { return e.zoneId === z.id || e.ownZone === z.id; });
+    events.forEach(function (e) {
       // Item drops don't record completion: they count as done when you own the item; trait books can't be told.
       var sheet = e.items.filter(function (i) { return i.item; });
       var done = e.done ? true : e.type !== 'Item drop' ? false : sheet.length ? sheet.every(function (i) { return itemOwned(i.item) === true; }) : null;
-      rows.push(statusIcon(done) + ' ' + esc(e.name) + ' <span class="cat">' + esc(e.type) + '</span>' +
-        (e.correctStatue != null ? '<div class="hint">Magir Test: <b>press ' + esc(statueText(e.correctStatue)) + '</b> — the real Magir, from your save</div>' : '') + tallyHtml(e) +
+      items.push(statusIcon(done) + ' ' + rareName(e.name) + ' <span class="cat">' + esc(e.type) + '</span>' +
+        (e.correctStatue != null ? '<div class="hint">Magir Test: <b>press ' + esc(statueText(e.correctStatue)) + '</b> — the real Magir, from your save</div>' : '') + tallyHtml(e) + introHtml(e) +
         e.items.map(function (i) { return evItem(i); }).join(''));
     });
     // Ward 13: Whispers and the armor skins he sells (the world save doesn't list merchants' stock as events).
     if (/^Ward 13\b/.test(z.name) && DATA.events.Whispers) {
       var skins = DATA.events.Whispers.items.map(function (p) { return { name: itemsByKey[p].name, item: itemsByKey[p] }; });
-      rows.push(statusIcon(skins.every(function (i) { return itemOwned(i.item) === true; })) + ' Whispers <span class="cat">Merchant · armor skins for scrap and Glowing Fragments</span>' +
+      items.push(statusIcon(skins.every(function (i) { return itemOwned(i.item) === true; })) + ' Whispers <span class="cat">Merchant · armor skins for scrap and Glowing Fragments</span>' +
         skins.map(function (i) { return evItem(i); }).join(''));
     }
-    // Passages: dungeon entrances, ways to other areas and out of a dungeon, the Cryptolith teleporter.
+
+    // Enemies the game placed on this area's tiles (they come back each time the area reloads), then who each event brings.
+    var all = {};
+    (z.ambient || []).forEach(function (t) { Object.keys(t.creatures).forEach(function (n) { all[n] = (all[n] || 0) + t.creatures[n]; }); });
+    Object.keys(all).sort(function (a, b) { return all[b] - all[a] || a.localeCompare(b); }).forEach(function (n, i, list) {
+      foes.push('⚔ ' + esc(n) + (all[n] > 1 ? ' ×' + all[n] : '') + (i === list.length - 1 ? '<div class="cat">across ' + z.ambient.length + ' tiles · they come back when the area reloads</div>' : ''));
+    });
+    events.forEach(function (e) {
+      (e.spawns || []).forEach(function (sp) { foes.push((e.done ? '✔ ' : '⚔ ') + esc(e.name) + ' — ' + esc(sp.role) + ': ' + creatureList(sp.creatures)); });
+    });
+
+    // Farm: what is still lying on the ground, and the chests.
+    var loot = {};
+    ws.loot.filter(function (l) { return l.zone === z.id; }).forEach(function (l) { loot[l.name] = (loot[l.name] || 0) + l.quantity; });
+    Object.keys(loot).forEach(function (n) { farm.push('• ' + rareName(n) + (loot[n] > 1 ? ' ×' + num(loot[n]) : '') + ' <span class="cat">on the ground</span>'); });
+    if (z.chests) farm.push('▣ ' + z.chestsOpen + ' of ' + z.chests + ' chests opened');
+
+    // Scenery: passages (dungeon entrances, ways to other areas and out of a dungeon, the Cryptolith teleporter),
+    // waypoints and checkpoints, people.
     z.links.forEach(function (l) {
       var p = passageTo(l, z); if (!p) return;
       var what = { entrance: 'dungeon entrance', way: 'way to another area', back: 'way out of its dungeon', teleport: 'Cryptolith teleporter' }[p.kind];
-      rows.push('<a href="#zone-' + p.zone.id + '">' + esc(p.text) + '</a> <span class="cat">' + what + (l.used ? ' · used' : '') + '</span>');
+      scenery.push('<a href="#zone-' + p.zone.id + '">' + esc(p.text) + '</a> <span class="cat">' + what + (l.used ? ' · used' : '') + '</span>');
     });
     z.links.filter(function (l) { return l.type !== 'Link'; }).forEach(function (l) {
-      rows.push((l.type === 'Waypoint' ? '⚑ ' : '✚ ') + esc(l.label || (l.type === 'Waypoint' ? 'Waypoint' : 'Respawn checkpoint')) + (l.active ? '' : ' <span class="cat">inactive</span>'));
+      scenery.push((l.type === 'Waypoint' ? '⚑ ' : '✚ ') + esc(l.label || (l.type === 'Waypoint' ? 'Waypoint' : 'Respawn checkpoint')) + (l.active ? '' : ' <span class="cat">inactive</span>'));
     });
-    if (z.chests) rows.push('▣ ' + z.chestsOpen + ' of ' + z.chests + ' chests opened');
-    var loot = {};
-    ws.loot.filter(function (l) { return l.zone === z.id; }).forEach(function (l) { loot[l.name] = (loot[l.name] || 0) + l.quantity; });
-    Object.keys(loot).forEach(function (n) { rows.push('• ' + esc(n) + (loot[n] > 1 ? ' ×' + num(loot[n]) : '') + ' <span class="cat">on the ground</span>'); });
-    var npcs = ws.npcs.filter(function (n) { return /Zone_(\d+)_/.exec(n.where) && +/Zone_(\d+)_/.exec(n.where)[1] === z.id; });
-    npcs.forEach(function (n) { rows.push('☺ ' + esc(n.name) + (n.items.length ? ' <span class="cat">carries ' + esc(n.items.join(', ')) + '</span>' : '')); });
-    return rows.length ? '<ul class="here">' + rows.map(function (r) { return '<li>' + r + '</li>'; }).join('') + '</ul>' : '<p class="cat">Nothing recorded here.</p>';
+    ws.npcs.filter(function (n) { return /Zone_(\d+)_/.exec(n.where) && +/Zone_(\d+)_/.exec(n.where)[1] === z.id; }).forEach(function (n) {
+      scenery.push('☺ ' + esc(n.name) + (n.items.length ? ' <span class="cat">carries ' + esc(n.items.join(', ')) + '</span>' : ''));
+    });
+
+    var group = function (cls, icon, title, rows) {
+      return rows.length ? '<div class="here-box ' + cls + '"><h4 class="here-h"><span>' + icon + ' ' + title + '</span><small>' + rows.length + '</small></h4><ul class="here">' +
+        rows.map(function (r) { return '<li>' + r + '</li>'; }).join('') + '</ul></div>' : '';
+    };
+    var html = group('hb-items', '◆', 'Items', items) + group('hb-foes', '⚔', 'Enemies', foes) + group('hb-farm', '▣', 'Farm', farm) + group('hb-scenery', '⌂', 'Scenery', scenery);
+    return html ? '<div class="here-groups">' + html + '</div>' : '<p class="cat">Nothing recorded here.</p>';
   }
 
   // Re-render the expensive tabs only when they're shown.
@@ -1768,10 +1812,10 @@
       var here = '<div class="zhere"><div class="section-title">What\'s here</div>' + zoneContents(z, ws) + '</div>';
       var views = (core.length > 2
         ? '<div><div class="section-title">Layout</div>' + zoneLayoutSvg(z) + '</div><div><div class="section-title">Your path</div>' + zoneFogSvg(z) + '</div>'
-        : '<div><div class="section-title">Your path <span class="cat">(fixed map: no tile layout in the save)</span></div>' + zoneFogSvg(z, 560) + '</div>') + here;
+        : '<div><div class="section-title">Your path <span class="cat">(fixed map: no tile layout in the save)</span></div>' + zoneFogSvg(z, 560) + '</div>');
       return '<section class="panel zone" id="zone-' + z.id + '"><h3>' + esc(z.name) + wikiLink(z.name) + '</h3><p class="cat">' + esc(facts) + '</p>' +
         (links ? '<div class="chips">' + links + '</div>' : '') +
-        '<div class="zviews">' + views + '</div>' +
+        '<div class="zviews">' + views + '</div>' + here +
         (z.spawns.length ? '<details class="spawns"><summary class="cat">Spawn tables (' + z.spawns.length + ')</summary><p class="cat">' + esc(z.spawns.join(', ')) + '</p></details>' : '') +
         '</section>';
     }).join('');

@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MANUAL_KEYS, EXTRA_EVENT_ITEMS, WEAPON_ALIASES, MODE_FIX } from './overrides.mjs';
+import { MANUAL_KEYS, EXTRA_EVENT_ITEMS, WEAPON_ALIASES, MODE_FIX, EVENT_NAMES } from './overrides.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(ROOT, 'tools/source');
@@ -188,6 +188,11 @@ function build({ report }) {
   for (const [ev, paths] of Object.entries(EXTRA_EVENT_ITEMS)) {
     gameInfo.events[ev] = gameInfo.events[ev] || { altName: null, items: [] };
     for (const p of paths) if (!gameInfo.events[ev].items.includes(p)) gameInfo.events[ev].items.push(p);
+  }
+  // Names as the game's map shows them (tools/overrides.mjs).
+  for (const [ev, name] of Object.entries(EVENT_NAMES)) {
+    if (gameInfo.events[ev]) gameInfo.events[ev].altName = name;
+    else console.warn('EVENT_NAMES event not in GameInfo:', ev);
   }
   const { unusedPaths } = link(items, gameInfo);
 

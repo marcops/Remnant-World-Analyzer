@@ -18,6 +18,17 @@
   function splitWords(s) { return String(s).replace(/([a-z])([A-Z])/g, '$1 $2').replace(/_/g, ' ').replace(/\s+/g, ' ').trim(); }
   function className(path) { return String(path || '').split('/').pop().split('.').pop().replace(/_C$/, ''); }
 
+  // Creatures the game spawns, by their class: Character_Root_Broken_Weak → "Root Broken Weak".
+  function creatureName(path) { return splitWords(className(path).replace(/^Character_/, '').replace(/_(NPC|Champion)$/, ' $1')); }
+  // { name: how many } of the creatures in a list of spawn entries (not items, props or empty slots).
+  function countCreatures(list, into) {
+    (list || []).forEach(function (s) {
+      var e = s && s.SpawnEntry; if (!e || !/Character/.test(String(e.Type || ''))) return;
+      var n = creatureName(e.ActorBP); into[n] = (into[n] || 0) + (e.Quantity || 1);
+    });
+    return into;
+  }
+
   var QUEST_TYPE = { Boss: 'Boss', MiniBoss: 'Miniboss', SmallD: 'Dungeon', Siege: 'Siege', Event: 'Item drop', OverworldPOI: 'Point of interest' };
   var LOOT_NAMES = {
     Resource_Scraps: 'Scrap', Resource_Rare_Iron: 'Simple Iron', Resource_Rare_ForgedIron: 'Forged Iron', Resource_Rare_GalvanizedIron: 'Galvanized Iron',
@@ -114,6 +125,12 @@
               return { label: (l.Label || '').replace(/\0/g, ''), type: String(l.Type || '').replace('EZoneLinkType::', ''), category: l.Category, tileId: l.TileID, active: !!l.IsActive, used: !!l.Used, name: l.NameID, to: l.DestinationZone };
             }),
             spawns: (p.DynamicResources || []).map(className),
+            // Enemies the game placed on each tile (AmbientSpawnManager); they come back when the area reloads.
+            ambient: ((a.comps.AmbientSpawnManager || {}).AmbientSpawns || []).map(function (t) {
+              var by = countCreatures(t.Spawns, {});
+              (t.Regions || []).forEach(function (r) { countCreatures(r.Spawns, by); });
+              return { tileId: t.TileID, creatures: by };
+            }).filter(function (t) { return Object.keys(t.creatures).length; }),
             chests: 0, chestsOpen: 0, loot: 0,
           };
         } else if (/^Quest_/.test(cls)) {
@@ -213,6 +230,19 @@
       if (q.props.AssignedCorrectLord && lord != null) e.correctStatue = lord;
       // Events that count what you destroyed (Circlet Hatchery: the wisp hives, for Evocation).
       if (q.props.TotalSpawned != null) e.tally = { done: q.props.TotalKilled || 0, of: q.props.TotalSpawned };
+      // Bosses: the intro played, so you already reached it.
+      if (q.props.IntroComplete === true) e.intro = true;
+      // Who this event brings: boss, minions, NPCs (each spawn group of the quest, "Boss", "Minions", "Elf"…).
+      // Numbered groups count as one: "Blink Thief 01/02/03", "DormantSplitters1/2/3", "Boss2(Optional)".
+      var roles = {};
+      Object.keys(q.comps || {}).forEach(function (k) {
+        var by = countCreatures(q.comps[k] && q.comps[k].Spawns, {});
+        if (!Object.keys(by).length) return;
+        var role = splitWords(k.replace(/\(Optional\)/, '').replace(/[\s_-]*\d+$/, '')) || 'Spawn';
+        roles[role] = roles[role] || {};
+        Object.keys(by).forEach(function (n) { roles[role][n] = (roles[role][n] || 0) + by[n]; });
+      });
+      e.spawns = Object.keys(roles).map(function (r) { return { role: r, creatures: roles[r] }; });
       var t = tileOf(q.inZone, q.tileId); if (t) t.events.push(e);
       return e;
     }).filter(Boolean);
