@@ -206,6 +206,9 @@
         state: q.state, done: q.state === 'Complete', mode: mode,
         items: ev ? ev.items.map(function (p) { return CHAR.itemFromPath(p); }) : [],
       };
+      // Magir Test (Frozen Lords, Judgement's Spear): the save keeps which of the 8 statues is the real Magir.
+      var lord = q.props['CorrectLord#'] != null ? q.props['CorrectLord#'] : q.props.CorrectLord;
+      if (q.props.AssignedCorrectLord && lord != null) e.correctStatue = lord;
       var t = tileOf(q.inZone, q.tileId); if (t) t.events.push(e);
       return e;
     }).filter(Boolean);

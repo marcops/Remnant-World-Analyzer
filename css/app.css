@@ -129,6 +129,8 @@ details.item summary::before { content: "▸"; color: var(--muted); display: inl
 details.item[open] summary::before { content: "▾"; }
 .how { margin: 4px 0 8px 16px; padding: 8px 10px; background: var(--panel-2); border-left: 3px solid var(--accent); border-radius: 4px; font-size: 14px; }
 .how .meta { color: var(--muted); font-size: 12px; margin-top: 4px; }
+/* Puzzle answers from the save (the Magir statue). */
+.hint { color: var(--now); font-size: 13px; margin-top: 4px; }
 
 .st { display: inline-block; width: 18px; text-align: center; font-weight: 700; }
 .st.ok { color: var(--ok); }

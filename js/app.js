@@ -494,7 +494,19 @@
   // One item of an event (World state, map): status, icon, name; greyed out with "needs …" when blocked.
   function evItem(i, after) {
     var needs = i.item ? needsTag(i.item) : '';
-    return '<div class="evitem' + (needs ? ' blocked' : '') + '">' + (i.item ? statusIcon(itemOwned(i.item)) : '') + ico(i.name) + esc(i.name) + (after || '') + needs + '</div>';
+    var step = i.item && itemOwned(i.item) !== true ? firstStep(i.item) : '';
+    return '<div class="evitem' + (needs ? ' blocked' : '') + '">' + (i.item ? statusIcon(itemOwned(i.item)) : '') + ico(i.name) + esc(i.name) + (after || '') + needs + step + '</div>';
+  }
+  // Rewards handed out here for something done elsewhere: the Krall Mother (Chillwind Hovel) gives the Blessed
+  // Necklace once you freed her baby, which spawns at random inside Wuthering Keep or The Wild Reach (the
+  // "KrallBaby" event; freeing it also gives Siphoner). Says whether that event is in your world, and where.
+  var FIRST_STEP = { 'Blessed Necklace': { what: 'free the Krall Baby', event: 'KrallBaby', places: 'Wuthering Keep or The Wild Reach' } };
+  function firstStep(it) {
+    var s = FIRST_STEP[it.name]; if (!s) return '';
+    var ws = state.worldStates && state.worldStates[state.charIndex];
+    var ev = ((ws && ws.events) || []).filter(function (e) { return e.key === s.event; })[0];
+    return ' <span class="cat">— first ' + esc(s.what) + ': ' + (ev ? '<b>in your world</b>, ' + mapLink(ev.zoneId, ev.area || s.places) + (ev.done ? ' (done)' : '')
+      : 'not in your world (it spawns at random inside ' + esc(s.places) + ')') + '</span>';
   }
   function needsTag(it) {
     var b = blockedBy(it);
@@ -552,11 +564,35 @@
     var meta = [it.category, it.world && WORLD_LABEL[it.world] !== undefined ? WORLD_LABEL[it.world] : it.world, it.mode && 'Mode: ' + it.mode, it.dlc && 'DLC: ' + it.dlc]
       .filter(Boolean).join(' · ');
     var needs = needsTag(it);
+    var hints = puzzleHints().filter(function (h) { return h.items.indexOf(it.key) >= 0; });
     return '<details class="item' + (needs ? ' blocked' : '') + '"><summary>' + statusIcon(itemOwned(it)) + ' ' + ico(it.name) + esc(it.name) + itemWikiLink(it) +
       (it.category ? '<span class="cat">' + esc(it.category) + '</span>' : '') + needs + (extra || '') + '</summary>' +
       '<div class="how">' + (it.how ? esc(it.how) : '<i>No description in the sheet.</i>') +
+      hints.map(function (h) { return '<div class="hint">' + h.html + '</div>'; }).join('') +
       (meta ? '<div class="meta">' + esc(meta) + '</div>' : '') + '</div></details>';
   }
+
+  // Puzzle answers the world save keeps. Magir Test (Frozen Lords, Judgement's Spear): which of the 8 statues
+  // at the cave is the real Magir. The save numbers them (FrozenLord1–8) but doesn't say where each stands.
+  // Where a statue number stands: 4 statues on each side, 1–4 on the left and 5–8 on the right, each side
+  // counted the same way (seen in game for no. 5, the first one on the right; the rest follows from it).
+  var ORDINAL = ['first', 'second', 'third', 'fourth'];
+  function statueSpot(n) { return n >= 1 && n <= 8 ? 'the ' + ORDINAL[(n - 1) % 4] + ' one on the ' + (n <= 4 ? 'left' : 'right') : ''; }
+  var STATUE_SPOT = { 1: statueSpot(1), 2: statueSpot(2), 3: statueSpot(3), 4: statueSpot(4), 5: statueSpot(5), 6: statueSpot(6), 7: statueSpot(7), 8: statueSpot(8) };
+  function statueText(n) { return 'statue no. ' + n + (STATUE_SPOT[n] ? ' (' + STATUE_SPOT[n] + ')' : ''); }
+  function puzzleHints() {
+    var ws = state.worldStates && state.worldStates[state.charIndex];
+    return ((ws && ws.events) || []).filter(function (e) { return e.correctStatue != null; }).map(function (e) {
+      return {
+        key: e.key, zoneId: e.zoneId, short: statueText(e.correctStatue),
+        items: (DATA.events[e.key] || { items: [] }).items,
+        html: '<b>In your world (' + esc(e.area) + '): press ' + esc(statueText(e.correctStatue)) + '</b> — the real Magir, from your save. ' +
+          (e.correctStatue === 5 ? '' : 'The 8 statues are 4 on each side, 1–4 on the left and 5–8 on the right (seen for no. 5, the first one on the right). ') +
+          'If a piece falls, press all the buttons, go to Ward 13 and back. Don\'t walk into the cave before pressing one.',
+      };
+    });
+  }
+  function puzzleHintFor(key) { return puzzleHints().filter(function (h) { return h.key === key; })[0] || null; }
 
   // Fextralife wiki pages for the areas our locations name, keyed by lowercase alphanumerics.
   // Every slug was checked to exist; areas without a page (Fairview, Reisum's areas, …) get no link.
@@ -656,7 +692,7 @@
       if (ev.zone !== lastZone) { rows.push('<tr class="zone-row"><td colspan="4">' + esc(WORLD_LABEL[ev.zone]) + '</td></tr>'); lastZone = ev.zone; }
       shown++;
       rows.push('<tr><td class="loc">' + esc(ev.location) + wikiLink(ev.location) + '</td><td class="type"><span class="type-badge">' + esc(TYPE_LABEL[ev.type] || ev.type) +
-        '</span></td><td class="name">' + esc(ev.name) +
+        '</span></td><td class="name">' + esc(ev.name) + (puzzleHintFor(ev.key) ? '<div class="hint">Magir Test: <b>' + esc(puzzleHintFor(ev.key).short) + '</b></div>' : '') +
         // Events that want a quest item: say which rewards need it and whether you carry it.
         gatedAt(ev).map(function (qi) {
           return '<div class="cat">' + esc(qi.usedAt[ev.key].length === qi.rewards.length ? 'Needs the ' + qi.name + '.' : qi.usedAt[ev.key].map(function (i) { return i.name; }).join(', ') + ' need the ' + qi.name + '.') +
@@ -1247,7 +1283,7 @@
         var items = e.items.map(function (i) { return evItem(i, i.item ? itemWikiLink(i.item) : ''); }).join('');
         return '<tr><th><span class="st ' + st.cls + '">' + (st.cls === 'ok' ? '✔' : st.cls === 'miss' ? '✘' : '?') + '</span> ' + esc(e.name) +
           ' <span class="cat">' + esc(e.type) + (e.area ? ' · ' + esc(e.area) : '') + '</span>' + (e.area ? wikiLink(e.area) : '') + '</th><td>' +
-          '<div class="cat">' + esc(st.text) + '</div>' + items + '</td></tr>';
+          '<div class="cat">' + esc(st.text) + '</div>' + (e.correctStatue != null ? '<div class="hint">Magir Test: <b>press ' + esc(statueText(e.correctStatue)) + '</b></div>' : '') + items + '</td></tr>';
       }).join('') + '</table>', true);
     };
 
@@ -1571,7 +1607,10 @@
       var named = t.links.map(function (l) { return passageTo(l, z); }).filter(Boolean);
       named.forEach(function (p) { lines.push([short(p.text, 15), p.kind === 'teleport' ? 'acc' : '']); });
       if (!named.length && t.kind === 'exit') lines.push([short(t.tag && t.tag !== 'None' ? t.tag.replace(/^To/, '→ ') : 'Exit', 12), '']);
-      t.events.forEach(function (e) { lines.push([(e.done ? '✔ ' : '') + short(e.name, 13), e.done ? 'ok' : e.type === 'Item drop' ? 'acc' : 'miss']); });
+      t.events.forEach(function (e) {
+        lines.push([(e.done ? '✔ ' : '') + short(e.name, 13), e.done ? 'ok' : e.type === 'Item drop' ? 'acc' : 'miss']);
+        if (e.correctStatue != null) lines.push(['statue no. ' + e.correctStatue, 'now']);
+      });
       if (t.links.some(function (l) { return l.type === 'Waypoint'; })) lines.push(['⚑ waypoint', 'now']);
       if (t.links.some(function (l) { return l.type === 'Checkpoint'; })) lines.push(['✚ checkpoint', 'now']);
       var icons = (t.chests ? '▣' + t.chestsOpen + '/' + t.chests + ' ' : '') + (t.loot.length ? (precious ? '★' : '•') + t.loot.length : '');
@@ -1628,6 +1667,7 @@
       var sheet = e.items.filter(function (i) { return i.item; });
       var done = e.done ? true : e.type !== 'Item drop' ? false : sheet.length ? sheet.every(function (i) { return itemOwned(i.item) === true; }) : null;
       rows.push(statusIcon(done) + ' ' + esc(e.name) + ' <span class="cat">' + esc(e.type) + '</span>' +
+        (e.correctStatue != null ? '<div class="hint">Magir Test: <b>press ' + esc(statueText(e.correctStatue)) + '</b> — the real Magir, from your save</div>' : '') +
         e.items.map(function (i) { return evItem(i); }).join(''));
     });
     // Ward 13: Whispers and the armor skins he sells (the world save doesn't list merchants' stock as events).
