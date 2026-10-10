@@ -438,6 +438,13 @@
     q.key = '__quest_' + q.id; q.category = 'Quest item'; q.quest = true; q.mode = ''; q.group = ''; q.dlc = q.dlc || '';
     q.hide = !!q.hide; q.usedAt = q.usedAt || {};
   });
+  // The sheet lists the Rusted Amulet as an amulet, but it's the first step of the Acid Cleaned Key: a key item,
+  // done once you own what the key gives. It keeps its game path, so the Fetid Pools event still finds it.
+  byName(['Rusted Amulet']).forEach(function (it) {
+    it.category = 'Quest item'; it.quest = true; it.id = 'rustedamulet'; it.carried = /RustedAmulet/i; it.hide = false; it.usedAt = {};
+    it.rewards = byName(['Heart of Darkness', "Hero's Ring", 'Fortification']);
+    it.how = 'Found in the Fetid Pools dungeon (Corsus). Wear it and crouch in one of the acid pools: it turns into the Acid Cleaned Key, which opens the doors to Heart of Darkness and, with 3 keys and other players, Hero\'s Ring and the Fortification trait.';
+  });
   // Story keys: true when your saves show you already went past them.
   function questSeen(q) {
     var s = q.seen; if (!s) return false;
@@ -460,7 +467,9 @@
   function isCryptolithReward(it) { return QUEST_ITEMS.some(function (q) { return q.hide && q.rewards.indexOf(it) >= 0; }); }
   function carries(q) {
     var ch = state.profile && state.profile.characters && state.profile.characters[state.charIndex];
-    return !!(ch && ch.extra && (ch.extra.questItems || []).some(function (x) { return q.carried.test(x.cls); }));
+    if (ch && ch.extra && (ch.extra.questItems || []).some(function (x) { return q.carried.test(x.cls); })) return true;
+    // Key items the sheet lists under their game path (the Rusted Amulet is a trinket): in your inventory.
+    return q.key.indexOf('__quest_') < 0 && !!state.owns && state.owns(q) === true;
   }
   function hasSigil() { return carries(SIGIL); }
   // Quest items handed over at this event, and the rewards that need them.
@@ -600,6 +609,17 @@
     });
   }
   function puzzleHintFor(key) { return puzzleHints().filter(function (h) { return h.key === key; })[0] || null; }
+  // "Hives destroyed 5 of 8" (Circlet Hatchery), as of the last time the game saved. Evocation needs all of
+  // them without a wisp hitting you; the save doesn't record hits.
+  function tallyHtml(e) {
+    if (!e || !e.tally) return '';
+    var t = e.tally, what = e.key === 'Wisp' ? 'Hives destroyed' : 'Destroyed';
+    return '<div class="hint">' + what + ': <b>' + t.done + ' of ' + t.of + '</b>' + (e.key === 'Wisp' ? (t.done >= t.of ? ' — all of them' : ' — ' + (t.of - t.done) + ' left') + ' (Evocation: without a wisp hitting you)' : '') + '</div>';
+  }
+  function tallyFor(key, mode) {
+    var ws = state.worldStates && state.worldStates[state.charIndex];
+    return ((ws && ws.events) || []).filter(function (e) { return e.key === key && e.tally && (!mode || e.mode.toLowerCase() === mode); })[0] || null;
+  }
 
   // Fextralife wiki pages for the areas our locations name, keyed by lowercase alphanumerics.
   // Every slug was checked to exist; areas without a page (Fairview, Reisum's areas, …) get no link.
@@ -699,7 +719,7 @@
       if (ev.zone !== lastZone) { rows.push('<tr class="zone-row"><td colspan="4">' + esc(WORLD_LABEL[ev.zone]) + '</td></tr>'); lastZone = ev.zone; }
       shown++;
       rows.push('<tr><td class="loc">' + esc(ev.location) + wikiLink(ev.location) + '</td><td class="type"><span class="type-badge">' + esc(TYPE_LABEL[ev.type] || ev.type) +
-        '</span></td><td class="name">' + esc(ev.name) + (puzzleHintFor(ev.key) ? '<div class="hint">Magir Test: <b>' + esc(puzzleHintFor(ev.key).short) + '</b></div>' : '') +
+        '</span></td><td class="name">' + esc(ev.name) + tallyHtml(tallyFor(ev.key, state.mode)) + (puzzleHintFor(ev.key) ? '<div class="hint">Magir Test: <b>' + esc(puzzleHintFor(ev.key).short) + '</b></div>' : '') +
         // Events that want a quest item: say which rewards need it and whether you carry it.
         gatedAt(ev).map(function (qi) {
           return '<div class="cat">' + esc(qi.usedAt[ev.key].length === qi.rewards.length ? 'Needs the ' + qi.name + '.' : qi.usedAt[ev.key].map(function (i) { return i.name; }).join(', ') + ' need the ' + qi.name + '.') +
@@ -1292,7 +1312,7 @@
         var items = e.items.map(function (i) { return evItem(i, i.item ? itemWikiLink(i.item) : ''); }).join('');
         return '<tr><th><span class="st ' + st.cls + '">' + (st.cls === 'ok' ? '✔' : st.cls === 'miss' ? '✘' : '?') + '</span> ' + esc(e.name) +
           ' <span class="cat">' + esc(e.type) + (e.area ? ' · ' + esc(e.area) : '') + '</span>' + (e.area ? wikiLink(e.area) : '') + '</th><td>' +
-          '<div class="cat">' + esc(st.text) + '</div>' + (e.correctStatue != null ? '<div class="hint">Magir Test: <b>press ' + esc(statueText(e.correctStatue)) + '</b></div>' : '') + items + '</td></tr>';
+          '<div class="cat">' + esc(st.text) + '</div>' + tallyHtml(e) + (e.correctStatue != null ? '<div class="hint">Magir Test: <b>press ' + esc(statueText(e.correctStatue)) + '</b></div>' : '') + items + '</td></tr>';
       }).join('') + '</table>', true);
     };
 
@@ -1619,6 +1639,7 @@
       t.events.forEach(function (e) {
         lines.push([(e.done ? '✔ ' : '') + short(e.name, 13), e.done ? 'ok' : e.type === 'Item drop' ? 'acc' : 'miss']);
         if (e.correctStatue != null) lines.push(['statue no. ' + e.correctStatue, 'now']);
+        if (e.tally) lines.push([(e.key === 'Wisp' ? 'hives ' : '') + e.tally.done + '/' + e.tally.of, e.tally.done >= e.tally.of ? 'ok' : 'now']);
       });
       if (t.links.some(function (l) { return l.type === 'Waypoint'; })) lines.push(['⚑ waypoint', 'now']);
       if (t.links.some(function (l) { return l.type === 'Checkpoint'; })) lines.push(['✚ checkpoint', 'now']);
@@ -1676,7 +1697,7 @@
       var sheet = e.items.filter(function (i) { return i.item; });
       var done = e.done ? true : e.type !== 'Item drop' ? false : sheet.length ? sheet.every(function (i) { return itemOwned(i.item) === true; }) : null;
       rows.push(statusIcon(done) + ' ' + esc(e.name) + ' <span class="cat">' + esc(e.type) + '</span>' +
-        (e.correctStatue != null ? '<div class="hint">Magir Test: <b>press ' + esc(statueText(e.correctStatue)) + '</b> — the real Magir, from your save</div>' : '') +
+        (e.correctStatue != null ? '<div class="hint">Magir Test: <b>press ' + esc(statueText(e.correctStatue)) + '</b> — the real Magir, from your save</div>' : '') + tallyHtml(e) +
         e.items.map(function (i) { return evItem(i); }).join(''));
     });
     // Ward 13: Whispers and the armor skins he sells (the world save doesn't list merchants' stock as events).

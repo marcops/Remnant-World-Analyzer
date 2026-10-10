@@ -211,6 +211,8 @@
       // Magir Test (Frozen Lords, Judgement's Spear): the save keeps which of the 8 statues is the real Magir.
       var lord = q.props['CorrectLord#'] != null ? q.props['CorrectLord#'] : q.props.CorrectLord;
       if (q.props.AssignedCorrectLord && lord != null) e.correctStatue = lord;
+      // Events that count what you destroyed (Circlet Hatchery: the wisp hives, for Evocation).
+      if (q.props.TotalSpawned != null) e.tally = { done: q.props.TotalKilled || 0, of: q.props.TotalSpawned };
       var t = tileOf(q.inZone, q.tileId); if (t) t.events.push(e);
       return e;
     }).filter(Boolean);
