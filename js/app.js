@@ -401,6 +401,9 @@
       how: 'With the Parasite effect (from an Iskal Infector), tell the Iskal Queen you want to help the Iskal. Needs the Graveyard Elf in the same Corsus map: sneak up to her cauldron with the vial for the Ring of the Unclean and the Potency trait.' },
     { id: 'janitorswatch', name: "Janitor's Watch", carried: /JanitorsWatch/i, from: 'JanitorsWatch', world: 'Reisum', dlc: 'Subject 2923', rewards: byName(['Amber Moonstone']),
       how: 'Random drop in Drolniir Woods (Reisum). Give it to Clementine for the Amber Moonstone ring.' },
+    { id: 'krallbaby', name: 'Krall Baby', carried: /KrallBaby/i, from: 'KrallBaby', world: 'Reisum', dlc: 'Subject 2923', rewards: byName(['Siphoner', 'Blessed Necklace']), proof: byName(['Siphoner']),
+      usedAt: { Afterbirth: byName(['Blessed Necklace']) },
+      how: 'A random event inside Wuthering Keep or The Wild Reach (Reisum): free the Krall Baby for the Siphoner trait, then talk to the Krall Mother at the Chillwind Hovel for the Blessed Necklace.' },
     { id: 'lizkey', name: "Liz's Key", carried: /LizKey|LizsKey/i, from: 'LizAndLiz', world: 'Earth', rewards: byName(['Chicago Typewriter']),
       how: 'Reward for the "A Tale of Two Liz\'s" event (Earth). Opens the locked door with the Chicago Typewriter.' },
     { id: 'monkeykey', name: 'Monkey Key', carried: /MonkeyKey/i, from: 'LastWill', world: 'Earth', rewards: byName(['Assault Rifle']),
@@ -736,7 +739,7 @@
         '</span></td><td class="name">' + esc(ev.name) + tallyHtml(wsEventFor(ev.key, state.mode)) + (puzzleHintFor(ev.key) ? '<div class="hint">Magir Test: <b>' + esc(puzzleHintFor(ev.key).short) + '</b></div>' : '') +
         // Events that want a quest item: say which rewards need it and whether you carry it.
         gatedAt(ev).map(function (qi) {
-          return '<div class="cat">' + esc(qi.usedAt[ev.key].length === qi.rewards.length ? 'Needs the ' + qi.name + '.' : qi.usedAt[ev.key].map(function (i) { return i.name; }).join(', ') + ' need the ' + qi.name + '.') +
+          return '<div class="cat">' + esc(qi.usedAt[ev.key].length === qi.rewards.length ? 'Needs the ' + qi.name + '.' : qi.usedAt[ev.key].map(function (i) { return i.name; }).join(', ') + (qi.usedAt[ev.key].length > 1 ? ' need the ' : ' needs the ') + qi.name + '.') +
             (carries(qi) ? ' You carry it.' : '') + '</div>';
         }).join('') +
         (EXCHANGES[ev.key] ? '<div class="cat">' + esc(EXCHANGES[ev.key].note) + (exchangeReady(ev) ? ' You have it.' : '') + '</div>' : '') + '</td><td>' +
@@ -1532,8 +1535,14 @@
     var ws = state.worldStates && state.worldStates[state.charIndex];
     if (!ws || !ws.zones || l.type !== 'Link') return null;
     var zone = null, kind;
+    // Links name the area they lead to by its NameID ("2130_Zone", "2130_Zone_POI", "2134_Dungeon_Zone", "1494_Zone2").
+    var target = l.to && ws.zones.filter(function (x) { return x.nameId === l.to; })[0];
     var m = /^(\d+)_Zone(_POI)?$/.exec(l.to || '');
-    if (m) {
+    if (target) {
+      // A dungeon's exit opens into the overworld from its last area: it's the way out of that dungeon.
+      if (/_Dungeon_Exit$/.test(l.name)) { zone = ws.zones.filter(function (x) { return x.id === target.parent; })[0] || target; kind = 'back'; }
+      else { zone = target; kind = 'way'; }
+    } else if (m) {
       zone = ws.zones.filter(function (x) { return String(x.questId) === m[1]; })[0];
       kind = m[2] ? 'back' : 'way';
     } else if (/CryptolithTeleporter/.test(l.name)) {
@@ -1626,7 +1635,7 @@
     core.forEach(function (t) {
       var x = px(t), y = py(t);
       var precious = t.loot.some(function (l) { return l.item && /Ring|Amulet|Weapon|Armor|Mod|Trait/.test(l.item.category) || l.name === 'Trait Book'; });
-      var tip = [z.name + ' — tile ' + t.id + ' (' + t.level + ')', t.role !== 'None' ? 'Role: ' + t.role : '', t.tag && t.tag !== 'None' ? 'Tag: ' + t.tag : '']
+      var tip = [z.name + ' — tile ' + t.id, t.role === 'Start' ? 'Start of the area' : '']
         .concat(t.events.map(function (e) { return e.type + ': ' + e.name + (e.done ? ' (completed)' : ''); }))
         .concat(t.links.map(function (l) {
           var p = passageTo(l, z);
@@ -1652,7 +1661,7 @@
       // Passages by the name of the area they lead to; otherwise the tile's tag ("→ City").
       var named = t.links.map(function (l) { return passageTo(l, z); }).filter(Boolean);
       named.forEach(function (p) { lines.push([short(p.text, 15), p.kind === 'teleport' ? 'acc' : '']); });
-      if (!named.length && t.kind === 'exit') lines.push([short(t.tag && t.tag !== 'None' ? t.tag.replace(/^To/, '→ ') : 'Exit', 12), '']);
+      if (!named.length && t.kind === 'exit') lines.push(['Exit', '']);
       t.events.forEach(function (e) {
         lines.push([(e.done ? '✔ ' : RARE.test(e.name) ? '★ ' : '') + short(e.name, 13), e.done ? 'ok' : RARE.test(e.name) ? 'rare' : e.type === 'Item drop' ? 'acc' : 'miss']);
         if (e.correctStatue != null) lines.push(['statue no. ' + e.correctStatue, 'now']);
@@ -1804,7 +1813,6 @@
         z.chests ? z.chestsOpen + '/' + z.chests + ' chests opened' : '',
         z.loot ? z.loot + ' piles on the ground' : '',
         z.explored ? num(z.explored) + ' map cells walked' : '',
-        z.tileSet ? 'tile set ' + z.tileSet.replace(/^TileSet_/, '') : '',
       ].filter(Boolean).join(' · ');
       // Fixed maps (Ward 13, Ward Prime, boss arenas…) keep no tile layout: the path you walked is their map,
       // drawn large, with what the area holds listed next to it (the save has no usable positions for them).
@@ -1816,7 +1824,6 @@
       return '<section class="panel zone" id="zone-' + z.id + '"><h3>' + esc(z.name) + wikiLink(z.name) + '</h3><p class="cat">' + esc(facts) + '</p>' +
         (links ? '<div class="chips">' + links + '</div>' : '') +
         '<div class="zviews">' + views + '</div>' + here +
-        (z.spawns.length ? '<details class="spawns"><summary class="cat">Spawn tables (' + z.spawns.length + ')</summary><p class="cat">' + esc(z.spawns.join(', ')) + '</p></details>' : '') +
         '</section>';
     }).join('');
   }

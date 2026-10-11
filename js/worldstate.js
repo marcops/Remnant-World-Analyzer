@@ -115,7 +115,7 @@
           var gen = a.comps.MapGen || {};
           zones[p.ID] = {
             id: p.ID, label: p.Label || '', level: p.ZoneLevel || p.Level || 0, itemLevel: p.ItemLevel || 0,
-            parent: p.ParentZoneID != null ? p.ParentZoneID : null, questId: p.QuestID, template: className(p.MapTemplate),
+            parent: p.ParentZoneID != null ? p.ParentZoneID : null, questId: p.QuestID, nameId: String(p.NameID || ''), template: className(p.MapTemplate),
             tileSet: className(p.TileSet && p.TileSet.path), colors: p.ColorScheme || '',
             explored: fow.length, fow: fow.map(function (q) { return [q.X, q.Y]; }),
             tiles: (gen.TilesBase || []).map(function (t) {
