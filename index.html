@@ -41,7 +41,7 @@
         "operatingSystem": "Any (web browser); automatic mode on Windows",
         "browserRequirements": "Requires JavaScript",
         "isAccessibleForFree": true,
-        "softwareVersion": "2.26",
+        "softwareVersion": "2.27",
         "dateModified": "2026-10-11",
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
         "license": "https://www.gnu.org/licenses/gpl-3.0.html",
@@ -122,6 +122,7 @@
   <script src="js/parser.js"></script>
   <script src="js/gvas.js"></script>
   <script src="js/character.js"></script>
+  <script src="js/editor.js"></script>
   <script src="js/worldstate.js"></script>
   <script src="js/stats.js"></script>
   <script src="js/dps.js"></script>
@@ -166,6 +167,7 @@
           <button class="tab" data-tab="build" role="tab"><span class="ic">⚔</span>Build &amp; DPS</button>
           <div class="nav-sec">Advanced</div>
           <button class="tab" data-tab="raw" role="tab"><span class="ic">{}</span>Raw data</button>
+          <button class="tab" data-tab="editor" role="tab"><span class="ic">✎</span>Save editor</button>
       </div>
       <div class="nav-sec">Info</div>
       <button class="tab" data-tab="home" id="nav-home" role="tab"><span class="ic">⇪</span>Load your save</button>
@@ -240,6 +242,10 @@
         <div id="raw-view"></div>
       </div>
 
+      <div id="tab-editor" class="tab-panel" hidden>
+        <div id="editor-view"></div>
+      </div>
+
       <div id="tab-items" class="tab-panel" hidden>
         <div id="items-cards"></div>
         <div class="filters"><input id="items-search" type="search" placeholder="Search item or how to obtain…"></div>
@@ -271,13 +277,14 @@
         <li><b>Current world</b> — every event in your campaign or adventure, where it is and what it drops, marked owned (✔) or missing (✘).</li>
         <li><b>Items</b> — every weapon, armor piece, amulet, ring, mod, trait, emote and key item as a picture, filtered by what you have or don't have, type, mode and world; click one for its stats from the wiki and how to get it.</li>
         <li><b>Checklist</b> — "x of y" with percentages by item type and by world, plus the 29 <b>key items</b> (Cryptolith Sigil, Guardian's Heart, Glowing Rod, Acid Cleaned Key…), with what drops in your current world flagged.</li>
-        <li><b>Traits</b> — all 50 traits with your level in each, trait points spent out of 640, and what every trait gives per level.</li>
+        <li><b>Traits</b> — all 50 traits with your level in each, trait points spent out of 1,000, and what every trait gives per level.</li>
         <li><b>Tips</b> — what to do next, worked out from your save: gear and trait books left on the ground, events with items you don't have, merchants selling what you're missing, closed chests, unspent trait points, upgrades, the Cryptolith questline and the best world to reroll.</li>
         <li><b>World state</b> — events completed, chests opened per area, merchant stock, NPC conversations, key items and time played per mode.</li>
         <li><b>Map</b> — every area of your world drawn from the save: tiles, events, waypoints, chests and loot per tile, and the path you walked.</li>
         <li><b>My character</b> — level, loadout with upgrade levels and mods, traits, resources, kills per weapon, deaths per quest and achievement progress.</li>
         <li><b>Build &amp; DPS</b> — damage per second of your guns with your weapon levels, traits, rings, amulet and armor set, and how many summons your weapon mods give.</li>
         <li><b>Raw data</b> — everything stored in your save files, browsable.</li>
+        <li><b>Save editor</b> — change your scrap, irons, Lumenite, Simulacrum, Glowing Fragments and trait points. With Start.bat it saves to the game folder (game closed, folder backed up first); on the website it downloads the edited profile.sav.</li>
       </ul>
     </div>
     <div class="ibox">
@@ -317,7 +324,7 @@
   <section id="tab-credits" class="tab-panel credits" hidden>
     <h2>Version &amp; credits</h2>
     <div class="ibox">
-      <p class="version" id="version">Version 2.26 · Updated on <time datetime="2026-10-11">October 11, 2026</time></p>
+      <p class="version" id="version">Version 2.27 · Updated on <time datetime="2026-10-11">October 11, 2026</time></p>
       <p class="repo">Open source (GPL-3.0) — <a href="https://github.com/marcops/Remnant-World-Analyzer" target="_blank" rel="noopener">github.com/marcops/Remnant-World-Analyzer</a> · <a href="https://github.com/marcops/Remnant-World-Analyzer/archive/refs/heads/master.zip">download to run locally (automatic mode)</a></p>
     </div>
     <div class="ibox">
@@ -342,6 +349,15 @@
   <section id="tab-notes" class="tab-panel notes" hidden>
     <h2>Release notes</h2>
     <p class="cat">The last 5 versions.</p>
+    <div class="release">
+      <h3>Version 2.27 <time datetime="2026-10-11">October 11, 2026</time></h3>
+      <ul>
+        <li><b>Save editor</b> (Advanced): change scrap (up to 999,999), irons, Lumenite, Simulacrum and Glowing Fragments (up to 999) and trait points (up to 1,000). With Start.bat it saves to the game folder — only with the game closed, after backing up the whole folder; on the website it downloads the edited profile.sav. Restart Start.bat to get it.</li>
+        <li><b>Map</b>: the tile layout shows, under each event, the items you don't have yet (◆, bold); the event line in "What's here" no longer has a ✔/✘ of its own.</li>
+        <li><b>Simulacrum</b> and <b>trait books</b> stand out (★, bold) everywhere they show up.</li>
+        <li>Trait points: the most you can spend is 1,000 (50 traits × 20), not 640. A used-up resource shows 0 instead of nothing.</li>
+      </ul>
+    </div>
     <div class="release">
       <h3>Version 2.26 <time datetime="2026-10-11">October 11, 2026</time></h3>
       <ul>
@@ -371,13 +387,6 @@
         <li><b>Hardened Carapace</b>: listed first in the Sketterling event; the Carapace Great Helm, Shell and Greaves show "needs Hardened Carapace" until you have one. Key items now come before the rewards they unlock in every event.</li>
         <li><b>My character</b>: kills by your summons (the save only tells under 100 or 100+, from the Invoker trait).</li>
         <li><b>Missing items</b> is now called <b>Checklist</b>.</li>
-      </ul>
-    </div>
-    <div class="release">
-      <h3>Version 2.22 <time datetime="2026-10-10">October 10, 2026</time></h3>
-      <ul>
-        <li><b>Magir Test</b> (Frozen Lords, Judgement's Spear): which statue to press, read from your save, with where it stands (no. 5 is the first one on the right) — in Current world, the Scavenger set's help, the map and World state.</li>
-        <li><b>Blessed Necklace</b>: says to free the Krall Baby first, and whether it is in your world.</li>
       </ul>
     </div>
   </section>

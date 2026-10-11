@@ -101,6 +101,36 @@ function Handle($ctx) {
     return Send $ctx 200 'application/octet-stream' (Read-Shared $full)
   }
 
+  # Save editor: writes an edited profile.sav back to the game folder. Only from this PC, only with the
+  # game closed, only if the file is still the one the page edited, and after copying the whole folder.
+  if ($path -eq '/api/save') {
+    if ($ctx.Request.HttpMethod -ne 'POST') { return Send-Text $ctx 405 'POST only' }
+    if (-not $ctx.Request.IsLocal) { return Send-Text $ctx 403 'Saving only works on the PC that runs Start.bat. Use "Download" instead.' }
+    $origin = [string]$ctx.Request.Headers['Origin']
+    if ($origin -and $origin -ne "http://$($ctx.Request.Url.Authority)") { return Send-Text $ctx 403 'Not allowed from another site.' }
+    $name = [string]$ctx.Request.QueryString['name']
+    if ($name -ne 'profile.sav') { return Send-Text $ctx 400 'Only profile.sav can be saved.' }
+    if (Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.ProcessName -match '^Remnant' }) {
+      return Send-Text $ctx 409 'Remnant is running. Close the game first: it rewrites profile.sav when it saves and when it quits.'
+    }
+    $full = Join-Path $SaveDir $name
+    if (-not (Test-Path -LiteralPath $full -PathType Leaf)) { return Send-Text $ctx 404 'profile.sav not found in the save folder.' }
+    $current = Read-Shared $full
+    $base = ([string]$ctx.Request.Headers['X-Base-Crc']).ToLower()
+    if ($base -ne [BitConverter]::ToUInt32($current, 0).ToString('x8')) {
+      return Send-Text $ctx 409 'profile.sav changed since the page read it (the game saved). Wait for the page to update and save again.'
+    }
+    $ms = New-Object IO.MemoryStream
+    $ctx.Request.InputStream.CopyTo($ms)
+    $body = $ms.ToArray()
+    if ($body.Length -lt 8 -or [BitConverter]::ToUInt32($body, 4) -ne $body.Length) { return Send-Text $ctx 400 'That is not a valid profile.sav.' }
+    $backup = Join-Path (Split-Path $SaveDir -Parent) ('SaveGames_backup_' + (Get-Date -Format 'yyyyMMdd_HHmmss'))
+    Copy-Item -LiteralPath $SaveDir -Destination $backup -Recurse
+    [IO.File]::WriteAllBytes($full, $body)
+    Write-Host "  Saved edited profile.sav (backup: $backup)" -ForegroundColor Green
+    return Send-Json $ctx ([ordered]@{ ok = $true; backup = $backup })
+  }
+
   $rel = $path.TrimStart('/')
   if ($rel -eq '') { $rel = 'index.html' }
   $full = [IO.Path]::GetFullPath((Join-Path $Root $rel))

@@ -58,6 +58,21 @@ kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4p
 .btn { background: var(--panel-2); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 7px 12px; cursor: pointer; font: inherit; }
 .btn:hover { border-color: var(--accent); }
 .btn.small { padding: 3px 9px; font-size: 13px; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+.btn:disabled { opacity: .45; cursor: default; }
+/* Save editor */
+.ed-box { border-left: 3px solid var(--miss); }
+.ed-warn { margin: 0; padding-left: 18px; font-size: 14px; }
+.ed-warn li { margin-bottom: 5px; }
+.ed-warn code, .ed-msg code { background: var(--panel-2); padding: 1px 5px; border-radius: 4px; word-break: break-all; }
+.kv.ed td.cur { font-variant-numeric: tabular-nums; color: var(--muted); }
+.kv.ed input { width: 140px; max-width: 100%; font: inherit; padding: 4px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); }
+.kv.ed tr.changed th, .kv.ed tr.changed input { color: var(--accent); font-weight: 700; }
+.kv.ed tr.changed input { border-color: var(--accent); }
+.ed-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+.ed-msg { margin-top: 10px; padding: 8px 10px; border-radius: 6px; font-size: 14px; background: var(--panel-2); }
+.ed-msg.ok { border-left: 3px solid var(--ok); }
+.ed-msg.bad { border-left: 3px solid var(--miss); }
 
 /* Top right: the file being read, and under it the character picker. */
 .top-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
@@ -295,8 +310,10 @@ svg.zmap { display: block; }
 .zmap .tl.acc { fill: var(--accent); }
 .zmap .tl.now { fill: var(--now); }
 .zmap .tl.rare { fill: var(--accent); font-weight: 700; }
-/* Simulacrum in What's here. */
-.here .rare { color: var(--accent); }
+/* Items you don't have yet, under their event on the tile. */
+.zmap .tl.want, .zmap .tile.unseen text.tl.want { font-weight: 700; fill: var(--text); opacity: 1; }
+/* Simulacrum, wherever it shows up. */
+.rare { color: var(--accent); }
 svg.zfog { display: block; background: var(--panel-2); border-radius: 6px; }
 .zfog path { fill: var(--accent); stroke: var(--accent); stroke-width: 1.4; stroke-linejoin: round; }
 .spawns { margin-top: 6px; }

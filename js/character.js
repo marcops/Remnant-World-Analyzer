@@ -96,7 +96,8 @@
       var info = itemFromPath(e.ItemBP.path), cls = info.cls, data = e.InstanceData && e.InstanceData.props;
       var row = { name: RESOURCE_NAMES[cls] || info.name, category: info.category, item: info.item, level: levelOf(e), mods: modsOf(e), quantity: data && data.Quantity };
       if (e.EquipmentSlotIndex != null && e.EquipmentSlotIndex >= 0) loadout.push({ slot: e.EquipmentSlotIndex, label: SLOTS[e.EquipmentSlotIndex] || 'Slot ' + e.EquipmentSlotIndex, entry: row });
-      if (/^(Resource|Item_DragonHeartUpgrade)/.test(cls)) resources.push(row);
+      // A resource used up stays in the bag with no Quantity written (the default): that's 0.
+      if (/^(Resource|Item_DragonHeartUpgrade)/.test(cls)) { if (row.quantity == null) row.quantity = 0; resources.push(row); }
       else if (/^Consumable_/.test(cls) && cls !== 'Consumable_DragonHeart') consumables.push(row);
       else if ((info.category === 'Weapon' || info.category === 'Armor') && row.level != null && !/_PreOrder$|_Nude$|Weapon_Fist/.test(cls)) arsenal.push(row);
     });

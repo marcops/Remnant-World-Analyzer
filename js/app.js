@@ -327,6 +327,7 @@
     renderMapTab();
     renderTipsTab();
     renderRawTab();
+    renderEditorTab();
     renderCharacterTab();
     renderTraitsTab();
     renderItemsTab();
@@ -736,7 +737,7 @@
       if (ev.zone !== lastZone) { rows.push('<tr class="zone-row"><td colspan="4">' + esc(WORLD_LABEL[ev.zone]) + '</td></tr>'); lastZone = ev.zone; }
       shown++;
       rows.push('<tr><td class="loc">' + esc(ev.location) + wikiLink(ev.location) + '</td><td class="type"><span class="type-badge">' + esc(TYPE_LABEL[ev.type] || ev.type) +
-        '</span></td><td class="name">' + esc(ev.name) + tallyHtml(wsEventFor(ev.key, state.mode)) + (puzzleHintFor(ev.key) ? '<div class="hint">Magir Test: <b>' + esc(puzzleHintFor(ev.key).short) + '</b></div>' : '') +
+        '</span></td><td class="name">' + rareName(ev.name) + tallyHtml(wsEventFor(ev.key, state.mode)) + (puzzleHintFor(ev.key) ? '<div class="hint">Magir Test: <b>' + esc(puzzleHintFor(ev.key).short) + '</b></div>' : '') +
         // Events that want a quest item: say which rewards need it and whether you carry it.
         gatedAt(ev).map(function (qi) {
           return '<div class="cat">' + esc(qi.usedAt[ev.key].length === qi.rewards.length ? 'Needs the ' + qi.name + '.' : qi.usedAt[ev.key].map(function (i) { return i.name; }).join(', ') + (qi.usedAt[ev.key].length > 1 ? ' need the ' : ' needs the ') + qi.name + '.') +
@@ -1125,8 +1126,8 @@
 
   // ---- my character --------------------------------------------------------
   function num(n) { return Math.round(n).toLocaleString('en-US'); }
-  // Most trait points a character can have.
-  var TRAIT_POINTS_MAX = 640;
+  // Most trait points a character can spend: 50 traits × 20 levels.
+  var TRAIT_POINTS_MAX = 1000;
   function duration(sec) { var h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60); return h + 'h ' + (m < 10 ? '0' : '') + m + 'm'; }
   function rowGlobe(row) { return row.item ? itemWikiLink(row.item) : globe(RWA_WIKI.items[row.name], row.name); }
   function levelTag(row) { return row.level != null && (row.category === 'Weapon' || row.category === 'Armor') ? ' <span class="lvl">+' + row.level + '</span>' : ''; }
@@ -1172,7 +1173,7 @@
     var tiles = function (rows) {
       return '<div class="tiles">' + rows.map(function (r) {
         var q = r.quantity != null ? r.quantity : 1;
-        return '<div class="tile' + (q ? '' : ' zero') + '"><span class="tq">' + num(q) + '</span><span class="tn">' + ico(r.name) + esc(r.name) + rowGlobe(r) + '</span></div>';
+        return '<div class="tile' + (q ? '' : ' zero') + '"><span class="tq">' + num(q) + '</span><span class="tn">' + ico(r.name) + rareName(r.name) + rowGlobe(r) + '</span></div>';
       }).join('') + '</div>';
     };
     var resources = ch.resources.filter(function (r) { return r.name !== 'Dragon Heart upgrades'; });
@@ -1327,7 +1328,7 @@
       return panel(mode + ' events', '<table class="kv">' + list.map(function (e) {
         var st = status(e);
         var items = e.items.map(function (i) { return evItem(i, i.item ? itemWikiLink(i.item) : ''); }).join('');
-        return '<tr><th><span class="st ' + st.cls + '">' + (st.cls === 'ok' ? '✔' : st.cls === 'miss' ? '✘' : '?') + '</span> ' + esc(e.name) +
+        return '<tr><th><span class="st ' + st.cls + '">' + (st.cls === 'ok' ? '✔' : st.cls === 'miss' ? '✘' : '?') + '</span> ' + rareName(e.name) +
           ' <span class="cat">' + esc(e.type) + (e.area ? ' · ' + esc(e.area) : '') + '</span>' + (e.area ? wikiLink(e.area) : '') + '</th><td>' +
           '<div class="cat">' + esc(st.text) + '</div>' + eventExtras(e) + (e.correctStatue != null ? '<div class="hint">Magir Test: <b>press ' + esc(statueText(e.correctStatue)) + '</b></div>' : '') + items + '</td></tr>';
       }).join('') + '</table>', true);
@@ -1343,7 +1344,7 @@
       return (precious.indexOf(b) >= 0) - (precious.indexOf(a) >= 0) || b.quantity - a.quantity;
     }).map(function (g) {
       var where = Object.keys(g.areas);
-      return '<tr><th>' + (precious.indexOf(g) >= 0 ? '★ ' : '') + esc(g.name) + (g.item ? itemWikiLink(g.item) : '') + '</th><td>' + num(g.quantity) +
+      return '<tr><th>' + (precious.indexOf(g) >= 0 && !RARE.test(g.name) ? '★ ' : '') + rareName(g.name) + (g.item ? itemWikiLink(g.item) : '') + '</th><td>' + num(g.quantity) +
         (g.piles > 1 ? ' <span class="cat">in ' + g.piles + ' piles</span>' : '') + (where.length ? '<div class="cat">' + esc(where.slice(0, 4).join(', ') + (where.length > 4 ? '…' : '')) + '</div>' : '') + '</td></tr>';
     }).join('') + '</table>' + (precious.length ? '<p class="cat">★ Gear or trait books you dropped or never picked up — still in your world.</p>' : '')
       : '<p class="cat">Nothing left behind.</p>';
@@ -1436,7 +1437,7 @@
       }).forEach(function (e) {
         var need = e.items.filter(function (i) { return missing(i.item); });
         var verb = { Boss: 'Defeat', Miniboss: 'Defeat', Dungeon: 'Clear', Siege: 'Survive', 'Item drop': 'Find', 'Point of interest': 'Visit' }[e.type] || 'Do';
-        world.push(verb + ' <b>' + esc(e.name) + '</b> <span class="cat">' + esc(e.type) + '</span> in ' + mapLink(e.zoneId, e.area) + ' → ' +
+        world.push(verb + ' <b>' + rareName(e.name) + '</b> <span class="cat">' + esc(e.type) + '</span> in ' + mapLink(e.zoneId, e.area) + ' → ' +
           need.map(function (i) { return esc(i.name) + itemWikiLink(i.item); }).join(', '));
       });
       ws.npcs.forEach(function (n) {
@@ -1446,7 +1447,7 @@
       var closed = ws.zones.filter(function (z) { return z.chests > z.chestsOpen; });
       if (closed.length) world.push((ws.chests.total - ws.chests.open) + ' chests still closed: ' + closed.map(function (z) { return mapLink(z.id, z.name) + ' ' + (z.chests - z.chestsOpen); }).join(', '));
       var undone = ws.events.filter(function (e) { return !e.done && e.type !== 'Item drop' && !e.items.some(function (i) { return missing(i.item); }); });
-      if (undone.length) world.push('Not done yet (nothing new for you, but XP and scrap): ' + undone.map(function (e) { return esc(e.name); }).join(', '));
+      if (undone.length) world.push('Not done yet (nothing new for you, but XP and scrap): ' + undone.map(function (e) { return rareName(e.name); }).join(', '));
       // Leto's Amulet: its rare secret room is the "Penitent" event. In the world: go; not: reroll.
       var leto = sheetItem("Leto's Amulet");
       if (missing(leto)) {
@@ -1666,6 +1667,8 @@
         lines.push([(e.done ? '✔ ' : RARE.test(e.name) ? '★ ' : '') + short(e.name, 13), e.done ? 'ok' : RARE.test(e.name) ? 'rare' : e.type === 'Item drop' ? 'acc' : 'miss']);
         if (e.correctStatue != null) lines.push(['statue no. ' + e.correctStatue, 'now']);
         if (e.tally) lines.push([(e.key === 'Wisp' ? 'hives ' : '') + e.tally.done + '/' + e.tally.of, e.tally.done >= e.tally.of ? 'ok' : 'now']);
+        // What you don't have yet from this event, in bold with ◆.
+        e.items.forEach(function (i) { if (i.item && itemOwned(i.item) === false) lines.push(['◆ ' + short(i.name, 13), 'want']); });
       });
       if (t.links.some(function (l) { return l.type === 'Waypoint'; })) lines.push(['⚑ waypoint', 'now']);
       if (t.links.some(function (l) { return l.type === 'Checkpoint'; })) lines.push(['✚ checkpoint', 'now']);
@@ -1713,29 +1716,28 @@
 
   // What's in an area, in four groups: items (events and what they give), enemies, farm (left on the
   // ground, chests) and scenery (passages, waypoints, people).
-  // Worth a detour: Simulacrum (the rarest upgrade material) is set apart wherever it shows up on the map.
-  var RARE = /Simulacrum/i;
+  // Worth a detour: Simulacrum (the rarest upgrade material) and trait books are set apart (★, bold) wherever
+  // they show up — Current world, World state, Tips, the map, My character.
+  var RARE = /Simulacrum|Trait ?Book/i;
   function rareName(name) { return RARE.test(name) ? '<b class="rare">★ ' + esc(name) + '</b>' : esc(name); }
   function zoneContents(z, ws) {
     var items = [], foes = [], farm = [], scenery = [];
     fixedEventsIn(z).forEach(function (x) {
       var list = x.ev.items.map(function (p) { var it = itemsByKey[p]; return { name: it ? it.name : p, item: it }; });
-      items.push(statusIcon(list.every(function (i) { return i.item && itemOwned(i.item) === true; })) + ' ' + esc(x.ev.name) + ' <span class="cat">' + esc(TYPE_LABEL[x.ev.type] || x.ev.type) + ' · on the start tile</span>' +
+      items.push(esc(x.ev.name) + ' <span class="cat">' + esc(TYPE_LABEL[x.ev.type] || x.ev.type) + ' · on the start tile</span>' +
         list.map(function (i) { return evItem(i); }).join(''));
     });
     var events = ws.events.filter(function (e) { return e.zoneId === z.id || e.ownZone === z.id; });
+    // The event's name only: the ✔/✘ is on each of its items.
     events.forEach(function (e) {
-      // Item drops don't record completion: they count as done when you own the item; trait books can't be told.
-      var sheet = e.items.filter(function (i) { return i.item; });
-      var done = e.done ? true : e.type !== 'Item drop' ? false : sheet.length ? sheet.every(function (i) { return itemOwned(i.item) === true; }) : null;
-      items.push(statusIcon(done) + ' ' + rareName(e.name) + ' <span class="cat">' + esc(e.type) + '</span>' +
+      items.push(rareName(e.name) + ' <span class="cat">' + esc(e.type) + '</span>' +
         (e.correctStatue != null ? '<div class="hint">Magir Test: <b>press ' + esc(statueText(e.correctStatue)) + '</b> — the real Magir, from your save</div>' : '') + tallyHtml(e) + introHtml(e) +
         e.items.map(function (i) { return evItem(i); }).join(''));
     });
     // Ward 13: Whispers and the armor skins he sells (the world save doesn't list merchants' stock as events).
     if (/^Ward 13\b/.test(z.name) && DATA.events.Whispers) {
       var skins = DATA.events.Whispers.items.map(function (p) { return { name: itemsByKey[p].name, item: itemsByKey[p] }; });
-      items.push(statusIcon(skins.every(function (i) { return itemOwned(i.item) === true; })) + ' Whispers <span class="cat">Merchant · armor skins for scrap and Glowing Fragments</span>' +
+      items.push('Whispers <span class="cat">Merchant · armor skins for scrap and Glowing Fragments</span>' +
         skins.map(function (i) { return evItem(i); }).join(''));
     }
 
@@ -1899,6 +1901,91 @@
   function pct(v) { return (v >= 0 ? '+' : '') + (+(v * 100).toFixed(2)) + '%'; }
   function fmt(v, d) { return v == null ? '—' : (+v).toLocaleString('en-US', { maximumFractionDigits: d == null ? 1 : d }); }
 
+  // ---- save editor -------------------------------------------------------------
+  // Resource quantities and trait points of the character on screen, written into profile.sav by
+  // js/editor.js. With Start.bat running on this PC it saves to the game folder (after a backup of the
+  // whole folder); otherwise, or from another PC, it downloads the edited profile.sav.
+  var ED = window.RWA_EDITOR;
+  state.editDraft = {};
+  state.editMsg = null;
+  function canSaveHere() { return !!state.auto && /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname); }
+  function editorFields() { return ED.fields(state.files['profile.sav'], state.charIndex); }
+  // Only what the person changed: { key: number }.
+  function editorValues(list) {
+    var draft = state.editDraft[state.charIndex] || {}, out = {};
+    list.forEach(function (f) { if (f.editable && f.key in draft && draft[f.key] !== f.value) out[f.key] = draft[f.key]; });
+    return out;
+  }
+  function renderEditorTab() {
+    if (state.tab !== 'editor') return;
+    var el = $('editor-view');
+    if (!state.files['profile.sav']) { el.innerHTML = '<div class="empty">Load <b>profile.sav</b> to edit your resources and trait points.</div>'; return; }
+    var list;
+    try { list = editorFields(); } catch (e) { el.innerHTML = '<div class="empty">' + esc(e.message) + '</div>'; return; }
+    var draft = state.editDraft[state.charIndex] = state.editDraft[state.charIndex] || {};
+    var here = canSaveHere(), changes = Object.keys(editorValues(list)).length;
+    var ch = state.profile && state.profile.characters && state.profile.characters[state.charIndex];
+    var rows = list.map(function (f) {
+      var v = f.key in draft ? draft[f.key] : f.value, changed = f.key in draft && draft[f.key] !== f.value;
+      return '<tr' + (changed ? ' class="changed"' : '') + '><th>' + ico(f.label) + rareName(f.label) + '</th><td class="cur">' + (f.value == null ? '—' : num(f.value)) + '</td><td>' +
+        (f.editable ? '<input type="number" class="ed-in" data-key="' + esc(f.key) + '" min="' + (f.min || 0) + '" max="' + f.max + '" step="1" value="' + esc(String(v)) + '">' : '<span class="cat">can’t edit</span>') +
+        '</td><td class="cat">' + esc(f.note || '') + '</td></tr>';
+    }).join('');
+    var warn = [
+      '<b>Close Remnant first.</b> The game rewrites profile.sav when it saves and when it quits: it would undo the edit, or the edit would undo your progress.',
+      here ? 'Saving first copies the whole save folder to <code>SaveGames_backup_&lt;date&gt;</code>, next to it.'
+        : 'Keep a copy of your current profile.sav. Then put the downloaded one in <code>%LOCALAPPDATA%\\Remnant\\Saved\\SaveGames</code>, replacing it.',
+      'Steam Cloud: if Steam asks which copy to keep, choose the <b>local</b> one.',
+      'Only resources already in your bag can be changed (pick one up in the game first). Up to 999,999 scrap and 999 of everything else; trait points go up to 1,000 (50 traits × 20 levels) and can’t go below what you already spent.',
+      'The file is checked after the change (checksum, sizes, every value read back); still, editing saves is at your own risk.',
+    ];
+    el.innerHTML = '<section class="panel wide ed-box"><h3>Before you save</h3><ul class="ed-warn">' + warn.map(function (w) { return '<li>' + w + '</li>'; }).join('') + '</ul></section>' +
+      '<section class="panel wide"><h3>' + esc(ch && !ch.error ? ch.archetype + ' · level ' + ch.level : 'Character ' + (state.charIndex + 1)) + '</h3>' +
+      '<table class="kv ed"><tr><th>What</th><td><b>Now</b></td><td><b>New value</b></td><td></td></tr>' + rows + '</table>' +
+      '<div class="ed-actions">' + (here ? '<button type="button" class="btn primary" id="ed-save"' + (changes ? '' : ' disabled') + '>Save to the game folder</button>' : '') +
+      '<button type="button" class="btn" id="ed-download"' + (changes ? '' : ' disabled') + '>' + (here ? 'Download instead' : 'Download the edited profile.sav') + '</button>' +
+      '<button type="button" class="btn" id="ed-reset"' + (changes ? '' : ' disabled') + '>Undo changes</button>' +
+      '<span class="cat" id="ed-count">' + (changes ? changes + ' change' + (changes > 1 ? 's' : '') : 'No changes yet') + '</span></div>' +
+      (state.editMsg ? '<div class="ed-msg ' + state.editMsg.cls + '">' + state.editMsg.html + '</div>' : '') + '</section>';
+  }
+  // The edited file, or null (with the reason shown) when it can't be made.
+  function editorBuild() {
+    try {
+      var list = editorFields(), values = editorValues(list);
+      if (!Object.keys(values).length) return null;
+      return ED.apply(state.files['profile.sav'], state.charIndex, values);
+    } catch (e) { state.editMsg = { cls: 'bad', html: esc(e.message) }; renderEditorTab(); return null; }
+  }
+  function editorDownload() {
+    var bytes = editorBuild(); if (!bytes) return;
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([bytes], { type: 'application/octet-stream' }));
+    a.download = 'profile.sav';
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    state.editMsg = { cls: 'ok', html: 'Downloaded <b>profile.sav</b>. With the game closed, put it in <code>%LOCALAPPDATA%\\Remnant\\Saved\\SaveGames</code> (replace the old one — keep a copy of it).' };
+    renderEditorTab();
+  }
+  function editorSave() {
+    var bytes = editorBuild(); if (!bytes) return;
+    if (!window.confirm('Write the edited profile.sav to the game folder?\n\nRemnant must be closed. A copy of the whole save folder is made first.')) return;
+    var base = new Uint8Array(state.files['profile.sav']);
+    var crc = new DataView(base.buffer, base.byteOffset, base.byteLength).getUint32(0, true).toString(16);
+    while (crc.length < 8) crc = '0' + crc;
+    fetch('api/save?name=profile.sav', { method: 'POST', headers: { 'X-Base-Crc': crc, 'Content-Type': 'application/octet-stream' }, body: bytes })
+      .then(function (r) {
+        // A Start.bat opened before this version has no /api/save.
+        if (r.status === 404 || r.status === 405) throw new Error('the Start.bat that is running is older than this page and can’t save. Close its window, open Start.bat again, press Ctrl+F5 here and save again (or use "Download instead").');
+        return r.ok ? r.json() : r.text().then(function (t) { throw new Error(t || 'HTTP ' + r.status); });
+      })
+      .then(function (res) {
+        state.editDraft[state.charIndex] = {};
+        state.editMsg = { cls: 'ok', html: 'Saved. A copy of the folder before the change is in <code>' + esc(res.backup) + '</code>. Open the game to see it.' };
+        renderEditorTab(); poll();
+      })
+      .catch(function (e) { state.editMsg = { cls: 'bad', html: 'Not saved: ' + esc(e.message) }; renderEditorTab(); });
+  }
+
   function renderBuildTab() {
     var el = $('build-view');
     var prof = state.profile, ch = prof && prof.characters && prof.characters[state.charIndex];
@@ -2057,6 +2144,26 @@
     // Links from tips to the map: switch to the Map tab, then jump to the area.
     // Items: have / don't have, type, mode, world, search; an item opens its panel on the side.
     $('items-search').addEventListener('input', renderItemsTab);
+    // Save editor: typing only updates the draft (no re-render, so the field keeps focus).
+    $('editor-view').addEventListener('input', function (e) {
+      var i = e.target.closest('.ed-in'); if (!i) return;
+      var d = state.editDraft[state.charIndex] = state.editDraft[state.charIndex] || {};
+      var v = i.value.trim() === '' ? NaN : Number(i.value);
+      if (isNaN(v)) delete d[i.dataset.key]; else d[i.dataset.key] = v;
+      state.editMsg = null;
+      var list; try { list = editorFields(); } catch (err) { return; }
+      var f = list.filter(function (x) { return x.key === i.dataset.key; })[0];
+      i.closest('tr').classList.toggle('changed', !!f && i.dataset.key in d && d[i.dataset.key] !== f.value);
+      var n = Object.keys(editorValues(list)).length;
+      ['ed-save', 'ed-download', 'ed-reset'].forEach(function (id) { var b = $(id); if (b) b.disabled = !n; });
+      $('ed-count').textContent = n ? n + ' change' + (n > 1 ? 's' : '') : 'No changes yet';
+      var m = document.querySelector('#editor-view .ed-msg'); if (m) m.remove();
+    });
+    $('editor-view').addEventListener('click', function (e) {
+      if (e.target.closest('#ed-save')) return editorSave();
+      if (e.target.closest('#ed-download')) return editorDownload();
+      if (e.target.closest('#ed-reset')) { state.editDraft[state.charIndex] = {}; state.editMsg = null; renderEditorTab(); }
+    });
     $('items-view').addEventListener('click', function (e) {
       var s = e.target.closest('[data-show]');
       if (s) { state.itemsShow = s.dataset.show; renderItemsTab(); return; }

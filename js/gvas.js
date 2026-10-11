@@ -45,13 +45,16 @@
     return new Uint8Array(buffer);
   }
 
+  // Where things sit in the file (for js/editor.js), kept out of sight: JSON and Object.keys don't see it.
+  function at(o, v) { Object.defineProperty(o, '_at', { value: v, enumerable: false, configurable: true }); return o; }
+
   // Parses one save or nested blob starting at `base`; `outer` for the .sav file itself.
   function readSave(bytes, base, outer) {
     var r = new Reader(bytes, base);
     if (outer) r.pos += 16;
     r.u32();
     if (outer) r.str();
-    var namesOff = r.u64(); r.u32(); var objOff = r.u64();
+    var namesOffPos = r.pos, namesOff = r.u64(); r.u32(); var objOffPos = r.pos, objOff = r.u64();
     var dataStart = r.pos;
 
     var nr = new Reader(bytes, base + namesOff), names = [], n = nr.u32(), i;
@@ -67,9 +70,10 @@
     var ctx = { bytes: bytes, names: names, objects: objects };
     r.pos = dataStart;
     for (i = 0; i < objects.length; i++) {
-      var idx = r.u32(), size = r.u32(), start = r.pos;
+      var idx = r.u32(), sizePos = r.pos, size = r.u32(), start = r.pos;
       var obj = objects[idx] || {};
       obj.props = readProps(ctx, r, start + size);
+      at(obj, { sizePos: sizePos, start: start, size: size });
       r.pos = start + size;
       obj.comps = {};
       if (r.u8()) {
@@ -81,17 +85,20 @@
         }
       }
     }
-    return { objects: objects, names: names, root: objects[0] };
+    return at({ objects: objects, names: names, root: objects[0] }, { base: base, namesOffPos: namesOffPos, namesOff: namesOff, objOffPos: objOffPos, objOff: objOff });
   }
 
   // Properties become a plain object { name: value }; repeated names (static arrays) become arrays.
+  // _at keeps, per property, where its size field is (and an IntProperty's value), and where the list ends.
   function readProps(ctx, r, end) {
-    var out = {};
+    var out = {}, pos = {};
+    at(out, pos);
     while (r.pos < end) {
-      var name = readName(ctx, r);
-      if (name === 'None' || name === undefined) break;
-      var type = readName(ctx, r), size = r.u32(); r.u32();
+      var npos = r.pos, name = readName(ctx, r);
+      if (name === 'None' || name === undefined) { pos.None = npos; break; }
+      var type = readName(ctx, r), sizePos = r.pos, size = r.u32(); r.u32();
       var start = r.pos, value = readValue(ctx, r, type, size);
+      if (!(name in pos)) pos[name] = { sizePos: sizePos, valuePos: type === 'IntProperty' ? start + 1 : null };
       if (name in out) out[name] = [].concat(out[name], [value]); else out[name] = value;
       if (r.pos < start) break;
     }

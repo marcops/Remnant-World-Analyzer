@@ -112,3 +112,28 @@ test('real save: character details and world stats are read', { skip: !savePath 
   const unnamed = ch.loadout.concat(ch.arsenal).filter((r) => (r.entry || r).category !== 'Consumable' && !(r.entry || r).item && !/Dragon Heart/.test((r.entry || r).name));
   assert.deepEqual(unnamed.map((r) => (r.entry || r).name), [], 'equipment not matched to a sheet item');
 });
+
+test('save editor: CRC32 matches zlib', () => {
+  const ED = require('../js/editor.js');
+  assert.equal(ED.crc32(Buffer.from('123456789')), 0xCBF43926);
+});
+
+test('real profile: save editor changes only what was asked', { skip: !process.env.RWA_PROFILE && 'set RWA_PROFILE' }, () => {
+  const ED = require('../js/editor.js');
+  const src = fs.readFileSync(process.env.RWA_PROFILE);
+  const before = ED.fields(src, 0);
+  const scrap = before.find((f) => f.key === 'Resource_Scraps');
+  const empty = before.find((f) => f.editable && f.value === 0 && f.key !== 'TraitPoints');
+  const values = { Resource_Scraps: scrap.value > 0 ? scrap.value - 1 : 1 };
+  if (empty) values[empty.key] = 123; // an item with no Quantity: the 17-byte insert
+  const out = ED.apply(src, 0, values);
+  assert.equal(out.length, src.length + (empty ? 17 : 0));
+  assert.equal(ED.crc32(out, 4), Buffer.from(out).readUInt32LE(0), 'header CRC');
+  for (const f of ED.fields(out, 0)) assert.equal(f.value, f.key in values ? values[f.key] : before.find((b) => b.key === f.key).value, f.label);
+  // Everything else the app reads is unchanged.
+  const strip = (p) => { const c = JSON.parse(JSON.stringify(p)); delete c.characters[0].resources; return c; };
+  assert.deepEqual(strip(CHAR.readProfile(out)), strip(CHAR.readProfile(src)));
+  assert.throws(() => ED.apply(src, 0, { TraitPoints: -1 }), /whole number/);
+  assert.throws(() => ED.apply(src, 0, { Resource_Scraps: 1000000 }), /between 0 and 999999/);
+  assert.throws(() => ED.apply(src, 0, { Resource_Special_Simulacrum: 1000 }), /between 0 and 999/);
+});
