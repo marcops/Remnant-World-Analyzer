@@ -769,9 +769,9 @@
   // The tutorial blade is taken away when the tutorial ends, so it can never be collected.
   function collectible(it) { return !UNTRACKED[it.category] && !it.merged && !(/^New characters begin/.test(it.how) && /removed/.test(it.how)); }
 
-  // Items that only drop in a given game mode (the sheet's "Mode" column); Normal is everything else.
-  var MODE_COLLECTION = [['Normal', function (it) { return it.mode !== 'Survival' && it.mode !== 'Hardcore'; }]].concat(
-    ['Survival', 'Hardcore'].map(function (m) { return [m, function (it) { return it.mode === m; }]; }));
+  // Items that only drop in a given game mode (the sheet's "Mode" column); Normal is what has none.
+  var MODE_COLLECTION = [['Normal', function (it) { return !it.mode; }]].concat(
+    ['Campaign', 'Adventure', 'Multiplayer', 'Survival', 'Hardcore'].map(function (m) { return [m, function (it) { return it.mode === m; }]; }));
 
   function testFor(list, label) {
     var c = list.filter(function (x) { return x[0] === label; })[0];
