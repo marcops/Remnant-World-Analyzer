@@ -177,6 +177,12 @@
     });
 
     var byId = {}; quests.forEach(function (q) { byId[q.id] = q; });
+    // Some events keep only their tile, not their area (the Packmaster, under the Ice Skimmer): they are in their parent's area.
+    quests.forEach(function (q) {
+      var p = q, seen = 0;
+      while (p && p.inZone == null && p.parent != null && seen++ < 20) p = byId[p.parent];
+      if (q.inZone == null && p && p.inZone != null) { q.inZone = p.inZone; if (q.zoneId == null) q.zoneId = p.inZone; }
+    });
     function rootOf(q) { var seen = 0; while (q && q.parent != null && byId[q.parent] && seen++ < 20) q = byId[q.parent]; return q; }
     // Unlabelled zones are the overworld of a campaign or adventure: name them after its world.
     Object.keys(zones).forEach(function (k) {
