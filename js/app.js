@@ -400,8 +400,8 @@
       how: 'Given by the dying Hunter at the start of the Hunter\'s Hideout dungeon (Hidden Grotto, Earth). Opens the Safehouse at the end, with the Hunting Pistol in a locker.' },
     { id: 'iskalvial', name: 'Iskal Vial', carried: /IskalVial/i, from: 'IskalQueen', world: 'Corsus', dlc: 'Swamps of Corsus', rewards: byName(['Ring of the Unclean', 'Potency']), usedAt: { GraveyardElf: byName(['Ring of the Unclean', 'Potency']) },
       how: 'With the Parasite effect (from an Iskal Infector), tell the Iskal Queen you want to help the Iskal. Needs the Graveyard Elf in the same Corsus map: sneak up to her cauldron with the vial for the Ring of the Unclean and the Potency trait.' },
-    { id: 'janitorswatch', name: "Janitor's Watch", carried: /JanitorsWatch/i, from: 'JanitorsWatch', world: 'Reisum', dlc: 'Subject 2923', rewards: byName(['Amber Moonstone']),
-      how: 'Random drop in Drolniir Woods (Reisum). Give it to Clementine for the Amber Moonstone ring.' },
+    { id: 'janitorswatch', name: "Janitor's Watch", carried: /JanitorsWatch/i, from: 'JanitorsWatch', world: 'Reisum', mode: 'Campaign', dlc: 'Subject 2923', rewards: byName(['Amber Moonstone']),
+      how: 'Random drop in Drolniir Woods (Reisum), only in the Subject 2923 campaign. Give it to Clementine for the Amber Moonstone ring (don’t exhaust her other dialogue first).' },
     { id: 'krallbaby', name: 'Krall Baby', carried: /KrallBaby/i, from: 'KrallBaby', world: 'Reisum', dlc: 'Subject 2923', rewards: byName(['Siphoner', 'Blessed Necklace']), proof: byName(['Siphoner']),
       usedAt: { Afterbirth: byName(['Blessed Necklace']) },
       how: 'A random event inside Wuthering Keep or The Wild Reach (Reisum): free the Krall Baby for the Siphoner trait, then talk to the Krall Mother at the Chillwind Hovel for the Blessed Necklace.' },
@@ -472,6 +472,8 @@
   function carries(q) {
     var ch = state.profile && state.profile.characters && state.profile.characters[state.charIndex];
     if (ch && ch.extra && (ch.extra.questItems || []).some(function (x) { return q.carried.test(x.cls); })) return true;
+    // Some key items are resources in the bag (Hardened Carapace, Opalescent Shell).
+    if (ch && (ch.resources || []).some(function (r) { return r.quantity > 0 && q.carried.test(String(r.name).replace(/\s+/g, '')); })) return true;
     // Key items the sheet lists under their game path (the Rusted Amulet is a trinket): in your inventory.
     return q.key.indexOf('__quest_') < 0 && !!state.owns && state.owns(q) === true;
   }
@@ -1949,7 +1951,65 @@
       '<button type="button" class="btn" id="ed-download"' + (changes ? '' : ' disabled') + '>' + (here ? 'Download instead' : 'Download the edited profile.sav') + '</button>' +
       '<button type="button" class="btn" id="ed-reset"' + (changes ? '' : ' disabled') + '>Undo changes</button>' +
       '<span class="cat" id="ed-count">' + (changes ? changes + ' change' + (changes > 1 ? 's' : '') : 'No changes yet') + '</span></div>' +
-      (state.editMsg ? '<div class="ed-msg ' + state.editMsg.cls + '">' + state.editMsg.html + '</div>' : '') + '</section>';
+      (state.editMsg ? '<div class="ed-msg ' + state.editMsg.cls + '">' + state.editMsg.html + '</div>' : '') + '</section>' +
+      editorBackupsHtml(here);
+    if (here && state.backups === undefined && !state.backupsLoading) loadBackups();
+  }
+
+  // Backups. With Start.bat: a copy of the whole save folder (SaveGames_backup_<date_time>), and Restore
+  // puts the newest one back (the server copies what it replaces first, to …_before_restore). On the
+  // website: a download of the profile.sav that is loaded, named with the date and time.
+  function stamp() {
+    var d = new Date(), p = function (n) { return (n < 10 ? '0' : '') + n; };
+    return d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '_' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds());
+  }
+  function editorBackupsHtml(here) {
+    var last = (state.backups || [])[0];
+    var body = here
+      ? '<p class="cat">' + (state.backups === undefined ? 'Looking for backups…' : last ? 'Last backup: <b>' + esc(last.when) + '</b> · <code>' + esc(last.name) + '</code> · ' + last.files + ' files' +
+          (state.backups.length > 1 ? ' · ' + state.backups.length + ' backups in all' : '') : 'No backup yet.') + '</p>' +
+        '<div class="ed-actions"><button type="button" class="btn" id="ed-backup">Back up now</button>' +
+        '<button type="button" class="btn" id="ed-restore"' + (last ? '' : ' disabled') + '>Restore last backup' + (last ? ' (' + esc(last.when) + ')' : '') + '</button></div>' +
+        '<p class="cat">Back up copies the whole save folder. Restore needs the game closed, and first copies what it replaces (to <code>…_before_restore</code>), so it can be undone.</p>'
+      : '<div class="ed-actions"><button type="button" class="btn" id="ed-backup">Download a backup of profile.sav</button></div>' +
+        '<p class="cat">Saved as <code>profile_backup_&lt;date_time&gt;.sav</code>. To restore it, close the game and put it back in the save folder renamed to <code>profile.sav</code>. With Start.bat, Back up and Restore work on the whole folder.</p>';
+    return '<section class="panel wide"><h3>Backups</h3>' + body + (state.backupMsg ? '<div class="ed-msg ' + state.backupMsg.cls + '">' + state.backupMsg.html + '</div>' : '') + '</section>';
+  }
+  function loadBackups() {
+    state.backupsLoading = true;
+    return fetch('api/backups', { cache: 'no-store' }).then(function (r) { state.backupsLoading = false; if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (j) { state.backups = [].concat(j.backups || []); renderEditorTab(); })
+      .catch(function () { state.backups = []; state.backupMsg = { cls: 'bad', html: 'This Start.bat can’t list backups: close its window and open Start.bat again.' }; renderEditorTab(); });
+  }
+  function serverPost(path, headers) {
+    return fetch(path, { method: 'POST', headers: headers || {} }).then(function (r) {
+      if (r.status === 404 && !/restore/.test(path)) throw new Error('the Start.bat that is running is older than this page. Close its window, open Start.bat again and press Ctrl+F5 here.');
+      return r.ok ? r.json() : r.text().then(function (t) { throw new Error(t || 'HTTP ' + r.status); });
+    });
+  }
+  function editorBackup() {
+    if (!canSaveHere()) {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([state.files['profile.sav']], { type: 'application/octet-stream' }));
+      a.download = 'profile_backup_' + stamp() + '.sav';
+      document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+      state.backupMsg = { cls: 'ok', html: 'Downloaded <b>' + esc(a.download) + '</b>.' };
+      return renderEditorTab();
+    }
+    serverPost('api/backup').then(function (res) {
+      state.backupMsg = { cls: 'ok', html: 'Backed up to <code>' + esc(res.backup) + '</code>.' };
+      return loadBackups();
+    }).catch(function (e) { state.backupMsg = { cls: 'bad', html: 'No backup made: ' + esc(e.message) }; renderEditorTab(); });
+  }
+  function editorRestore() {
+    var last = (state.backups || [])[0]; if (!last) return;
+    if (!window.confirm('Restore the backup from ' + last.when + '?\n\n' + last.name + '\n\nRemnant must be closed. Your current saves are copied first (…_before_restore), so this can be undone.')) return;
+    serverPost('api/restore', { 'X-Backup': last.name }).then(function (res) {
+      state.editDraft[state.charIndex] = {};
+      state.backupMsg = { cls: 'ok', html: 'Restored the backup from <b>' + esc(res.when) + '</b>. What it replaced is in <code>' + esc(res.before) + '</code>. Open the game to see it.' };
+      poll(); return loadBackups();
+    }).catch(function (e) { state.backupMsg = { cls: 'bad', html: 'Not restored: ' + esc(e.message) }; renderEditorTab(); });
   }
   // The edited file, or null (with the reason shown) when it can't be made.
   function editorBuild() {
@@ -2166,6 +2226,8 @@
       if (e.target.closest('#ed-save')) return editorSave();
       if (e.target.closest('#ed-download')) return editorDownload();
       if (e.target.closest('#ed-reset')) { state.editDraft[state.charIndex] = {}; state.editMsg = null; renderEditorTab(); }
+      if (e.target.closest('#ed-backup')) return editorBackup();
+      if (e.target.closest('#ed-restore')) return editorRestore();
     });
     $('items-view').addEventListener('click', function (e) {
       var s = e.target.closest('[data-show]');

@@ -1593,9 +1593,9 @@ var RWA_DATA = {
    "category": "Ring",
    "group": "",
    "world": "Reisum",
-   "mode": "",
+   "mode": "Campaign",
    "dlc": "Subject 2923",
-   "how": "Obtain the Janitor's Watch, which can randomly drop in Drolniir Woods. Return it to Clementine to be rewarded with this ring.",
+   "how": "Obtain the Janitor's Watch, which can randomly drop in Drolniir Woods. Return it to Clementine to be rewarded with this ring. Only in the Subject 2923 campaign: Clementine is not in Adventure mode.",
    "key": "/Items/Trinkets/AmberMoonstone",
    "id": 144
   },

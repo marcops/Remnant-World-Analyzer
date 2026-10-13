@@ -66,6 +66,7 @@
     Resource_Rare_GalvanizedIron: 'Galvanized Iron', Resource_Rare_HardenedIron: 'Hardened Iron',
     Resource_Special_LumeniteCrystal: 'Lumenite Crystal', Resource_Special_GlowingFragment: 'Glowing Fragment',
     Resource_Special_Simulacrum: 'Simulacrum', Resource_Simulacrum: 'Simulacrum',
+    Resource_Swamp_HardenedCarapace: 'Hardened Carapace', Resource_Swamp_OpalescentShell: 'Opalescent Shell',
     Item_DragonHeartUpgrade: 'Dragon Heart upgrades',
   };
   // Always listed, with 0 when the character has none.

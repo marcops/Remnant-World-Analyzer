@@ -123,7 +123,7 @@ test('real profile: save editor changes only what was asked', { skip: !process.e
   const src = fs.readFileSync(process.env.RWA_PROFILE);
   const before = ED.fields(src, 0);
   const scrap = before.find((f) => f.key === 'Resource_Scraps');
-  const empty = before.find((f) => f.editable && f.value === 0 && f.key !== 'TraitPoints');
+  const empty = before.find((f) => f.editable && f.value === 0 && f.key !== 'TraitPoints' && f.max >= 123 && !/adds it/.test(f.note));
   const values = { Resource_Scraps: scrap.value > 0 ? scrap.value - 1 : 1 };
   if (empty) values[empty.key] = 123; // an item with no Quantity: the 17-byte insert
   const out = ED.apply(src, 0, values);
@@ -136,4 +136,18 @@ test('real profile: save editor changes only what was asked', { skip: !process.e
   assert.throws(() => ED.apply(src, 0, { TraitPoints: -1 }), /whole number/);
   assert.throws(() => ED.apply(src, 0, { Resource_Scraps: 1000000 }), /between 0 and 999999/);
   assert.throws(() => ED.apply(src, 0, { Resource_Special_Simulacrum: 1000 }), /between 0 and 999/);
+});
+
+test('real profile: save editor adds a Hardened Carapace to the bag', { skip: !process.env.RWA_PROFILE && 'set RWA_PROFILE' }, () => {
+  const ED = require('../js/editor.js');
+  const src = fs.readFileSync(process.env.RWA_PROFILE);
+  const key = 'Resource_Swamp_HardenedCarapace';
+  const out = ED.apply(src, 0, { [key]: 2 });
+  assert.equal(ED.fields(out, 0).find((f) => f.key === key).value, 2);
+  assert.equal(ED.crc32(out, 4), Buffer.from(out).readUInt32LE(0), 'header CRC');
+  const a = JSON.parse(JSON.stringify(CHAR.readProfile(src))), b = JSON.parse(JSON.stringify(CHAR.readProfile(out)));
+  assert.equal(b.characters[0].resources.find((r) => r.name === 'Hardened Carapace').quantity, 2);
+  delete a.characters[0].resources; delete b.characters[0].resources;
+  assert.deepEqual(b, a, 'nothing else changed');
+  assert.throws(() => ED.apply(src, 0, { [key]: 4 }), /between 0 and 3/);
 });

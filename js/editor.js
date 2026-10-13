@@ -18,10 +18,13 @@
     ['Resource_Rare_GalvanizedIron', 'Galvanized Iron'], ['Resource_Rare_HardenedIron', 'Hardened Iron'],
     ['Resource_Special_LumeniteCrystal', 'Lumenite Crystal'], ['Resource_Special_Simulacrum', 'Simulacrum'],
     ['Resource_Special_GlowingFragment', 'Glowing Fragment'],
+    // Not in the bag yet is fine: saving adds it (its game path is known, from the game's pak index). Up to 3.
+    ['Resource_Swamp_HardenedCarapace', 'Hardened Carapace', '/Game/World_Swamp/Items/Resources/WorldResources/Resource_Swamp_HardenedCarapace.Resource_Swamp_HardenedCarapace_C', 3],
   ];
   // Limits: what the game showed fine when tried (scrap 999,999; every other resource 999); trait points up to 2,000.
   var MAX = 999, SCRAP_MAX = 999999, TRAIT_MAX = 2000;
-  function maxOf(key) { return key === 'Resource_Scraps' ? SCRAP_MAX : MAX; }
+  function resource(key) { return RESOURCES.filter(function (r) { return r[0] === key; })[0] || null; }
+  function maxOf(key) { var r = resource(key); return r && r[3] ? r[3] : key === 'Resource_Scraps' ? SCRAP_MAX : MAX; }
 
   var CRC_TABLE = (function () {
     var t = [], c, n, k;
@@ -59,9 +62,10 @@
       var e = L.inBag[r[0]], inst = e && e.InstanceData;
       var has = inst && inst.props && inst.props.Quantity != null;
       out.push({
-        key: r[0], label: r[1], max: maxOf(r[0]), editable: !!(inst && inst.props),
-        value: has ? inst.props.Quantity : inst ? 0 : null,
-        note: !inst ? 'not in your bag yet: pick one up in the game first' : r[0] === 'Resource_Special_GlowingFragment' && L.account ? 'also the account’s Glowing Fragments' : '',
+        key: r[0], label: r[1], max: maxOf(r[0]), editable: !!(inst && inst.props) || !!(!e && r[2]),
+        value: has ? inst.props.Quantity : inst || (!e && r[2]) ? 0 : null,
+        note: !e && r[2] ? 'not in your bag: saving adds it (up to ' + maxOf(r[0]) + ')' : !inst ? 'not in your bag yet: pick one up in the game first'
+          : r[0] === 'Resource_Special_GlowingFragment' && L.account ? 'also the account’s Glowing Fragments' : r[3] ? 'up to ' + r[3] : '',
       });
     });
     var t = L.traits || {};
@@ -74,7 +78,7 @@
   function apply(buffer, charIndex, values) {
     var src = toBytes(buffer), L = locate(src, charIndex);
     var out = new Uint8Array(src), view = new DataView(out.buffer);
-    var inserts = [];
+    var inserts = [], adds = [];
     var setInt = function (pos, v) { view.setInt32(pos, v, true); };
     var check = function (key, v, min, max) {
       if (typeof v !== 'number' || !isFinite(v) || Math.floor(v) !== v || v < min || v > max) throw new Error(key + ': ' + v + ' is not a whole number between ' + min + ' and ' + max + '.');
@@ -87,9 +91,10 @@
         if (!t._at.TraitPoints) throw new Error('No trait points in this character.');
         return setInt(t._at.TraitPoints.valuePos, v);
       }
-      var label = (RESOURCES.filter(function (r) { return r[0] === key; })[0] || [key, key])[1];
+      var r = resource(key) || [key, key], label = r[1];
       check(label, v, 0, maxOf(key));
       var e = L.inBag[key], inst = e && e.InstanceData;
+      if (!e && r[2]) { if (v > 0) adds.push({ path: r[2], value: v }); return; }
       if (!inst || !inst.props) throw new Error(label + ' is not in the bag: pick one up in the game first.');
       if (inst.props._at.Quantity) setInt(inst.props._at.Quantity.valuePos, v);
       else if (v !== 0) inserts.push({ obj: inst, value: v });
@@ -99,6 +104,7 @@
     view = new DataView(out.buffer);
     view.setUint32(4, out.length, true);
     view.setUint32(0, crc32(out, 4), true);
+    adds.forEach(function (a) { out = addItem(out, charIndex, a.path, a.value); });
     // Read it back: every value must be there and nothing else may have moved.
     var got = fields(out, charIndex), want = fields(src, charIndex);
     got.forEach(function (f, i) {
@@ -107,6 +113,87 @@
     });
     return out;
   }
+
+  // Adds a new resource to the bag, stored exactly like one already there (any resource with a quantity):
+  // an Items[] element (ID, ItemBP, New, Hidden, EquipmentSlotIndex, InstanceData), two objects (the
+  // item's class path, and its ItemInstanceData with the Quantity) in the character's object table and
+  // data, the next item ID (IDGen keeps the last one handed out), and every size and offset around them.
+  // The result is read back and checked before it is returned.
+  function addItem(bytes, charIndex, path, qty) {
+    var L = locate(bytes, charIndex), blob = L.blob, base = L.ref.blobAt;
+    var view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    var inv = blob.root.comps.Inventory, items = inv.Items, idx = function (o) { return blob.objects.indexOf(o); };
+    var tpl = null, k, i;
+    for (k = 1; k < items.length && !tpl; k++) {
+      var c = items[k], d = c.InstanceData;
+      if (/^Resource_/.test(className(c.ItemBP)) && d && d._at && d._at.size === 23 && d.props.Quantity != null) tpl = c;
+    }
+    if (!tpl) throw new Error('No resource in the bag to copy the layout from: nothing was changed.');
+    k = items.indexOf(tpl);
+    var elem = bytes.slice(items[k - 1]._at.None + 2, tpl._at.None + 2), ev = new DataView(elem.buffer);
+    var inst = tpl.InstanceData._at, instData = bytes.slice(inst.sizePos - 4, inst.start + inst.size + 1);
+    // Object table: the template's instance entry and every instance-name number in use.
+    var tableStart = base + blob._at.objOff, p = tableStart + 4, nObj = view.getUint32(tableStart, true), entries = [];
+    for (i = 0; i < nObj; i++) {
+      var at = p, loaded = bytes[p++], len = view.getInt32(p, true); p += 4 + len;
+      if (!loaded) p += 10;
+      entries.push({ at: at, end: p, loaded: loaded });
+    }
+    if (p !== base + blob._at.namesOff) throw new Error('Unexpected object table: nothing was changed.');
+    var ti = idx(tpl.InstanceData), tc = idx(tpl.ItemBP);
+    var instEntry = bytes.slice(entries[ti].at, entries[ti].end);
+    var numbers = entries.filter(function (x) { return !x.loaded; }).map(function (x) { return view.getInt32(x.end - 8, true); });
+    var number = Math.min.apply(null, numbers.filter(function (x) { return x > 0; })) - 1;
+    var ci = nObj, ii = nObj + 1, id = inv.IDGen + 1;
+    // The element's ID, ItemBP and InstanceData values, found by property name and type.
+    var N = function (n) { return blob.names.indexOf(n); };
+    var field = function (name, type) {
+      for (var o = 0; o + 4 < elem.length; o++) if (ev.getUint16(o, true) === N(name) && ev.getUint16(o + 2, true) === N(type)) return o + 13;
+      return -1;
+    };
+    var oId = field('ID', 'IntProperty'), oBP = field('ItemBP', 'ObjectProperty'), oIn = field('InstanceData', 'ObjectProperty');
+    if (oId < 0 || oBP < 0 || oIn < 0 || ev.getInt32(oId, true) !== tpl.ID || ev.getInt32(oBP, true) !== tc || ev.getInt32(oIn, true) !== ti || instData.length !== 32) {
+      throw new Error('Unexpected item layout: nothing was changed.');
+    }
+    ev.setInt32(oId, id, true); ev.setInt32(oBP, ci, true); ev.setInt32(oIn, ii, true);
+    var dv = new DataView(instData.buffer); dv.setUint32(0, ii, true); dv.setInt32(21, qty, true);
+    var classData = new Uint8Array(9); new DataView(classData.buffer).setUint32(0, ci, true);
+    var pathBytes = new Uint8Array(path.length + 1); for (i = 0; i < path.length; i++) pathBytes[i] = path.charCodeAt(i) & 0xff;
+    var classEntry = new Uint8Array(5 + pathBytes.length); classEntry[0] = 1; new DataView(classEntry.buffer).setInt32(1, pathBytes.length, true); classEntry.set(pathBytes, 5);
+    new DataView(instEntry.buffer).setInt32(instEntry.length - 8, number, true);
+    // Sizes and offsets.
+    var sizePos = inv._at.Items.sizePos, countPos = sizePos + 11, eszPos = countPos + 8;
+    var arrayEnd = sizePos + 11 + view.getUint32(sizePos, true);
+    var firstProp = Math.min.apply(null, Object.keys(inv._at).filter(function (x) { return x !== 'None'; }).map(function (x) { return inv._at[x].sizePos - 4; }));
+    if (view.getUint32(countPos, true) !== items.length || items[items.length - 1]._at.None + 2 !== arrayEnd || view.getUint32(firstProp - 4, true) !== inv._at.None + 6 - firstProp) {
+      throw new Error('Unexpected inventory layout: nothing was changed.');
+    }
+    var dE = elem.length, dD = classData.length + instData.length, dT = classEntry.length + instEntry.length, total = dE + dD + dT;
+    var out0 = new Uint8Array(bytes), v0 = new DataView(out0.buffer);
+    var add32 = function (pos, d2) { v0.setUint32(pos, v0.getUint32(pos, true) + d2, true); };
+    add32(sizePos, dE); add32(countPos, 1); add32(eszPos, dE); add32(firstProp - 4, dE);
+    v0.setInt32(inv._at.IDGen.valuePos, id, true);
+    v0.setUint32(tableStart, nObj + 2, true);
+    add32(blob._at.objOffPos, dE + dD); add32(blob._at.namesOffPos, total);
+    add32(base - 4, total); add32(L.saved.props._at.CharacterData.sizePos, total); add32(L.saved._at.sizePos, total);
+    add32(L.file._at.objOffPos, total); add32(L.file._at.namesOffPos, total);
+    var cuts = [arrayEnd, tableStart, base + blob._at.namesOff], parts = [elem, cat(classData, instData), cat(classEntry, instEntry)];
+    var out = new Uint8Array(out0.length + total), from = 0, to = 0;
+    cuts.forEach(function (c2, j) { out.set(out0.subarray(from, c2), to); to += c2 - from; from = c2; out.set(parts[j], to); to += parts[j].length; });
+    out.set(out0.subarray(from), to);
+    var ov = new DataView(out.buffer);
+    ov.setUint32(4, out.length, true);
+    ov.setUint32(0, crc32(out, 4), true);
+    // Read back: one more item, the right one, a unique ID, every other item as it was.
+    var M = locate(out, charIndex), after = M.blob.root.comps.Inventory.Items, added = after[after.length - 1];
+    var same = items.every(function (x, n) { return after[n].ID === x.ID && String(after[n].ItemBP && after[n].ItemBP.path) === String(x.ItemBP && x.ItemBP.path); });
+    if (after.length !== items.length + 1 || String(added.ItemBP.path) !== path || added.ID !== id || !same || !added.InstanceData ||
+        added.InstanceData.props.Quantity !== qty || after.filter(function (x) { return x.ID === id; }).length !== 1 || M.blob.root.comps.Inventory.IDGen !== id) {
+      throw new Error('Check failed after adding ' + className(path) + ': nothing was saved.');
+    }
+    return out;
+  }
+  function cat(a, b) { var c = new Uint8Array(a.length + b.length); c.set(a, 0); c.set(b, a.length); return c; }
 
   // Adds a Quantity IntProperty to item data that has none, fixing every size and offset that spans it.
   function insertQuantities(bytes, L, inserts) {
