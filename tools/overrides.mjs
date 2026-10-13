@@ -65,6 +65,8 @@ export const MODE_FIX = {
   "Armor|Drifter's Overcoat": ['Campaign', ' Only in the main Earth campaign (Fairview, right after Ward 13): not in Adventure mode or the Subject 2923 campaign, so reroll the main campaign to get it.'],
   "Armor|Drifter's Trousers": ['Campaign', ' Only in the main Earth campaign (Fairview, right after Ward 13): not in Adventure mode or the Subject 2923 campaign, so reroll the main campaign to get it.'],
   'Mod|Vampiric': ['Adventure', ' Only in Adventure mode.'],
+  // The Rural Areas are only in the Subject 2923 campaign (no adventure is rural); the other rural drops already say so.
+  'Amulet|Terror Margin': ['Campaign', ' Only in the Subject 2923 campaign: the Rural Areas are not in Adventure mode.'],
   // Ward Prime is only in the Subject 2923 campaign.
   'Weapon|Machine Pistol': ['Campaign', ' Only in the Subject 2923 campaign: Ward Prime is not in Adventure mode.'],
   'Ring|Ring of Honor': ['Campaign', ' Only in the Subject 2923 campaign: Ward Prime is not in Adventure mode.'],

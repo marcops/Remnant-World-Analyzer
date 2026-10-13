@@ -1505,9 +1505,9 @@ var RWA_DATA = {
    "category": "Amulet",
    "group": "",
    "world": "Earth",
-   "mode": "",
+   "mode": "Campaign",
    "dlc": "Subject 2923",
-   "how": "Random drop from the Rural Areas.",
+   "how": "Random drop from the Rural Areas. Only in the Subject 2923 campaign: the Rural Areas are not in Adventure mode.",
    "key": "/Items/Trinkets/TerrorMargin",
    "id": 136
   },

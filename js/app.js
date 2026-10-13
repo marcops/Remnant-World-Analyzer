@@ -937,7 +937,7 @@
 
     el.innerHTML = '<div class="summary">' +
       '<div class="card static"><div class="w">Traits</div><div class="n' + (have === TRAITS.length ? ' done' : ' neutral') + '">' + (hasProfile ? have + ' of ' + TRAITS.length : TRAITS.length) + '</div><div class="of">' + (hasProfile ? (TRAITS.length - have) + ' missing' : 'load profile.sav') + '</div></div>' +
-      (ch ? '<div class="card static"><div class="w">Points spent</div><div class="n neutral">' + num(ch.traitPointsSpent) + ' / ' + num(TRAIT_POINTS_MAX) + '</div><div class="of">' + num(ch.traitPoints) + ' earned · ' + num(Math.max(0, (ch.traitPoints || 0) - (ch.traitPointsSpent || 0))) + ' to spend</div></div>' +
+      (ch ? '<div class="card static"><div class="w">Trait rank</div><div class="n neutral">' + num(traitRank(ch)) + ' / ' + num(TRAIT_POINTS_MAX) + '</div><div class="of">' + num(ch.traitPointsSpent) + ' points spent · ' + num(ch.traitPoints) + ' earned · ' + num(Math.max(0, (ch.traitPoints || 0) - (ch.traitPointsSpent || 0))) + ' to spend</div></div>' +
         '<div class="card static"><div class="w">At max</div><div class="n neutral">' + rows.filter(function (r) { return r.level >= 20; }).length + '</div><div class="of">traits at level 20</div></div>' : '') +
       '</div>' +
       '<div class="filters">' +
@@ -1127,6 +1127,9 @@
   // ---- my character --------------------------------------------------------
   function num(n) { return Math.round(n).toLocaleString('en-US'); }
   // Most trait points a character can spend: 50 traits × 20 levels.
+  // The game's "Trait Rank": the sum of your trait levels (the save keeps it as TraitRank). It can differ from
+  // the points spent.
+  function traitRank(ch) { return ch.extra && ch.extra.traitRank != null ? ch.extra.traitRank : (ch.traits || []).reduce(function (n, t) { return n + (t.level || 0); }, 0); }
   var TRAIT_POINTS_MAX = 1000;
   function duration(sec) { var h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60); return h + 'h ' + (m < 10 ? '0' : '') + m + 'm'; }
   function rowGlobe(row) { return row.item ? itemWikiLink(row.item) : globe(RWA_WIKI.items[row.name], row.name); }
@@ -1152,7 +1155,7 @@
 
     var cards = [
       ['Character', 'Level ' + ch.level, ch.archetype + ' · ' + num(ch.experience) + ' XP'],
-      ['Traits', num(ch.traitPointsSpent) + ' / ' + num(TRAIT_POINTS_MAX) + ' points', leveled.length + ' traits leveled · ' + maxed + ' at max · ' + num(ch.traitPoints) + ' earned'],
+      ['Trait rank', num(traitRank(ch)) + ' / ' + num(TRAIT_POINTS_MAX), leveled.length + ' traits leveled · ' + maxed + ' at max · ' + num(ch.traitPointsSpent) + ' of ' + num(ch.traitPoints) + ' points spent'],
       world ? ['Time played', duration(world.timePlayed), world.difficulty ? world.difficulty + ' difficulty' : ''] : null,
       world && world.objective ? ['Current objective', world.objective, ''] : null,
       ['Dragon Heart', (heart && heart.entry.quantity != null ? heart.entry.quantity : '?') + ' charges', (res['Dragon Heart upgrades'] || 0) + ' upgrades · used ' + num(ch.dragonHeartUses) + ' times'],
@@ -1220,7 +1223,7 @@
       '<div class="summary">' + cards + '</div>' +
       '<div class="panels">' +
       panel('Loadout', loadout) +
-      panel('Traits (' + num(ch.traitPointsSpent) + ' / ' + num(ch.traitPoints) + ' points spent · max ' + num(TRAIT_POINTS_MAX) + ')', traits) +
+      panel('Traits (trait rank ' + num(traitRank(ch)) + ' / ' + num(TRAIT_POINTS_MAX) + ' · ' + num(ch.traitPointsSpent) + ' of ' + num(ch.traitPoints) + ' points spent)', traits) +
       panel('Resources', tiles(resources)) +
       panel('Consumables', ch.consumables.length ? tiles(ch.consumables) : '<p class="cat">None.</p>') +
       panel('Weapon upgrades', arsenalList('Weapon')) +
