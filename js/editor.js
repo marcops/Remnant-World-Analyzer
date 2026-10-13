@@ -19,8 +19,8 @@
     ['Resource_Special_LumeniteCrystal', 'Lumenite Crystal'], ['Resource_Special_Simulacrum', 'Simulacrum'],
     ['Resource_Special_GlowingFragment', 'Glowing Fragment'],
   ];
-  // Limits: what the game showed fine when tried (scrap 999,999; every other resource 999); trait points 50 × 20.
-  var MAX = 999, SCRAP_MAX = 999999, TRAIT_MAX = 1000;
+  // Limits: what the game showed fine when tried (scrap 999,999; every other resource 999); trait points up to 2,000.
+  var MAX = 999, SCRAP_MAX = 999999, TRAIT_MAX = 2000;
   function maxOf(key) { return key === 'Resource_Scraps' ? SCRAP_MAX : MAX; }
 
   var CRC_TABLE = (function () {

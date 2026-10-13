@@ -394,7 +394,7 @@
     { id: 'carapace', name: 'Hardened Carapace', carried: /Hardened_?Carapace/i, from: 'Sketterling', world: 'Corsus', dlc: 'Swamps of Corsus', repeat: true,
       rewards: byName(['Carapace Great Helm', 'Carapace Shell', 'Carapace Greaves']),
       how: 'Dropped by the Black Vikorian Beetles during the Sketterling Temple event (Corsus). With the Parasite effect (from an Iskal Infector), Mar\'Gosh sells each Carapace piece for one Hardened Carapace plus scrap (Great Helm 500, Shell 1,500, Greaves 1,000).' },
-    { id: 'homestead', name: 'Homestead Basement Key', carried: /Homestead_?Key/i, from: 'WardPrime', world: 'Ward Prime', dlc: 'Subject 2923', rewards: byName(['Vanguard Ring']),
+    { id: 'homestead', name: 'Homestead Basement Key', carried: /Homestead_?Key/i, from: 'WardPrime', world: 'Ward Prime', mode: 'Campaign', dlc: 'Subject 2923', rewards: byName(['Vanguard Ring']),
       how: 'In Dr. Enji Sato and Dr. Sebastian Weisskoof\'s office in Ward Prime, when the Homestead is in your Rural Earth. Destroy the shelves in the Homestead house, go down and unlock the basement for the Vanguard Ring.' },
     { id: 'hunterskey', name: "Hunter's Key", carried: /HuntersKey|HunterKey/i, from: 'HuntersHideout', world: 'Earth', rewards: byName(['Hunting Pistol']),
       how: 'Given by the dying Hunter at the start of the Hunter\'s Hideout dungeon (Hidden Grotto, Earth). Opens the Safehouse at the end, with the Hunting Pistol in a locker.' },
@@ -423,23 +423,23 @@
       seen: { talk: ['ReggieGaveRing'], achievements: ['Return_Reggie_Ring'] },
       how: 'Spawns at a random place on Earth. Give it to Reggie in Ward 13 (exhaust his dialogue) for the Scavenger trait — also earned by picking up 50,000 scrap.' },
     // Story and door keys: no collection item, recognised from your progress.
-    { id: 'datla', name: 'D.A.T.L.A. Key', carried: /DATLA/i, world: 'Ward 13', rewards: [], seen: { socket: /DATLA/, achievements: ['Kill_Dreamer'], flags: ['Finished Game'] },
+    { id: 'datla', name: 'D.A.T.L.A. Key', carried: /DATLA/i, world: 'Ward 13', mode: 'Campaign', rewards: [], seen: { socket: /DATLA/, achievements: ['Kill_Dreamer'], flags: ['Finished Game'] },
       how: 'Given by Commander Ford after you turn on the reactor in Ward 13. Powers the crystal terminal on the way to Ward 17 (main story).' },
-    { id: 'founderskey', name: "Founder's Key", carried: /FoundersKey/i, world: 'Ward 13', rewards: [], seen: { achievements: ['Kill_Dreamer'], flags: ['Finished Game'] },
+    { id: 'founderskey', name: "Founder's Key", carried: /FoundersKey/i, world: 'Ward 13', mode: 'Campaign', rewards: [], seen: { achievements: ['Kill_Dreamer'], flags: ['Finished Game'] },
       how: 'Given after you free the Founder in the Founder\'s Prison (Yaesha). Unlocks the computer connected to the mirror on the lower levels of Ward 13 (main story).' },
-    { id: 'howlingkey', name: 'Howling Key', carried: /HowlingKey/i, world: 'Rhom', rewards: [], seen: { achievements: ['Meet_Undying_King', 'Kill_Undying_King'] },
+    { id: 'howlingkey', name: 'Howling Key', carried: /HowlingKey/i, world: 'Rhom', mode: 'Campaign', rewards: [], seen: { achievements: ['Meet_Undying_King', 'Kill_Undying_King'] },
       how: 'Dropped by Claviger or The Harrow (Rhom). Opens the altar of the Sun Gate that leads to the Undying King.' },
-    { id: 'labyrinthkey', name: 'Labyrinth Key', carried: /LabyrinthKey/i, world: 'The Labyrinth', rewards: [], seen: { achievements: ['Meet_Labyrinth_Keeper'], milestones: ['Traveled To Labyrinth'] },
+    { id: 'labyrinthkey', name: 'Labyrinth Key', carried: /LabyrinthKey/i, world: 'The Labyrinth', mode: 'Campaign', rewards: [], seen: { achievements: ['Meet_Labyrinth_Keeper'], milestones: ['Traveled To Labyrinth'] },
       how: 'Given by the Undying King for the Guardian\'s Heart, or as the reward for killing him. Opens the way to the Labyrinth.' },
-    { id: 'wpfuse', name: 'Ward Prime Fuse', carried: /WardPrime_?Fuse/i, world: 'Ward Prime', dlc: 'Subject 2923', rewards: [], seen: { fuse: /Zone_204_|WardPrime/, flags: ['Fuse Used'], achievements: ['Kill_Harsgaard'] },
+    { id: 'wpfuse', name: 'Ward Prime Fuse', carried: /WardPrime_?Fuse/i, world: 'Ward Prime', mode: 'Campaign', dlc: 'Subject 2923', rewards: [], seen: { fuse: /Zone_204_|WardPrime/, flags: ['Fuse Used'], achievements: ['Kill_Harsgaard'] },
       how: 'Behind the obstructed door on the left of the Laboratory in Ward Prime. Restores power to the main level of Ward Prime (DLC story).' },
-    { id: 'wpkeycard', name: 'Ward Prime Keycard', carried: /Keycard_?WardPrime/i, world: 'Ward Prime', dlc: 'Subject 2923', rewards: [], seen: { keyItems: /Keycard Ward Prime/i, achievements: ['Kill_Harsgaard'] },
+    { id: 'wpkeycard', name: 'Ward Prime Keycard', carried: /Keycard_?WardPrime/i, world: 'Ward Prime', mode: 'Campaign', dlc: 'Subject 2923', rewards: [], seen: { keyItems: /Keycard Ward Prime/i, achievements: ['Kill_Harsgaard'] },
       how: 'In the Medical Storage of Ward Prime: restore power from the reactor room and use the computer to unlock its door (DLC story).' },
-    { id: 'wpmaintkey', name: 'Ward Prime Maintenance Key', carried: /Maintenance/i, world: 'Ward Prime', dlc: 'Subject 2923', rewards: [],
+    { id: 'wpmaintkey', name: 'Ward Prime Maintenance Key', carried: /Maintenance/i, world: 'Ward Prime', mode: 'Campaign', dlc: 'Subject 2923', rewards: [],
       how: 'In the Medical Area of Ward Prime: vault over a broken window and destroy a bookshelf.' },
   ];
   QUEST_ITEMS.forEach(function (q) {
-    q.key = '__quest_' + q.id; q.category = 'Quest item'; q.quest = true; q.mode = ''; q.group = ''; q.dlc = q.dlc || '';
+    q.key = '__quest_' + q.id; q.category = 'Quest item'; q.quest = true; q.mode = q.mode || ''; q.group = ''; q.dlc = q.dlc || '';
     q.hide = !!q.hide; q.usedAt = q.usedAt || {};
   });
   // The sheet lists the Rusted Amulet as an amulet, but it's the first step of the Acid Cleaned Key: a key item,
@@ -1936,7 +1936,7 @@
       here ? 'Saving first copies the whole save folder to <code>SaveGames_backup_&lt;date&gt;</code>, next to it.'
         : 'Keep a copy of your current profile.sav. Then put the downloaded one in <code>%LOCALAPPDATA%\\Remnant\\Saved\\SaveGames</code>, replacing it.',
       'Steam Cloud: if Steam asks which copy to keep, choose the <b>local</b> one.',
-      'Only resources already in your bag can be changed (pick one up in the game first). Up to 999,999 scrap and 999 of everything else; trait points go up to 1,000 (50 traits × 20 levels) and can’t go below what you already spent.',
+      'Only resources already in your bag can be changed (pick one up in the game first). Up to 999,999 scrap and 999 of everything else; trait points go up to 2,000 and can’t go below what you already spent (1,000 is enough to max all 50 traits).',
       'The file is checked after the change (checksum, sizes, every value read back); still, editing saves is at your own risk.',
     ];
     el.innerHTML = '<section class="panel wide ed-box"><h3>Before you save</h3><ul class="ed-warn">' + warn.map(function (w) { return '<li>' + w + '</li>'; }).join('') + '</ul></section>' +

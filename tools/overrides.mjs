@@ -65,6 +65,11 @@ export const MODE_FIX = {
   "Armor|Drifter's Overcoat": ['Campaign', ' Only in the main Earth campaign (Fairview, right after Ward 13): not in Adventure mode or the Subject 2923 campaign, so reroll the main campaign to get it.'],
   "Armor|Drifter's Trousers": ['Campaign', ' Only in the main Earth campaign (Fairview, right after Ward 13): not in Adventure mode or the Subject 2923 campaign, so reroll the main campaign to get it.'],
   'Mod|Vampiric': ['Adventure', ' Only in Adventure mode.'],
+  // Ward Prime is only in the Subject 2923 campaign.
+  'Weapon|Machine Pistol': ['Campaign', ' Only in the Subject 2923 campaign: Ward Prime is not in Adventure mode.'],
+  'Ring|Ring of Honor': ['Campaign', ' Only in the Subject 2923 campaign: Ward Prime is not in Adventure mode.'],
+  'Mod|Fusion Cannon': ['Campaign', ' Only in the Subject 2923 campaign, like the Fusion Rifle.'],
+  'Ring|Vanguard Ring': ['Campaign', ' Only in the Subject 2923 campaign: the Homestead Basement Key is in Ward Prime, which Adventure mode does not have.'],
 };
 
 // Events the game files name differently from the game's map: the Felmourn Burrow (where the Frostborne is)
