@@ -200,6 +200,27 @@
       z.name = zoneName(z);
     });
 
+    // The world an area belongs to (Earth, Rhom, Corsus, Yaesha, Reisum, The Labyrinth, Ward 17, Ward Prime): the
+    // hubs by their level, else the category of its links or of the area it sits in (Earth, Wasteland, Swamp…),
+    // else its tile set.
+    var CATEGORY = { Earth: 'Earth', City: 'Earth', Rural: 'Earth', Wasteland: 'Rhom', Swamp: 'Corsus', Jungle: 'Yaesha', Snow: 'Reisum', Core: 'The Labyrinth' };
+    function worldOfZone(z) {
+      var name = z.template + ' ' + z.tileSet;
+      if (z.mode === 'Ward 13') return 'Ward 13';
+      if (/Ward17/i.test(name)) return 'Ward 17';
+      if (/WardPrime/i.test(name)) return 'Ward Prime';
+      if (/TileSet_Labyrinth|Quest_Campaign_Labyrinth/i.test(name)) return 'The Labyrinth';
+      if (/LabyrinthTower/i.test(name)) return 'Earth';     // the Keeper's Tower stands in Earth's city
+      for (var p = z, n = 0; p && n < 10; p = zones[p.parent], n++) {
+        var c = p.links.map(function (l) { return CATEGORY[l.category]; }).filter(Boolean)[0];
+        if (c) return c;
+      }
+      var t = /City|Subway|Canopy|Sewer|Farmland|Rural/i.test(name) ? 'Earth' : /Wasteland|Citadel/i.test(name) ? 'Rhom' : /Swamp|Mine/i.test(name) ? 'Corsus'
+        : /Jungle|Ziggurat|Crypt|Village|Pan_/i.test(name) ? 'Yaesha' : /Snow|IceShelf|Warren/i.test(name) ? 'Reisum' : '';
+      return t || (z.parent != null && zones[z.parent] ? worldOfZone(zones[z.parent]) : '');
+    }
+    Object.keys(zones).forEach(function (k) { zones[k].world = worldOfZone(zones[k]); });
+
     function tileOf(zone, tile) {
       var z = zones[zone]; if (!z) return null;
       return z.tiles.filter(function (t) { return t.id === tile; })[0] || null;

@@ -1907,10 +1907,25 @@
     // Campaign and adventure are separate maps: show one at a time, adventure first.
     var modes = ['Adventure', 'Campaign', 'Ward 13'].filter(function (m) { return ws.zones.some(function (z) { return z.mode === m; }); });
     if (modes.indexOf(state.mapMode) < 0) state.mapMode = modes[0];
-    var zones = ws.zones.filter(function (z) { return !modes.length || z.mode === state.mapMode || (!z.mode && state.mapMode === modes[0]); });
+    var inMode = ws.zones.filter(function (z) { return !modes.length || z.mode === state.mapMode || (!z.mode && state.mapMode === modes[0]); });
     var switcher = modes.length > 1 ? '<div class="seg" id="map-mode">' + modes.map(function (m) {
       return '<button type="button" data-map-mode="' + esc(m) + '" class="' + (m === state.mapMode ? 'active' : '') + '">' + esc(m) + ' <span class="cat">' + ws.zones.filter(function (z) { return z.mode === m; }).length + '</span></button>';
     }).join('') + '</div>' : '';
+    // A campaign spans several worlds: one at a time (the one you're in first), or all.
+    var WORLD_ORDER_MAP = ['Earth', 'Rhom', 'Corsus', 'Yaesha', 'Reisum', 'The Labyrinth', 'Ward 17', 'Ward Prime', 'Ward 13'];
+    var worldsHere = WORLD_ORDER_MAP.filter(function (w) { return inMode.some(function (z) { return z.world === w; }); });
+    inMode.forEach(function (z) { if (z.world && worldsHere.indexOf(z.world) < 0) worldsHere.push(z.world); });
+    state.mapWorld = state.mapWorld || {};
+    if (state.mapWorld[state.mapMode] === undefined) {
+      var md = (ws.modes || []).filter(function (m) { return state.mapMode === 'Campaign' ? /^Campaign/.test(m.name) : /^Adventure/.test(m.name); })[0];
+      var here = md && md.checkpointZone != null && inMode.filter(function (z) { return z.id === md.checkpointZone; })[0];
+      state.mapWorld[state.mapMode] = here && here.world ? here.world : worldsHere[0] || null;
+    }
+    var pickedWorld = worldsHere.length > 1 ? state.mapWorld[state.mapMode] : null;
+    var zones = inMode.filter(function (z) { return !pickedWorld || z.world === pickedWorld; });
+    if (worldsHere.length > 1) switcher += '<div class="seg map-worlds">' + worldsHere.map(function (w) {
+      return '<button type="button" data-map-world="' + esc(w) + '" class="' + (pickedWorld === w ? 'active' : '') + '">' + esc(w) + ' <span class="cat">' + inMode.filter(function (z) { return z.world === w; }).length + '</span></button>';
+    }).join('') + '<button type="button" data-map-world="" class="' + (!pickedWorld ? 'active' : '') + '">All worlds <span class="cat">' + inMode.length + '</span></button></div>';
     // Place filter in alphabetical order.
     var index = zones.slice().sort(function (a, b) { return a.name.localeCompare(b.name); })
       .map(function (z) { return '<a class="chip on" href="#zone-' + z.id + '">' + esc(z.name) + '</a>'; }).join('');
@@ -2323,6 +2338,8 @@
         window.scrollBy(0, $('zone-' + id).getBoundingClientRect().top - before);
         return;
       }
+      var mw = e.target.closest('[data-map-world]');
+      if (mw) { state.mapWorld[state.mapMode] = mw.dataset.mapWorld || null; renderMapTab(); return; }
       var b = e.target.closest('[data-map-mode]'); if (!b) return;
       state.mapMode = b.dataset.mapMode; renderMapTab();
     });
@@ -2395,6 +2412,7 @@
       var ws = state.worldStates && state.worldStates[state.charIndex];
       var zone = ws && ws.zones ? ws.zones.filter(function (z) { return String(z.id) === a.dataset.gotoMap; })[0] : null;
       if (zone && zone.mode) state.mapMode = zone.mode;
+      if (zone && zone.world) { state.mapWorld = state.mapWorld || {}; state.mapWorld[state.mapMode] = zone.world; }
       state.tab = 'map'; store('tab', state.tab); render();
       var z = $('zone-' + a.dataset.gotoMap); if (z && z.scrollIntoView) z.scrollIntoView({ behavior: 'smooth' });
     });

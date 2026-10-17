@@ -394,3 +394,6 @@ details.raw > summary { cursor: pointer; }
   input[type=search] { min-width: 0; }
   .panels { grid-template-columns: 1fr; }
 }
+/* Map: worlds of a campaign, below the campaign/adventure switch. */
+.seg.map-worlds { display: flex; width: fit-content; max-width: 100%; flex-wrap: wrap; margin: 22px 0 24px; }
+#map-mode { margin-bottom: 4px; }
