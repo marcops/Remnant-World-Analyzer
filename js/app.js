@@ -1741,7 +1741,8 @@
     (ws.raw || []).forEach(function (c) { var m = re.exec(c.key); if (m && MAPS[m[1]] && !found) found = m[1]; });
     // Not visited yet (the game saves an area's levels once you've been there): the zone's map template names it
     // (Quest_Boss_Fatty_POI, or Quest_WardPrime_Template for Quest_WardPrime_POI).
-    if (!found && z.template) found = [z.template, z.template.replace(/_Template$/, '_POI')].filter(function (n) { return MAPS[n]; })[0] || null;
+    var ALIAS = { Quest_Campaign_Labyrinth: 'Labyrinth_Core_04', Quest_Ward13_Template: 'PlayerBase01' };
+    if (!found && z.template) found = [ALIAS[z.template], z.template, z.template.replace(/_Template$/, '_POI')].filter(function (n) { return n && MAPS[n]; })[0] || null;
     return found ? { level: found, map: MAPS[found] } : null;
   }
   // The floor a world point is on: the level's region boxes (RegionSize is half the box), else the ground floor.
@@ -1956,7 +1957,9 @@
       var views = (core.length > 2
         ? '<div><div class="section-title">Layout</div>' + zoneLayoutSvg(z) + '</div><div><div class="section-title">Your path</div>' + zoneFogSvg(z) + '</div>'
         : fm ? '<div><div class="section-title">Map</div>' + fixedMapSvg(z, ws, fm) + '</div><div><div class="section-title">Your path</div>' + zoneFogSvg(z) + '</div>'
-          : '<div><div class="section-title">Your path <span class="cat">(fixed map: no tile layout in the save)</span></div>' + zoneFogSvg(z, 560) + '</div>');
+          // A random area (Template_Dungeon40_…) not entered yet: the game builds its tiles the first time you go in.
+          : !core.length && /^Template_/.test(z.template || '') ? '<div><div class="section-title">Layout</div><p class="cat">Random area: the game builds its tiles the first time you go in. Come back after visiting it.</p></div>'
+          : '<div><div class="section-title">Your path <span class="cat">(no map of this area in the save or the game files)</span></div>' + zoneFogSvg(z, 560) + '</div>');
       return '<section class="panel zone" id="zone-' + z.id + '"><h3>' + esc(z.name) + wikiLink(z.name) + '</h3><p class="cat">' + esc(facts) + '</p>' +
         (links ? '<div class="chips">' + links + '</div>' : '') +
         '<div class="zviews">' + views + '</div>' + here +
