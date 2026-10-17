@@ -134,8 +134,8 @@ test('real profile: save editor changes only what was asked', { skip: !process.e
   const strip = (p) => { const c = JSON.parse(JSON.stringify(p)); delete c.characters[0].resources; return c; };
   assert.deepEqual(strip(CHAR.readProfile(out)), strip(CHAR.readProfile(src)));
   assert.throws(() => ED.apply(src, 0, { TraitPoints: -1 }), /whole number/);
-  assert.throws(() => ED.apply(src, 0, { Resource_Scraps: 1000000 }), /between 0 and 999999/);
-  assert.throws(() => ED.apply(src, 0, { Resource_Special_Simulacrum: 1000 }), /between 0 and 999/);
+  assert.throws(() => ED.apply(src, 0, { Resource_Scraps: 10000000 }), /between 0 and 9999999/);
+  assert.throws(() => ED.apply(src, 0, { Resource_Special_Simulacrum: 10000 }), /between 0 and 9999/);
 });
 
 test('real profile: save editor adds a Hardened Carapace to the bag', { skip: !process.env.RWA_PROFILE && 'set RWA_PROFILE' }, () => {

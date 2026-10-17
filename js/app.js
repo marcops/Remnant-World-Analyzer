@@ -2073,7 +2073,7 @@
       here ? 'Saving first copies the whole save folder to <code>SaveGames_backup_&lt;date&gt;</code>, next to it.'
         : 'Keep a copy of your current profile.sav. Then put the downloaded one in <code>%LOCALAPPDATA%\\Remnant\\Saved\\SaveGames</code>, replacing it.',
       'Steam Cloud: if Steam asks which copy to keep, choose the <b>local</b> one.',
-      'Only resources already in your bag can be changed (pick one up in the game first). Up to 999,999 scrap and 999 of everything else; trait points go up to 2,000 and can’t go below what you already spent (1,000 is enough to max all 50 traits).',
+      'Resources not in your bag yet are added when you save. Up to 9,999,999 scrap and 9,999 of everything else (3 Hardened Carapace); trait points go up to 2,000 and can’t go below what you already spent (1,000 is enough to max all 50 traits).',
       'The file is checked after the change (checksum, sizes, every value read back); still, editing saves is at your own risk.',
     ];
     el.innerHTML = '<section class="panel wide ed-box"><h3>Before you save</h3><ul class="ed-warn">' + warn.map(function (w) { return '<li>' + w + '</li>'; }).join('') + '</ul></section>' +

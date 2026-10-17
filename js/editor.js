@@ -26,8 +26,8 @@
     // Up to 3.
     ['Resource_Swamp_HardenedCarapace', 'Hardened Carapace', '/Game/World_Swamp/Items/Resources/WorldResources/Resource_Swamp_HardenedCarapace.Resource_Swamp_HardenedCarapace_C', 3],
   ];
-  // Limits: what the game showed fine when tried (scrap 999,999; every other resource 999); trait points up to 2,000.
-  var MAX = 999, SCRAP_MAX = 999999, TRAIT_MAX = 2000;
+  // Limits: scrap up to 9,999,999, every other resource 9,999 (the Hardened Carapace 3); trait points up to 2,000.
+  var MAX = 9999, SCRAP_MAX = 9999999, TRAIT_MAX = 2000;
   function resource(key) { return RESOURCES.filter(function (r) { return r[0] === key; })[0] || null; }
   function maxOf(key) { var r = resource(key); return r && r[3] ? r[3] : key === 'Resource_Scraps' ? SCRAP_MAX : MAX; }
 
