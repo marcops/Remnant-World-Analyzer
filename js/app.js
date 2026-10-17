@@ -355,6 +355,9 @@
   //   hide:    the rewards are listed as this item instead (the Labyrinth set isn't something you pick up in Corsus)
   //   notOnly: the rewards can also be earned without it (Scavenger: picking up 50,000 scrap)
   function byName(names) { return names.map(function (n) { return DATA.items.filter(function (i) { return i.name === n; })[0]; }).filter(Boolean); }
+  // A key item lying in the world (world-state loot with keyItem), by its class: its entry below and its name.
+  function questItemFor(l) { return l.keyItem ? QUEST_ITEMS.filter(function (q) { return q.carried.test(l.cls); })[0] || null : null; }
+  function lootName(l) { var q = questItemFor(l); return q ? q.name : l.name; }
   var CRYPTOLITH_REWARDS = ((DATA.events.Cryptolith || {}).items || []).map(function (p) { return itemsByKey[p]; }).filter(Boolean);
   var HEART_IKSAL = byName(['Crossbow', 'Slayer Mask', 'Slayer Mantle', 'Slayer Boots']), HEART_UNDYING = byName(['Riven']);
   // Every key item of the game (Fextralife wiki, "Key Items"). `rewards` are the sheet items it leads to;
@@ -1435,6 +1438,12 @@
       ws.loot.filter(function (l) { return (l.item && /Ring|Amulet|Weapon|Armor|Mod|Trait/.test(l.item.category) && missing(l.item)) || l.name === 'Trait Book'; }).forEach(function (l) {
         world.push('★ <b>Pick up ' + esc(l.name) + '</b> lying on the ground in ' + mapLink(l.zone, l.zoneLabel) + (l.item ? itemWikiLink(l.item) : ''));
       });
+      // Key items lying in the world that lead to something you don't have.
+      ws.loot.filter(function (l) { return l.keyItem; }).forEach(function (l) {
+        var q = questItemFor(l), need = q ? q.rewards.filter(missing) : [];
+        if (q && q.rewards.length && !need.length) return;
+        world.push('🔑 <b>Pick up the ' + esc(lootName(l)) + '</b> lying in ' + mapLink(l.zone, l.zoneLabel) + (need.length ? ' → ' + need.map(function (i) { return esc(i.name); }).join(', ') : '') + (q ? '<div class="cat">' + esc(q.how) + '</div>' : ''));
+      });
       // Skip the Cryptolith (it has its own panel) and item drops already listed as lying on the ground.
       var onGround = {}; ws.loot.forEach(function (l) { if (l.item) onGround[l.item.name] = true; });
       ws.events.filter(function (e) {
@@ -1640,7 +1649,7 @@
     }
     core.forEach(function (t) {
       var x = px(t), y = py(t);
-      var precious = t.loot.some(function (l) { return l.item && /Ring|Amulet|Weapon|Armor|Mod|Trait/.test(l.item.category) || l.name === 'Trait Book'; });
+      var precious = t.loot.some(function (l) { return l.item && /Ring|Amulet|Weapon|Armor|Mod|Trait/.test(l.item.category) || l.name === 'Trait Book' || l.keyItem; });
       var tip = [z.name + ' — tile ' + t.id, t.role === 'Start' ? 'Start of the area' : '']
         .concat(t.events.map(function (e) { return e.type + ': ' + e.name + (e.done ? ' (completed)' : ''); }))
         .concat(t.links.map(function (l) {
@@ -1649,7 +1658,7 @@
           return ({ Waypoint: 'Waypoint', Checkpoint: 'Respawn checkpoint', Link: 'Passage' }[l.type] || l.type) + (l.label ? ': ' + l.label : '') + (l.used ? ' (used)' : '') + (l.active ? '' : ' (inactive)');
         }))
         .concat(t.chests ? ['Chests: ' + t.chestsOpen + ' of ' + t.chests + ' opened'] : [])
-        .concat(t.loot.map(function (l) { return 'On the ground: ' + l.name + (l.quantity > 1 ? ' ×' + l.quantity : ''); }))
+        .concat(t.loot.map(function (l) { return 'On the ground: ' + lootName(l) + (l.quantity > 1 ? ' ×' + l.quantity : ''); }))
         .concat((z.ambient || []).filter(function (a) { return a.tileId === t.id; }).map(function (a) {
           return 'Enemies: ' + Object.keys(a.creatures).map(function (n) { return n + (a.creatures[n] > 1 ? ' ×' + a.creatures[n] : ''); }).join(', ');
         }))
@@ -1675,6 +1684,8 @@
         // What you don't have yet from this event, in bold with ◆.
         e.items.forEach(function (i) { if (i.item && itemOwned(i.item) === false) lines.push(['◆ ' + short(i.name, 13), 'want']); });
       });
+      // Key items lying on this tile (the Homestead Basement Key in Ward Prime…), in bold.
+      t.loot.forEach(function (l) { if (l.keyItem) lines.unshift(['🔑 ' + short(lootName(l), 13), 'want']); });
       if (t.links.some(function (l) { return l.type === 'Waypoint'; })) lines.push(['⚑ waypoint', 'now']);
       if (t.links.some(function (l) { return l.type === 'Checkpoint'; })) lines.push(['✚ checkpoint', 'now']);
       var icons = (t.chests ? '▣' + t.chestsOpen + '/' + t.chests + ' ' : '') + (t.loot.length ? (precious ? '★' : '•') + t.loot.length : '');
@@ -1758,7 +1769,15 @@
 
     // Farm: what is still lying on the ground, and the chests.
     var loot = {};
-    ws.loot.filter(function (l) { return l.zone === z.id; }).forEach(function (l) { loot[l.name] = (loot[l.name] || 0) + l.quantity; });
+    ws.loot.filter(function (l) { return l.zone === z.id; }).forEach(function (l) {
+      // A key item lying here goes with the items, in bold, with what it opens.
+      if (l.keyItem) {
+        var q = questItemFor(l), need = q ? q.rewards.filter(function (i) { return itemOwned(i) === false; }) : [];
+        items.unshift('🔑 <b>' + esc(lootName(l)) + '</b> <span class="cat">key item lying here' + (need.length ? ' → ' + esc(need.map(function (i) { return i.name; }).join(', ')) : '') + '</span>');
+        return;
+      }
+      loot[lootName(l)] = (loot[lootName(l)] || 0) + l.quantity;
+    });
     Object.keys(loot).forEach(function (n) { farm.push('• ' + rareName(n) + (loot[n] > 1 ? ' ×' + num(loot[n]) : '') + ' <span class="cat">on the ground</span>'); });
     if (z.chests) farm.push('▣ ' + z.chestsOpen + ' of ' + z.chests + ' chests opened');
 

@@ -204,7 +204,7 @@ if ($server.Lan) {
   foreach ($ip in (Get-LanAddresses)) { Write-Host "  Other PCs on your network:  http://${ip}:$($server.Port)/" -ForegroundColor Cyan }
 } else {
   Write-Host '  Other PCs on your network can''t open it yet. Once, in PowerShell run as administrator:' -ForegroundColor DarkYellow
-  Write-Host "    netsh http add urlacl url=http://+:$Port/ sddl=D:(A;;GX;;;WD)"
+  Write-Host "    netsh http add urlacl url=http://+:$Port/ ""sddl=D:(A;;GX;;;WD)"""
   Write-Host "    netsh advfirewall firewall add rule name=""Remnant World Analyzer"" dir=in action=allow protocol=TCP localport=$Port profile=private"
   Write-Host '  then close this window and open Start.bat again.'
 }

@@ -26,7 +26,7 @@ Other options: `-Port 9000` (different port), `-NoBrowser` (don't open the brows
 **From another PC or phone at home:** the window shows the address to open (e.g. `http://192.168.1.130:8765/`). Windows needs a one-time permission for that — in PowerShell **run as administrator**:
 
 ```powershell
-netsh http add urlacl url=http://+:8765/ sddl=D:(A;;GX;;;WD)
+netsh http add urlacl url=http://+:8765/ "sddl=D:(A;;GX;;;WD)"
 netsh advfirewall firewall add rule name="Remnant World Analyzer" dir=in action=allow protocol=TCP localport=8765 profile=private
 ```
 

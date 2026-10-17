@@ -158,6 +158,9 @@
           // The quantity lives on the item's InstanceData object inside the actor's save.
           if (p.InstanceData && p.InstanceData.props && p.InstanceData.props.Quantity) qty = p.InstanceData.props.Quantity;
           loot.push({ cls: cls, name: LOOT_NAMES[cls] || info.name, item: info.item, quantity: qty, zone: tileZone, tile: tileId, location: a.location });
+        } else if (cls && p.InstanceData && !/^Character_/.test(cls)) {
+          // Other pickups with item data are key items lying in the world (Homestead_Key in Ward Prime…).
+          loot.push({ cls: cls, name: splitWords(cls.replace(/^Quest_(Item_)?/, '')), item: null, keyItem: true, quantity: 1, zone: tileZone, tile: tileId, location: a.location });
         } else if (/^Character_/.test(cls)) {
           var items = ((a.comps.Inventory || {}).Items || []).filter(function (it) { return it.ItemBP; }).map(function (it) { return LOOT_NAMES[className(it.ItemBP.path)] || CHAR.itemFromPath(it.ItemBP.path).name; });
           npcs.push({ name: splitWords(cls.replace(/^Character_/, '')), items: items, where: key.split('/').pop().split(':')[0] });
