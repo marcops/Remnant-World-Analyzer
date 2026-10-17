@@ -6,8 +6,6 @@ Just drop your `save_N.sav` and `profile.sav` on the page. Nothing is uploaded: 
 
 Shows what rolled in your **Remnant: From the Ashes** world (campaign and adventure), what each event drops, **what you already have (✔) and what you're missing (✘)**, and a per-world summary of what's left — Earth, Subject 2923, Rhom, Corsus, Yaesha, Reisum, Ward 13, Ward 17, Ward Prime — with a description of how to obtain each item.
 
-Fork of [hzla/Remnant-World-Analyzer](https://github.com/hzla/Remnant-World-Analyzer), with a rewritten parser (the original showed nothing for saves with an active adventure).
-
 ## How to use
 
 ### Automatic (Windows) — recommended
@@ -80,6 +78,9 @@ tools/update.ps1                      rebuilds all generated files in one run (s
 tools/build-data.mjs                  js/data.js from tools/source/ (sheet CSVs + GameInfo.xml)
 tools/build-stats.mjs                 js/stats.js from the cached wiki pages
 tools/overrides.mjs                   manual name → game path fixes
+tools/minimaps.mjs                    js/maps.js + img/maps/ from the game's minimap pictures of the fixed maps:
+                                      node tools/minimaps.mjs "<Remnant folder>"
+tools/pak.mjs, uasset.mjs, bc7.mjs    reading the game's .pak files, levels and BC7 textures (used by minimaps.mjs)
 tools/source/wiki/                    cached wiki pages (not committed)
 server.ps1, Start.bat                 local server for automatic mode
 test/parser.test.mjs                  tests
@@ -99,12 +100,9 @@ It downloads only what isn't cached yet, so a normal run takes seconds. `node to
 
 ## Credits
 
-- [hzla/Remnant-World-Analyzer](https://github.com/hzla/Remnant-World-Analyzer) — the original project.
 - [Razzmatazzz/RemnantSaveManager](https://github.com/Razzmatazzz/RemnantSaveManager) — the campaign, adventure and inventory parsing logic was ported from it, and `tools/source/GameInfo.xml` (events → items) comes from it.
 - [Remnant: From the Ashes — Completionist's Checklist](https://docs.google.com/spreadsheets/d/1rmmwn-kaVS44qWgub7ubXqL26fAgM7TBIi-dNc7VGdI) by **Amythyst34** — full list of items, worlds, modes, DLC and "How to Obtain" (`tools/source/sheet-*.csv`).
 - [Remnant: From the Ashes Wiki](https://remnantfromtheashes.wiki.fextralife.com/) by **Fextralife** — the item and location pages linked by the 🌐 icons (`js/wiki.js`).
-- Forks with fixes and ideas: [axllency](https://github.com/axllency/Remnant-World-Analyzer), [tkerzmann](https://github.com/tkerzmann/Remnant-World-Analyzer), [paige404](https://github.com/paige404/Remnant-World-Analyzer), [gmferise](https://github.com/gmferise/Remnant-World-Analyzer), [northy](https://github.com/northy/Remnant-World-Analyzer), [chris-faulkner](https://github.com/chris-faulkner/Remnant-World-Analyzer).
-- /u/FAOAB on Reddit, for the [name spreadsheet](https://docs.google.com/spreadsheets/d/1VzmDx0ZXQWN5N_9_zP0gEqToyuB9ZjlxgZOEGdiuA6A) used by the original.
 
 ## License
 

@@ -398,7 +398,8 @@
       rewards: byName(['Carapace Great Helm', 'Carapace Shell', 'Carapace Greaves']),
       how: 'Dropped by the Black Vikorian Beetles during the Sketterling Temple event (Corsus). With the Parasite effect (from an Iskal Infector), Mar\'Gosh sells each Carapace piece for one Hardened Carapace plus scrap (Great Helm 500, Shell 1,500, Greaves 1,000).' },
     { id: 'homestead', name: 'Homestead Basement Key', carried: /Homestead_?Key/i, from: 'WardPrime', world: 'Ward Prime', mode: 'Campaign', dlc: 'Subject 2923', rewards: byName(['Vanguard Ring']),
-      how: 'In Dr. Enji Sato and Dr. Sebastian Weisskoof\'s office in Ward Prime, when the Homestead is in your Rural Earth. Destroy the shelves in the Homestead house, go down and unlock the basement for the Vanguard Ring.' },
+      how: 'In Dr. Enji Sato and Dr. Sebastian Weisskoof\'s office in Ward Prime, when the Homestead is in your Rural Earth: restore the power first (Ward Prime Fuse in the Main Bay Power room), then walk out of that room, turn left and right again past the medical bay stairs — a small room with two computers and a board game on the desks. ' +
+        'Destroy the shelves in the Homestead house, go down and unlock the basement for the Vanguard Ring.' },
     { id: 'hunterskey', name: "Hunter's Key", carried: /HuntersKey|HunterKey/i, from: 'HuntersHideout', world: 'Earth', rewards: byName(['Hunting Pistol']),
       how: 'Given by the dying Hunter at the start of the Hunter\'s Hideout dungeon (Hidden Grotto, Earth). Opens the Safehouse at the end, with the Hunting Pistol in a locker.' },
     { id: 'iskalvial', name: 'Iskal Vial', carried: /IskalVial/i, from: 'IskalQueen', world: 'Corsus', dlc: 'Swamps of Corsus', rewards: byName(['Ring of the Unclean', 'Potency']), usedAt: { GraveyardElf: byName(['Ring of the Unclean', 'Potency']) },
@@ -435,11 +436,14 @@
     { id: 'labyrinthkey', name: 'Labyrinth Key', carried: /LabyrinthKey/i, world: 'The Labyrinth', mode: 'Campaign', rewards: [], seen: { achievements: ['Meet_Labyrinth_Keeper'], milestones: ['Traveled To Labyrinth'] },
       how: 'Given by the Undying King for the Guardian\'s Heart, or as the reward for killing him. Opens the way to the Labyrinth.' },
     { id: 'wpfuse', name: 'Ward Prime Fuse', carried: /WardPrime_?Fuse/i, world: 'Ward Prime', mode: 'Campaign', dlc: 'Subject 2923', rewards: [], seen: { fuse: /Zone_204_|WardPrime/, flags: ['Fuse Used'], achievements: ['Kill_Harsgaard'] },
-      how: 'Behind the obstructed door on the left of the Laboratory in Ward Prime. Restores power to the main level of Ward Prime (DLC story).' },
+      how: 'Behind the obstructed door on the left of the Laboratory in Ward Prime. Put it in the fuse box of the Main Bay Power room, on the opposite side of the building, and use the box a second time to restore the power to the main level (DLC story; opens the way to the Homestead Basement Key).' },
     { id: 'wpkeycard', name: 'Ward Prime Keycard', carried: /Keycard_?WardPrime/i, world: 'Ward Prime', mode: 'Campaign', dlc: 'Subject 2923', rewards: [], seen: { keyItems: /Keycard Ward Prime/i, achievements: ['Kill_Harsgaard'] },
       how: 'In the Medical Storage of Ward Prime: restore power from the reactor room and use the computer to unlock its door (DLC story).' },
+    // It only opens the generator room (no item): used once the Ward Prime keycard or fuse — found after the
+    // power is back — is in your bag, or Harsgaard is dead.
     { id: 'wpmaintkey', name: 'Ward Prime Maintenance Key', carried: /Maintenance/i, world: 'Ward Prime', mode: 'Campaign', dlc: 'Subject 2923', rewards: [],
-      how: 'In the Medical Area of Ward Prime: vault over a broken window and destroy a bookshelf.' },
+      seen: { keyItems: /Keycard Ward Prime|Ward Prime Fuse/i, achievements: ['Kill_Harsgaard'] },
+      how: 'In the Medical Area of Ward Prime: vault over a broken window and destroy a bookshelf. Opens the door next to the first breach, to the generator room where you restore the power.' },
   ];
   QUEST_ITEMS.forEach(function (q) {
     q.key = '__quest_' + q.id; q.category = 'Quest item'; q.quest = true; q.mode = q.mode || ''; q.group = ''; q.dlc = q.dlc || '';
@@ -1489,8 +1493,20 @@
     // Quest items whose rewards aren't all yours yet (the Sigil has its own panel above).
     QUEST_ITEMS.filter(function (qi) { return !qi.hide && qi.rewards.some(function (r) { return itemOwned(r) === false; }); }).forEach(function (qi) {
       var miss = qi.rewards.filter(function (r) { return itemOwned(r) === false; });
+      // Can this world do it now? Where it comes from and where it is used, both in the same campaign/adventure.
+      var save = current(), now = [];
+      if (save && qi.from) [['Campaign', save.campaign], ['Adventure', save.adventure]].forEach(function (b) {
+        if (!b[1]) return;
+        var src = b[1].events.filter(function (ev) { return ev.key === qi.from; })[0];
+        if (!src) return;
+        Object.keys(qi.usedAt || {}).forEach(function (k) {
+          var dst = b[1].events.filter(function (ev) { return ev.key === k; })[0];
+          var gets = (qi.usedAt[k] || []).filter(function (r) { return miss.indexOf(r) >= 0; });
+          if (dst && gets.length) now.push('<div class="where">★ In your ' + b[0] + ' now: ' + esc(src.name) + ' (' + esc(src.location) + ') drops it → give it to ' + esc(dst.name) + ' (' + esc(dst.location) + ') for ' + gets.map(function (r) { return '<b>' + esc(r.name) + '</b>'; }).join(', ') + '</div>');
+        });
+      });
       me.push('<b>' + esc(qi.name) + '</b>' + (carries(qi) ? ' (you carry one)' : itemOwned(qi) === true ? ' (you already had one — getting the rest needs another)' : '') + ': still missing ' + miss.map(function (r) { return esc(r.name) + itemWikiLink(r); }).join(', ') +
-        '<div class="cat">' + esc(qi.how) + '</div>');
+        now.join('') + '<div class="cat">' + esc(qi.how) + '</div>');
     });
     if ((x.newItems || []).length) me.push('New items you haven\'t looked at: ' + x.newItems.map(esc).join(', '));
     prof.achievements.filter(function (a) { return a.target > 1 && a.value < a.target && a.value / a.target >= 0.5; }).forEach(function (a) {
@@ -1716,6 +1732,83 @@
     return '<svg class="zfog" viewBox="0 0 ' + w + ' ' + h + '" width="' + Math.round(w * scale) + '" height="' + Math.round(h * scale) + '" shape-rendering="crispEdges" role="img" aria-label="Explored part of ' + esc(z.name) + '"><path d="' + d + '"/></svg>';
   }
 
+  // Fixed maps drawn from the game's own minimap pictures (js/maps.js, tools/minimaps.mjs): one picture per floor,
+  // the cells you walked on top (a cell is 50 world units, centred on 256), and what is lying there on its floor.
+  var MAPS = window.RWA_MAPS || {};
+  state.mapFloor = {};
+  function fixedMapOf(z, ws) {
+    var re = new RegExp('Zone_' + z.id + '_\\d+\\.([^:]+):'), found = null;
+    (ws.raw || []).forEach(function (c) { var m = re.exec(c.key); if (m && MAPS[m[1]] && !found) found = m[1]; });
+    // Not visited yet (the game saves an area's levels once you've been there): the zone's map template names it
+    // (Quest_Boss_Fatty_POI, or Quest_WardPrime_Template for Quest_WardPrime_POI).
+    if (!found && z.template) found = [z.template, z.template.replace(/_Template$/, '_POI')].filter(function (n) { return MAPS[n]; })[0] || null;
+    return found ? { level: found, map: MAPS[found] } : null;
+  }
+  // The floor a world point is on: the level's region boxes (RegionSize is half the box), else the ground floor.
+  function floorOf(map, p) {
+    var hit = map.regions.filter(function (r) {
+      var sx = r.size[0] * (r.scale[0] || 1), sy = r.size[1] * (r.scale[1] || 1), sz = r.size[2] * (r.scale[2] || 1);
+      if (Math.abs(Math.round(r.yaw / 90)) % 2) { var t = sx; sx = sy; sy = t; }
+      return Math.abs(p[0] - r.at[0]) <= sx && Math.abs(p[1] - r.at[1]) <= sy && Math.abs((p[2] || 0) - r.at[2]) <= sz;
+    })[0];
+    return hit ? hit.floor : 0;
+  }
+  function maskOf(f) {
+    if (!f._bits) { var s = atob(f.mask), b = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) b[i] = s.charCodeAt(i); f._bits = b; }
+    return f._bits;
+  }
+  // World point -> pixel in a 1024 square (all floors of a level drawn in the same frame).
+  function toPx(f, wx, wy) { var k = 1024 / f.size; return [512 + (wx - f.offset[0]) * k, 512 + (wy - f.offset[1]) * k]; }
+  function onGround(f, px, py) {
+    var k = f.side / 1024, x = px * k - f.crop[0], y = py * k - f.crop[1];
+    if (x < 0 || y < 0 || x >= f.crop[2] || y >= f.crop[3]) return false;
+    var mw = Math.ceil(f.crop[2] / 8), i = (y >> 3) * mw + (x >> 3);
+    return !!(maskOf(f)[i >> 3] & (1 << (i & 7)));
+  }
+  var FLOOR_NAME = function (n) { return n === 0 ? 'Ground floor' : n > 0 ? 'Floor ' + n : 'Floor ' + n + ' (below)'; };
+  function fixedMapSvg(z, ws, fm) {
+    var map = fm.map, floors = map.floors;
+    var cellPx = function (f, c) { return toPx(f, (c[0] - 256) * 50, (c[1] - 256) * 50); };
+    // Loot lying in this area, with its floor.
+    var lying = ws.loot.filter(function (l) { return l.zone === z.id && l.location; }).map(function (l) {
+      return { l: l, floor: floorOf(map, l.location), want: l.keyItem || (l.item && /Ring|Amulet|Weapon|Armor|Mod|Trait/.test(l.item.category) && itemOwned(l.item) === false) || l.name === 'Trait Book' };
+    });
+    // Which floor to show: the one picked, else where a key item or something you need lies, else where you walked most.
+    var walked = {}; floors.forEach(function (f) { walked[f.floor] = z.fow.filter(function (c) { var p = cellPx(f, c); return onGround(f, p[0], p[1]); }).length; });
+    var cur = state.mapFloor[z.id];
+    if (!floors.some(function (f) { return f.floor === cur; })) {
+      var wantOn = lying.filter(function (x) { return x.want; })[0];
+      cur = wantOn && floors.some(function (f) { return f.floor === wantOn.floor; }) ? wantOn.floor
+        : floors.slice().sort(function (a, b) { return walked[b.floor] - walked[a.floor] || Math.abs(a.floor) - Math.abs(b.floor); })[0].floor;
+    }
+    var f = floors.filter(function (x) { return x.floor === cur; })[0];
+    // The game's own picture of this floor, with what is lying there marked on it. Your walked cells are not drawn
+    // over it: they are shown next to it ("Your path").
+    var kk = 1024 / f.side, X0 = f.crop[0] * kk, Y0 = f.crop[1] * kk, X1 = (f.crop[0] + f.crop[2]) * kk, Y1 = (f.crop[1] + f.crop[3]) * kk;
+    lying.filter(function (x) { return x.floor === cur; }).forEach(function (x) { var p = toPx(f, x.l.location[0], x.l.location[1]); X0 = Math.min(X0, p[0]); Y0 = Math.min(Y0, p[1]); X1 = Math.max(X1, p[0]); Y1 = Math.max(Y1, p[1]); });
+    X0 -= 12; Y0 -= 12; X1 += 12; Y1 += 12;
+    // Turned 90° counter-clockwise like the rest of the map (and the game's): (x, y) -> (y - Y0, X1 - x).
+    var rot = function (p) { return [p[1] - Y0, X1 - p[0]]; };
+    var W = Y1 - Y0, H = X1 - X0;
+    var marks = lying.filter(function (x) { return x.floor === cur; }).map(function (x) {
+      var q = rot(toPx(f, x.l.location[0], x.l.location[1])), name = lootName(x.l);
+      if (x.l.keyItem) return '<g class="mk key"><circle cx="' + q[0] + '" cy="' + q[1] + '" r="9"/><text x="' + (q[0] + 12) + '" y="' + (q[1] + 4) + '">🔑 ' + esc(name) + '</text><title>' + esc(name + ' — lying here') + '</title></g>';
+      if (x.want) return '<g class="mk want"><circle cx="' + q[0] + '" cy="' + q[1] + '" r="7"/><text x="' + (q[0] + 10) + '" y="' + (q[1] + 4) + '">★ ' + esc(name) + '</text><title>' + esc(name) + '</title></g>';
+      return '<circle class="mk loot" cx="' + q[0] + '" cy="' + q[1] + '" r="3"><title>' + esc(name + (x.l.quantity > 1 ? ' ×' + x.l.quantity : '')) + '</title></circle>';
+    }).join('');
+    var others = lying.filter(function (x) { return x.floor !== cur && (x.want || x.l.keyItem); });
+    var tabs = floors.length > 1 ? '<div class="seg floors">' + floors.map(function (g) {
+      var n = lying.filter(function (x) { return x.floor === g.floor && (x.want || x.l.keyItem); }).length;
+      return '<button type="button" data-floor="' + g.floor + '" data-zone="' + z.id + '" class="' + (g.floor === cur ? 'active' : '') + '">' + esc(FLOOR_NAME(g.floor)) + (n ? ' ★' + n : '') + '</button>';
+    }).join('') + '</div>' : '';
+    var img = '<g transform="matrix(0,-1,1,0,' + (-Y0) + ',' + X1 + ')"><image href="img/maps/' + esc(f.image) + '" x="' + (f.crop[0] * kk) + '" y="' + (f.crop[1] * kk) + '" width="' + (f.crop[2] * kk) + '" height="' + (f.crop[3] * kk) + '"/></g>';
+    var scale = Math.min(1.6, 620 / Math.max(W, H));
+    return tabs + '<svg class="fmap" viewBox="0 0 ' + W + ' ' + H + '" width="' + Math.round(W * scale) + '" height="' + Math.round(H * scale) + '" role="img" aria-label="Map of ' + esc(z.name + ', ' + FLOOR_NAME(cur)) + '">' +
+      img + marks + '</svg>' +
+      '<p class="cat">The game\'s own map of ' + esc(z.name) + ' · ' + esc(FLOOR_NAME(cur)) + ' · 🔑 key item · ★ something you don\'t have' +
+      (others.length ? ' · on other floors: ' + others.map(function (x) { return esc(lootName(x.l)) + ' (' + esc(FLOOR_NAME(x.floor)) + ')'; }).join(', ') : '') + '</p>';
+  }
+
   // Everything an area holds, as a list: events, waypoints, chests and loot on the ground.
   // Fixed places the world save keeps no event for, shown where they are on the map: Founder's Hideout is
   // the start of Fairview (the tile the save tags "POI_Ford"), in the main Earth campaign.
@@ -1844,9 +1937,11 @@
       // drawn large, with what the area holds listed next to it (the save has no usable positions for them).
       var core = z.tiles.filter(function (t) { return t.kind !== 'blank' && t.kind !== 'vista'; });
       var here = '<div class="zhere"><div class="section-title">What\'s here</div>' + zoneContents(z, ws) + '</div>';
+      var fm = core.length > 2 ? null : fixedMapOf(z, ws);
       var views = (core.length > 2
         ? '<div><div class="section-title">Layout</div>' + zoneLayoutSvg(z) + '</div><div><div class="section-title">Your path</div>' + zoneFogSvg(z) + '</div>'
-        : '<div><div class="section-title">Your path <span class="cat">(fixed map: no tile layout in the save)</span></div>' + zoneFogSvg(z, 560) + '</div>');
+        : fm ? '<div><div class="section-title">Map</div>' + fixedMapSvg(z, ws, fm) + '</div><div><div class="section-title">Your path</div>' + zoneFogSvg(z) + '</div>'
+          : '<div><div class="section-title">Your path <span class="cat">(fixed map: no tile layout in the save)</span></div>' + zoneFogSvg(z, 560) + '</div>');
       return '<section class="panel zone" id="zone-' + z.id + '"><h3>' + esc(z.name) + wikiLink(z.name) + '</h3><p class="cat">' + esc(facts) + '</p>' +
         (links ? '<div class="chips">' + links + '</div>' : '') +
         '<div class="zviews">' + views + '</div>' + here +
@@ -2220,6 +2315,14 @@
     });
     // Map: Adventure / Campaign / Ward 13 switch.
     $('map-view').addEventListener('click', function (e) {
+      // A floor of a fixed map: redraw, keeping that area where it was on screen.
+      var fl = e.target.closest('[data-floor]');
+      if (fl) {
+        var id = fl.dataset.zone, before = $('zone-' + id).getBoundingClientRect().top;
+        state.mapFloor[id] = +fl.dataset.floor; renderMapTab();
+        window.scrollBy(0, $('zone-' + id).getBoundingClientRect().top - before);
+        return;
+      }
       var b = e.target.closest('[data-map-mode]'); if (!b) return;
       state.mapMode = b.dataset.mapMode; renderMapTab();
     });

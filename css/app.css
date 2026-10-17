@@ -316,6 +316,14 @@ svg.zmap { display: block; }
 .rare { color: var(--accent); }
 svg.zfog { display: block; background: var(--panel-2); border-radius: 6px; }
 .zfog path { fill: var(--accent); stroke: var(--accent); stroke-width: 1.4; stroke-linejoin: round; }
+/* Fixed maps: the game's floor plan, with what is lying there. */
+svg.fmap { display: block; max-width: 100%; height: auto; background: var(--panel-2); border-radius: 6px; }
+.fmap .mk circle, .fmap circle.mk { stroke: var(--panel); stroke-width: 2; }
+.fmap .mk.key circle { fill: var(--miss); }
+.fmap .mk.want circle { fill: var(--accent); }
+.fmap circle.mk.loot { fill: var(--muted); stroke-width: 1; }
+.fmap .mk text { font-size: 15px; font-weight: 700; fill: var(--text); paint-order: stroke; stroke: var(--panel); stroke-width: 4px; stroke-linejoin: round; }
+.seg.floors { margin-bottom: 8px; flex-wrap: wrap; }
 .spawns { margin-top: 6px; }
 
 /* Raw data */

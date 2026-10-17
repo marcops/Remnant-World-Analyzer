@@ -57,4 +57,3 @@ Not for: Remnant II (Remnant 2), which uses a different save format.
 - Item list and "How to Obtain": "Remnant: From the Ashes — Completionist's Checklist" by Amythyst34.
 - Event → item mapping and save parsing logic: RemnantSaveManager by Razzmatazzz (GPL-3.0).
 - Wiki links: Remnant: From the Ashes Wiki by Fextralife.
-- Fork of hzla/Remnant-World-Analyzer.
