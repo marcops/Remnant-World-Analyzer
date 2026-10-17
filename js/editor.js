@@ -13,12 +13,17 @@
   'use strict';
 
   // What can be edited, in the order shown. Glowing Fragments are kept per character and per account.
+  // A resource with its game path can be added to a bag that doesn't have it yet (a new character).
+  var UP = '/Game/World_Base/Items/Resources/UpgradeResources/';
   var RESOURCES = [
-    ['Resource_Scraps', 'Scrap'], ['Resource_Rare_Iron', 'Simple Iron'], ['Resource_Rare_ForgedIron', 'Forged Iron'],
-    ['Resource_Rare_GalvanizedIron', 'Galvanized Iron'], ['Resource_Rare_HardenedIron', 'Hardened Iron'],
-    ['Resource_Special_LumeniteCrystal', 'Lumenite Crystal'], ['Resource_Special_Simulacrum', 'Simulacrum'],
-    ['Resource_Special_GlowingFragment', 'Glowing Fragment'],
-    // Not in the bag yet is fine: saving adds it (its game path is known, from the game's pak index). Up to 3.
+    ['Resource_Scraps', 'Scrap'], ['Resource_Rare_Iron', 'Simple Iron', UP + 'Resource_Rare_Iron.Resource_Rare_Iron_C'],
+    ['Resource_Rare_ForgedIron', 'Forged Iron', UP + 'Resource_Rare_ForgedIron.Resource_Rare_ForgedIron_C'],
+    ['Resource_Rare_GalvanizedIron', 'Galvanized Iron', UP + 'Resource_Rare_GalvanizedIron.Resource_Rare_GalvanizedIron_C'],
+    ['Resource_Rare_HardenedIron', 'Hardened Iron', UP + 'Resource_Rare_HardenedIron.Resource_Rare_HardenedIron_C'],
+    ['Resource_Special_LumeniteCrystal', 'Lumenite Crystal', UP + 'Resource_Special_LumeniteCrystal.Resource_Special_LumeniteCrystal_C'],
+    ['Resource_Special_Simulacrum', 'Simulacrum', UP + 'Resource_Special_Simulacrum.Resource_Special_Simulacrum_C'],
+    ['Resource_Special_GlowingFragment', 'Glowing Fragment', '/Game/SurvivalMode/Items/Resources/Resource_Special_GlowingFragment.Resource_Special_GlowingFragment_C'],
+    // Up to 3.
     ['Resource_Swamp_HardenedCarapace', 'Hardened Carapace', '/Game/World_Swamp/Items/Resources/WorldResources/Resource_Swamp_HardenedCarapace.Resource_Swamp_HardenedCarapace_C', 3],
   ];
   // Limits: what the game showed fine when tried (scrap 999,999; every other resource 999); trait points up to 2,000.
@@ -69,8 +74,9 @@
       });
     });
     var t = L.traits || {};
+    // A character that never earned a trait point has none stored (default values aren't written): saving adds it.
     out.push({ key: 'TraitPoints', label: 'Trait points (earned)', value: t.TraitPoints || 0, min: t.TraitPointsSpent || 0, max: TRAIT_MAX,
-      editable: !!(t._at && t._at.TraitPoints), note: (t.TraitPointsSpent || 0) + ' spent · the rest are free to spend in the game' });
+      editable: !!t._at, note: (t.TraitPointsSpent || 0) + ' spent · the rest are free to spend in the game' });
     return out;
   }
 
@@ -78,7 +84,7 @@
   function apply(buffer, charIndex, values) {
     var src = toBytes(buffer), L = locate(src, charIndex);
     var out = new Uint8Array(src), view = new DataView(out.buffer);
-    var inserts = [], adds = [];
+    var inserts = [], adds = [], newTraitPoints = null;
     var setInt = function (pos, v) { view.setInt32(pos, v, true); };
     var check = function (key, v, min, max) {
       if (typeof v !== 'number' || !isFinite(v) || Math.floor(v) !== v || v < min || v > max) throw new Error(key + ': ' + v + ' is not a whole number between ' + min + ' and ' + max + '.');
@@ -88,7 +94,8 @@
       if (key === 'TraitPoints') {
         var t = L.traits;
         check('Trait points', v, t.TraitPointsSpent || 0, TRAIT_MAX);
-        if (!t._at.TraitPoints) throw new Error('No trait points in this character.');
+        if (!t._at) throw new Error('No traits in this character.');
+        if (!t._at.TraitPoints) { if (v > 0) newTraitPoints = v; return; }
         return setInt(t._at.TraitPoints.valuePos, v);
       }
       var r = resource(key) || [key, key], label = r[1];
@@ -105,6 +112,7 @@
     view.setUint32(4, out.length, true);
     view.setUint32(0, crc32(out, 4), true);
     adds.forEach(function (a) { out = addItem(out, charIndex, a.path, a.value); });
+    if (newTraitPoints != null) out = addTraitPoints(out, charIndex, newTraitPoints);
     // Read it back: every value must be there and nothing else may have moved.
     var got = fields(out, charIndex), want = fields(src, charIndex);
     got.forEach(function (f, i) {
@@ -194,6 +202,62 @@
     return out;
   }
   function cat(a, b) { var c = new Uint8Array(a.length + b.length); c.set(a, 0); c.set(b, a.length); return c; }
+
+  // Trait points for a character that has none stored: a TraitPoints IntProperty (17 bytes) added to the
+  // Traits component, before its None, and — when the character's name table doesn't have "TraitPoints" yet —
+  // that name added at the end of the table. Every size and offset around them grows to match; the result is
+  // read back and checked before it is returned.
+  function addTraitPoints(bytes, charIndex, value) {
+    var L = locate(bytes, charIndex), blob = L.blob, base = L.ref.blobAt, t = L.traits;
+    var view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    if (!t || !t._at || t._at.TraitPoints) throw new Error('Unexpected traits: nothing was changed.');
+    var names = blob.names, ii = names.indexOf('IntProperty'), ni = names.indexOf('TraitPoints');
+    if (ii < 0 || ii > 0x7fff) throw new Error('This character has no number property to copy: nothing was changed.');
+    // The names table: count, then FStrings; it must end the blob for a name to be added after it.
+    var namesStart = base + blob._at.namesOff, p = namesStart + 4, count = view.getUint32(namesStart, true);
+    for (var i = 0; i < count; i++) { var len = view.getInt32(p, true); p += 4 + (len < 0 ? -len * 2 : len); }
+    var blobEnd = base + L.ref.blobLength;
+    var nameBytes = new Uint8Array(0);
+    if (ni < 0) {
+      if (p !== blobEnd) throw new Error('Unexpected name table: nothing was changed.');
+      var s = 'TraitPoints';
+      nameBytes = new Uint8Array(4 + s.length + 1);
+      new DataView(nameBytes.buffer).setInt32(0, s.length + 1, true);
+      for (i = 0; i < s.length; i++) nameBytes[4 + i] = s.charCodeAt(i);
+      ni = count;
+    }
+    if (ni > 0x7fff) throw new Error('Too many names: nothing was changed.');
+    // The component's own size sits just before its first property (name + type: 4 bytes before its size field).
+    var firstProp = Math.min.apply(null, Object.keys(t._at).filter(function (x) { return x !== 'None'; }).map(function (x) { return t._at[x].sizePos - 4; }));
+    var at = t._at.None;
+    if (view.getUint32(firstProp - 4, true) !== at + 6 - firstProp || at >= base + blob._at.objOff) throw new Error('Unexpected traits layout: nothing was changed.');
+    var prop = new Uint8Array(17), pd = new DataView(prop.buffer);
+    pd.setUint16(0, ni, true); pd.setUint16(2, ii, true); pd.setUint32(4, 4, true); pd.setUint32(8, 0, true); prop[12] = 0; pd.setInt32(13, value, true);
+    var total = prop.length + nameBytes.length;
+    var out0 = new Uint8Array(bytes), v0 = new DataView(out0.buffer);
+    var add32 = function (pos, d) { v0.setUint32(pos, v0.getUint32(pos, true) + d, true); };
+    add32(firstProp - 4, prop.length);
+    add32(blob._at.objOffPos, prop.length); add32(blob._at.namesOffPos, prop.length);
+    if (nameBytes.length) v0.setUint32(namesStart, count + 1, true);
+    add32(base - 4, total); add32(L.saved.props._at.CharacterData.sizePos, total); add32(L.saved._at.sizePos, total);
+    add32(L.file._at.objOffPos, total); add32(L.file._at.namesOffPos, total);
+    var out = new Uint8Array(out0.length + total);
+    out.set(out0.subarray(0, at), 0);
+    out.set(prop, at);
+    out.set(out0.subarray(at, blobEnd), at + prop.length);
+    out.set(nameBytes, blobEnd + prop.length);
+    out.set(out0.subarray(blobEnd), blobEnd + total);
+    var ov = new DataView(out.buffer);
+    ov.setUint32(4, out.length, true);
+    ov.setUint32(0, crc32(out, 4), true);
+    // Read back: the trait points are there, the traits and the bag as they were.
+    var M = locate(out, charIndex);
+    if (M.traits.TraitPoints !== value || JSON.stringify(M.traits.Traits) !== JSON.stringify(t.Traits) ||
+        M.blob.root.comps.Inventory.Items.length !== blob.root.comps.Inventory.Items.length) {
+      throw new Error('Check failed after adding the trait points: nothing was saved.');
+    }
+    return out;
+  }
 
   // Adds a Quantity IntProperty to item data that has none, fixing every size and offset that spans it.
   function insertQuantities(bytes, L, inserts) {
